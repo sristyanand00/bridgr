@@ -5,8 +5,8 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    # Anthropic (Claude AI)
-    ANTHROPIC_API_KEY: str
+    # OpenAI (GPT)
+    OPENAI_API_KEY: str
 
     # Supabase (database + auth)
     SUPABASE_URL: str = ""

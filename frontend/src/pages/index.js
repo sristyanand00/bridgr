@@ -1,0 +1,8 @@
+export { default as Dashboard } from './Dashboard.jsx';
+export { default as Resume } from './Resume.jsx';
+export { default as Chat } from './Chat.jsx';
+export { default as Roadmap } from './Roadmap.jsx';
+export { default as Market } from './Market.jsx';
+export { default as Interview } from './Interview.jsx';
+export { default as Pricing } from './Pricing.jsx';
+export { default as Settings } from './Settings.jsx';

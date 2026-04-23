@@ -1,7 +1,7 @@
 # backend/routes/chat.py
 
 import json
-import anthropic
+import openai
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 
@@ -44,19 +44,24 @@ async def chat(request: ChatRequest):
     settings = get_settings()
 
     try:
-        client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+        client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
 
         context = request.context or {}
         system_prompt = _build_system_prompt(context)
 
         def generate():
-            with client.messages.stream(
-                model="claude-3-5-sonnet-20241022",
+            stream = client.chat.completions.create(
+                model="gpt-3.5-turbo",
                 max_tokens=500,
-                system=system_prompt,
-                messages=[{"role": "user", "content": request.message}],
-            ) as stream:
-                for text in stream.text_stream:
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": request.message}
+                ],
+                stream=True,
+            )
+            for chunk in stream:
+                if chunk.choices[0].delta.content:
+                    text = chunk.choices[0].delta.content
                     # Server-Sent Events format — frontend reads this
                     yield f"data: {json.dumps({'text': text})}\n\n"
             yield "data: [DONE]\n\n"
@@ -70,5 +75,5 @@ async def chat(request: ChatRequest):
             }
         )
 
-    except anthropic.APIError:
+    except openai.APIError:
         raise AIServiceError()

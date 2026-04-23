@@ -1,0 +1,18 @@
+{
+  "name": "bridgr",
+  "version": "1.0.0",
+  "description": "Bridgr - Career Development Platform",
+  "scripts": {
+    "dev:backend": "cd backend && uvicorn main:app --reload --host 0.0.0.0 --port 8000",
+    "dev:frontend": "cd frontend && npm start",
+    "dev:frontend:vite": "cd frontend && npm run dev",
+    "install:backend": "cd backend && pip install -r requirements.txt",
+    "install:frontend": "cd frontend && npm install",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "build:frontend": "cd frontend && npm run build",
+    "start:prod": "cd backend && uvicorn main:app --host 0.0.0.0 --port 8000"
+  },
+  "keywords": ["career", "ai", "resume", "job-search", "skill-analysis"],
+  "author": "Bridgr Team",
+  "license": "MIT"
+}

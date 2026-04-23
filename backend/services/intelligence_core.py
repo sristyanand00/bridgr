@@ -40,7 +40,7 @@ class IntelligenceCore:
         self.skill_extractor = SkillExtractor(
             skill_list=all_skills,
             semantic_threshold=config.get("SEMANTIC_THRESHOLD", 0.75),
-            anthropic_key=config.get("ANTHROPIC_API_KEY", ""),
+            openai_key=config.get("OPENAI_API_KEY", ""),
         )
         self.matching_engine = MatchingEngine(self.skill_extractor.embed_model)
         self.gap_analyzer    = GapAnalyzer(self.dataset_loader.skill_market_demand)

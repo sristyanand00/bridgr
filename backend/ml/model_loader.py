@@ -18,7 +18,7 @@ def get_core() -> IntelligenceCore:
             "ONET_ZIP_PATH":       os.getenv("ONET_ZIP_PATH", "data/raw/db_30_2_text.zip"),
             "ONET_EXTRACT_PATH":   os.getenv("ONET_EXTRACT_PATH", "data/"),
             "SEMANTIC_THRESHOLD":  float(os.getenv("SEMANTIC_THRESHOLD", "0.75")),
-            "ANTHROPIC_API_KEY":   os.getenv("ANTHROPIC_API_KEY", ""),
+            "OPENAI_API_KEY":     os.getenv("OPENAI_API_KEY", ""),
         }
         _core_instance = IntelligenceCore(config)
     return _core_instance

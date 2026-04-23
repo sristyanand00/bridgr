@@ -33,11 +33,11 @@ class SkillExtractor:
         self,
         skill_list: List[str],
         semantic_threshold: float = 0.75,
-        anthropic_key: str = "",
+        openai_key: str = "",
     ):
         self.skill_list = [s for s in skill_list if s not in STOP_SKILLS]
         self.threshold = semantic_threshold
-        self.anthropic_key = anthropic_key
+        self.openai_key = openai_key
 
         print("🔧 Loading NLP models...")
         self.nlp = spacy.load("en_core_web_sm")
@@ -91,7 +91,7 @@ class SkillExtractor:
         all_skills = t1_skills + t2_skills
 
         # Tier 3: LLM fallback — only if we found very few skills
-        if len(all_skills) < 5 and self.anthropic_key:
+        if len(all_skills) < 5 and self.openai_key:
             t3_skills = self._tier3_llm_fallback(full_text, all_skills)
             all_skills += t3_skills
             if debug:
@@ -189,15 +189,14 @@ class SkillExtractor:
         text: str,
         already_found: List[ExtractedSkill],
     ) -> List[ExtractedSkill]:
-        """Uses Claude (Anthropic) to extract skills as a last resort."""
+        """Uses OpenAI to extract skills as a last resort."""
         try:
-            import anthropic
-            client = anthropic.Anthropic(api_key=self.anthropic_key)
+            import openai
+            client = openai.OpenAI(api_key=self.openai_key)
 
             already_names = [s.name for s in already_found]
-            response = client.messages.create(
-                model="claude-3-haiku-20240307",
-                max_tokens=300,
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
                 messages=[{
                     "role": "user",
                     "content": f"""Extract professional and technical skills from this resume text.
@@ -213,7 +212,7 @@ Return ONLY the JSON array, nothing else."""
                 }]
             )
 
-            raw = response.content[0].text.strip()
+            raw = response.choices[0].message.content.strip()
             raw = re.sub(r"```json|```", "", raw).strip()
             skills_raw = json.loads(raw)
 
