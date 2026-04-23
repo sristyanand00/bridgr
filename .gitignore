@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pkl
+.env
+venv/
+.venv/
+
+# Node
+node_modules/
+dist/
+.env.local
+
+# Data (too large for git)
+data/
+*.csv
+
+# VS Code
+.vscode/
