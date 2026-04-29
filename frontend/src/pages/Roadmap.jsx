@@ -1,8 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Topbar } from '../components/layout';
 import { Button, Card, Chip, ProgressBar, Icon } from '../components/ui';
 
-const Roadmap = ({ profile }) => {
+const Roadmap = ({ profile, analysisData }) => {
+  const [currentCareer, setCurrentCareer] = useState(profile?.currentRole || "Software Engineer");
+  const [targetCareer, setTargetCareer] = useState("");
+  const [assessmentComplete, setAssessmentComplete] = useState(!!analysisData);
+  const [feasibilityScore, setFeasibilityScore] = useState(analysisData?.score || 0);
+
+  const careerOptions = [
+    "Data Scientist", "Product Manager", "UX Designer", "DevOps Engineer",
+    "Machine Learning Engineer", "Full Stack Developer", "Backend Engineer",
+    "Frontend Developer", "Mobile Developer", "Cloud Architect"
+  ];
+
   const hoursMap = { 
     "Less than 3 hours": 3, 
     "3–7 hours": 5, 
@@ -13,51 +24,150 @@ const Roadmap = ({ profile }) => {
   const baseWeeks = 14;
   const adjustedWeeks = Math.round(baseWeeks * (10 / hours));
 
-  const phases = [
-    { 
-      label: "Phase 1 — Foundation", 
-      weeks: `Weeks 1–${Math.round(adjustedWeeks * 0.28)}`, 
-      done: true, 
-      skills: ["SQL Fundamentals", "Window Functions", "Database Design"], 
-      milestone: "Mode Analytics Tutorial + 20 LeetCode SQL problems", 
-      resources: [
-        { name: "Mode Analytics", url: "mode.com", free: true }, 
-        { name: "LeetCode SQL", url: "leetcode.com", free: true }
-      ]
-    },
-    { 
-      label: "Phase 2 — Core Skills", 
-      weeks: `Weeks ${Math.round(adjustedWeeks * 0.28)}–${Math.round(adjustedWeeks * 0.6)}`, 
-      active: true, 
-      skills: ["Feature Engineering", "scikit-learn Pipelines", "Model Evaluation"], 
-      milestone: "2 end-to-end Kaggle projects with full feature pipelines", 
-      resources: [
-        { name: "Kaggle Learn", url: "kaggle.com", free: true }, 
-        { name: "Hands-On ML (Géron)", url: "oreilly.com", free: false }
-      ]
-    },
-    { 
-      label: "Phase 3 — Production", 
-      weeks: `Weeks ${Math.round(adjustedWeeks * 0.6)}–${Math.round(adjustedWeeks * 0.85)}`, 
-      skills: ["Docker Basics", "FastAPI for ML", "Model Deployment"], 
-      milestone: "Deploy a live model API to Railway or Render", 
-      resources: [
-        { name: "MLOps Zoomcamp", url: "github.com", free: true }, 
-        { name: "FastAPI docs", url: "fastapi.tiangolo.com", free: true }
-      ]
-    },
-    { 
-      label: "Phase 4 — Apply", 
-      weeks: `Weeks ${Math.round(adjustedWeeks * 0.85)}–${adjustedWeeks}`, 
-      skills: ["System Design for ML", "Behavioral Prep", "Portfolio Polish"], 
-      milestone: "5 targeted applications/week + mock interview weekly", 
-      resources: [
-        { name: "Designing ML Systems", url: "oreilly.com", free: false }
-      ]
-    },
-  ];
+  const phases = React.useMemo(() => {
+    if (analysisData && analysisData.gaps) {
+      // Create phases based on actual resume analysis gaps
+      const criticalGaps = analysisData.gaps.filter(gap => gap.p === "Critical").slice(0, 3);
+      const otherGaps = analysisData.gaps.filter(gap => gap.p !== "Critical").slice(0, 3);
+      
+      return [
+        { 
+          label: "Phase 1 — Bridge Critical Gaps", 
+          weeks: `Weeks 1–${Math.round(adjustedWeeks * 0.4)}`, 
+          active: true, 
+          skills: criticalGaps.map(gap => gap.n), 
+          milestone: `Master ${criticalGaps.length} critical skills for ${targetCareer}`, 
+          resources: criticalGaps.map(gap => ({ 
+            name: `${gap.n} Learning Path`, 
+            url: "coursera.org", 
+            free: false 
+          }))
+        },
+        { 
+          label: "Phase 2 — Strengthen Foundation", 
+          weeks: `Weeks ${Math.round(adjustedWeeks * 0.4)}–${Math.round(adjustedWeeks * 0.7)}`, 
+          skills: otherGaps.map(gap => gap.n), 
+          milestone: `Complete ${otherGaps.length} additional skill areas`, 
+          resources: otherGaps.map(gap => ({ 
+            name: `${gap.n} Tutorial`, 
+            url: "youtube.com", 
+            free: true 
+          }))
+        },
+        { 
+          label: "Phase 3 — Build Portfolio", 
+          weeks: `Weeks ${Math.round(adjustedWeeks * 0.7)}–${Math.round(adjustedWeeks * 0.9)}`, 
+          skills: ["Portfolio Projects", "Case Studies", "Technical Writing"], 
+          milestone: "Create 3 portfolio projects showcasing new skills", 
+          resources: [
+            { name: "GitHub Portfolio", url: "github.com", free: true }, 
+            { name: "Project Templates", url: "github.com", free: true }
+          ]
+        },
+        { 
+          label: "Phase 4 — Job Application", 
+          weeks: `Weeks ${Math.round(adjustedWeeks * 0.9)}–${adjustedWeeks}`, 
+          skills: ["Interview Prep", "Networking", "Resume Optimization"], 
+          milestone: "Apply to 10+ ${targetCareer} positions per week", 
+          resources: [
+            { name: "Interview Practice", url: "leetcode.com", free: true }
+          ]
+        },
+      ];
+    }
+    
+    // Fallback to generic phases if no analysis data
+    return [
+      { 
+        label: "Phase 1 — Foundation", 
+        weeks: `Weeks 1–${Math.round(adjustedWeeks * 0.28)}`, 
+        done: true, 
+        skills: ["SQL Fundamentals", "Window Functions", "Database Design"], 
+        milestone: "Mode Analytics Tutorial + 20 LeetCode SQL problems", 
+        resources: [
+          { name: "Mode Analytics", url: "mode.com", free: true }, 
+          { name: "LeetCode SQL", url: "leetcode.com", free: true }
+        ]
+      },
+      { 
+        label: "Phase 2 — Core Skills", 
+        weeks: `Weeks ${Math.round(adjustedWeeks * 0.28)}–${Math.round(adjustedWeeks * 0.6)}`, 
+        active: true, 
+        skills: ["Feature Engineering", "scikit-learn Pipelines", "Model Evaluation"], 
+        milestone: "2 end-to-end Kaggle projects with full feature pipelines", 
+        resources: [
+          { name: "Kaggle Learn", url: "kaggle.com", free: true }, 
+          { name: "Hands-On ML (Géron)", url: "oreilly.com", free: false }
+        ]
+      },
+      { 
+        label: "Phase 3 — Production", 
+        weeks: `Weeks ${Math.round(adjustedWeeks * 0.6)}–${Math.round(adjustedWeeks * 0.85)}`, 
+        skills: ["Docker Basics", "FastAPI for ML", "Model Deployment"], 
+        milestone: "Deploy a live model API to Railway or Render", 
+        resources: [
+          { name: "MLOps Zoomcamp", url: "github.com", free: true }, 
+          { name: "FastAPI docs", url: "fastapi.tiangolo.com", free: true }
+        ]
+      },
+      { 
+        label: "Phase 4 — Apply", 
+        weeks: `Weeks ${Math.round(adjustedWeeks * 0.85)}–${adjustedWeeks}`, 
+        skills: ["System Design for ML", "Behavioral Prep", "Portfolio Polish"], 
+        milestone: "5 targeted applications/week + mock interview weekly", 
+        resources: [
+          { name: "Designing ML Systems", url: "oreilly.com", free: false }
+        ]
+      },
+    ];
+  }, [analysisData, adjustedWeeks, targetCareer]);
 
-  const progressMetrics = [
+  const calculateFeasibility = () => {
+    // If we have analysis data from resume, use that score
+    if (analysisData) {
+      setFeasibilityScore(analysisData.score);
+      setAssessmentComplete(true);
+      return;
+    }
+    
+    // Otherwise, simulate feasibility calculation based on career transition
+    const careerTransitions = {
+      "Software Engineer": {
+        "Data Scientist": 75,
+        "Product Manager": 65,
+        "UX Designer": 55,
+        "DevOps Engineer": 85,
+        "Machine Learning Engineer": 70,
+        "Full Stack Developer": 90,
+        "Backend Engineer": 85,
+        "Frontend Developer": 75,
+        "Mobile Developer": 60,
+        "Cloud Architect": 70
+      }
+    };
+    
+    const baseScore = careerTransitions[currentCareer]?.[targetCareer] || 50;
+    const experienceBonus = profile?.stage === "Senior" ? 10 : profile?.stage === "Mid" ? 5 : 0;
+    const finalScore = Math.min(95, baseScore + experienceBonus);
+    
+    setFeasibilityScore(finalScore);
+    setAssessmentComplete(true);
+  };
+
+  // Initialize with analysis data if available
+  React.useEffect(() => {
+    if (analysisData && analysisData.target_role) {
+      setTargetCareer(analysisData.target_role);
+      setAssessmentComplete(true);
+      setFeasibilityScore(analysisData.score);
+    }
+  }, [analysisData]);
+
+  const progressMetrics = assessmentComplete ? [
+    { label: "Career Change Feasibility", value: feasibilityScore, bar: true },
+    { label: "Estimated Timeline", value: `${Math.round(adjustedWeeks * (100 / feasibilityScore))} weeks`, bar: false },
+    { label: "Skills to Bridge", value: `${Math.max(3, Math.round(15 - (feasibilityScore / 10)))} skills`, bar: false }
+  ] : [
     { label: "Overall Progress", value: 28, bar: true },
     { label: "Weeks Remaining", value: `${Math.round(adjustedWeeks * 0.72)} weeks`, bar: false },
     { label: "Skills Completed", value: "3 of 14", bar: false }
@@ -66,41 +176,194 @@ const Roadmap = ({ profile }) => {
   return (
     <div className="main">
       <Topbar 
-        title="Learning Roadmap" 
-        sub={`Adjusted for ${profile?.hours || "7–15 hours"}/week`}
+        title="Your Career Transition Roadmap" 
+        sub={assessmentComplete ? `Roadmap to becoming a ${targetCareer}` : "Plan your move to a new career"}
         right={
           <>
-            <Chip name="AI Generated" className="tv" style={{ fontSize:10 }} />
-            <Button size="small" style={{ marginLeft:8 }}>
-              Edit Goals
+            <Chip name="AI Powered" className="tv" style={{ fontSize:10 }} />
+            <Button size="small" style={{ marginLeft:8 }} onClick={() => setAssessmentComplete(false)}>
+              Start New Roadmap
             </Button>
           </>
         }
       />
       
       <div className="page">
-        {/* Timeline adjustment callout */}
-        <div style={{ 
-          background:"rgba(139,92,246,.07)", 
-          border:"1px solid rgba(139,92,246,.18)", 
-          borderRadius:"var(--rm)", 
-          padding:"13px 18px", 
-          marginBottom:16, 
-          display:"flex", 
-          alignItems:"center", 
-          gap:10 
-        }}>
-          <Icon name="clock" s={17} c="var(--p3)"/>
-          <div>
-            <span style={{ fontSize:13.5, color:"var(--t1)", fontWeight:600 }}>
-              Timeline: {adjustedWeeks} weeks total
-            </span>
-            <span style={{ fontSize:13, color:"var(--t3)", marginLeft:8 }}>
-              at {profile?.hours || "7–15 hours"}/week · Standard 10h/week plan is {baseWeeks} weeks
-              {hours < 10 ? ` — adjusted longer for your schedule` : hours > 10 ? ` — you'll finish faster` : ``}
-            </span>
-          </div>
-        </div>
+        {/* Career Transition Journey */}
+        {!assessmentComplete ? (
+          <Card className="gl" style={{ padding:30, marginBottom:16 }}>
+            <div style={{ 
+              fontSize:24, 
+              fontWeight:600, 
+              marginBottom:16, 
+              color:"var(--t1)",
+              fontFamily:"'Fraunces', serif",
+              textAlign: "center"
+            }}>
+              � Ready for Your Next Chapter?
+            </div>
+            
+            <div style={{ 
+              fontSize:16, 
+              color:"var(--t2)", 
+              marginBottom:32, 
+              textAlign: "center",
+              lineHeight: 1.6
+            }}>
+              Every career change begins with a single step. Let's create your personalized roadmap 
+              to transform your professional journey and unlock new opportunities.
+            </div>
+            
+            <div style={{ marginBottom:24 }}>
+              <div style={{ fontSize:14, color:"var(--t2)", marginBottom:8 }}>
+                Where are you now?
+              </div>
+              <select 
+                value={currentCareer}
+                onChange={(e) => setCurrentCareer(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid var(--gb)",
+                  borderRadius: "8px",
+                  color: "var(--t1)",
+                  fontSize: "14px"
+                }}
+              >
+                <option value="Software Engineer">Software Engineer</option>
+                <option value="Product Manager">Product Manager</option>
+                <option value="Data Scientist">Data Scientist</option>
+                <option value="UX Designer">UX Designer</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom:32 }}>
+              <div style={{ fontSize:14, color:"var(--t2)", marginBottom:8 }}>
+                Where do you want to be?
+              </div>
+              <select 
+                value={targetCareer}
+                onChange={(e) => setTargetCareer(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid var(--gb)",
+                  borderRadius: "8px",
+                  color: "var(--t1)",
+                  fontSize: "14px"
+                }}
+              >
+                <option value="">Choose your dream career</option>
+                {careerOptions.map(career => (
+                  <option key={career} value={career}>{career}</option>
+                ))}
+              </select>
+            </div>
+
+            <Button 
+              size="medium" 
+              onClick={calculateFeasibility}
+              disabled={!targetCareer}
+              style={{ 
+                background: targetCareer ? "linear-gradient(135deg, #8b5cf6, #3b82f6)" : "var(--t4)",
+                border: "none",
+                fontSize: 16,
+                padding: "16px 32px",
+                width: "100%"
+              }}
+            >
+              <Icon name="route" s={16} c="white"/>
+              Generate My Career Roadmap
+            </Button>
+          </Card>
+        ) : (
+          /* Personalized Roadmap */
+          <Card className="gl" style={{ padding:30, marginBottom:16 }}>
+            <div style={{ 
+              fontSize:24, 
+              fontWeight:600, 
+              marginBottom:20, 
+              color:"var(--t1)",
+              fontFamily:"'Fraunces', serif",
+              textAlign: "center"
+            }}>
+              🎯 Your Journey to {targetCareer}
+            </div>
+            
+            <div style={{ 
+              background: "linear-gradient(135deg, rgba(139,92,246,.1), rgba(59,130,246,.1))",
+              border: "1px solid rgba(139,92,246,.2)",
+              borderRadius: "12px",
+              padding: "20px",
+              marginBottom:24,
+              textAlign: "center"
+            }}>
+              <div style={{ 
+                fontSize:18, 
+                fontWeight:600, 
+                marginBottom:8,
+                color: "var(--t1)"
+              }}>
+                Your Career Transition is {feasibilityScore}% Achievable
+              </div>
+              <div style={{ fontSize:14, color:"var(--t2)" }}>
+                {feasibilityScore > 70 ? "🎉 You're perfectly positioned for this transition!" :
+                 feasibilityScore > 50 ? "💪 With dedication, this transition is very achievable!" :
+                 "🔥 This will be challenging, but your determination will make it possible!"}
+              </div>
+            </div>
+
+            <div style={{ 
+              fontSize:16, 
+              color:"var(--t1)", 
+              marginBottom:20,
+              fontWeight: 600
+            }}>
+              📍 Your Transition Timeline
+            </div>
+            
+            <div style={{ 
+              background: "rgba(255,255,255,0.02)",
+              border: "1px solid var(--gb)",
+              borderRadius: "8px",
+              padding: "16px",
+              marginBottom:24
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom:8 }}>
+                <span style={{ color: "var(--t2)" }}>From:</span>
+                <span style={{ color: "var(--t1)", fontWeight: 600 }}>{currentCareer}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom:8 }}>
+                <span style={{ color: "var(--t2)" }}>To:</span>
+                <span style={{ color: "var(--t1)", fontWeight: 600 }}>{targetCareer}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom:8 }}>
+                <span style={{ color: "var(--t2)" }}>Duration:</span>
+                <span style={{ color: "var(--t1)", fontWeight: 600 }}>{Math.round(adjustedWeeks * (100 / feasibilityScore))} weeks</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "var(--t2)" }}>Focus Areas:</span>
+                <span style={{ color: "var(--t1)", fontWeight: 600 }}>{Math.max(3, Math.round(15 - (feasibilityScore / 10)))} key skills</span>
+              </div>
+            </div>
+
+            <div style={{ 
+              fontSize:16, 
+              color:"var(--t1)", 
+              marginBottom:16,
+              fontWeight: 600
+            }}>
+              🗺️ Your Personalized Roadmap
+            </div>
+            
+            <div style={{ fontSize:14, color:"var(--t2)", marginBottom:16, lineHeight: 1.6 }}>
+              Based on your background and goals, I've created a step-by-step plan to guide your transition. 
+              Each phase builds upon the previous one, ensuring you develop the right skills at the right time.
+            </div>
+          </Card>
+        )}
 
         {/* Progress Metrics */}
         <div className="b3" style={{ marginBottom:16 }}>

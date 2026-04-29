@@ -1,13 +1,18 @@
 # backend/routes/chat.py
 
+import os
+import sys
 import json
 import openai
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 
-from backend.core.config import get_settings
-from backend.core.exceptions import AIServiceError
-from backend.models.analysis import ChatRequest, ChatResponse
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from core.config import get_settings
+from core.exceptions import AIServiceError
+from models.analysis import ChatRequest, ChatResponse
 
 router = APIRouter()
 

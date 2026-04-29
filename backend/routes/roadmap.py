@@ -1,13 +1,20 @@
 # backend/routes/roadmap.py
 
-import anthropic
+import os
+import sys
+import json
+import re
+import openai
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Dict
 
-from backend.core.config import get_settings
-from backend.core.exceptions import AIServiceError
-from backend.models.analysis import RoadmapResponse
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from core.config import get_settings
+from core.exceptions import AIServiceError, RoadmapError
+from models.analysis import RoadmapResponse
 
 router = APIRouter()
 
@@ -30,7 +37,7 @@ async def generate_roadmap(request: RoadmapRequest):
     settings = get_settings()
 
     try:
-        client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+        client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
 
         ri = request.roadmap_inputs
         prompt = f"""Generate a concrete 30-60-90 day learning roadmap for someone targeting {request.target_role}.
@@ -60,28 +67,28 @@ Return a JSON object with this exact structure:
     }}
   ],
   "total_weeks": 12,
-  "summary": "one paragraph summary of the full journey"
+  "summary": "one paragraph summary of full journey"
 }}
 
 Be specific. Name actual free resources (Kaggle, freeCodeCamp, fast.ai, official docs). 
 Name actual projects to build. Return ONLY valid JSON."""
 
-        response = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
             max_tokens=2000,
             messages=[{"role": "user", "content": prompt}],
         )
 
-        import json, re
-        raw = response.content[0].text.strip()
+
+        raw = response.choices[0].message.content.strip()
         raw = re.sub(r"```json|```", "", raw).strip()
         data = json.loads(raw)
 
         return RoadmapResponse(
             phases=data.get("phases", []),
             total_weeks=data.get("total_weeks", 12),
-            summary=data.get("summary", ""),
+            summary=data.get("summary", "")
         )
 
-    except anthropic.APIError:
+    except openai.APIError:
         raise AIServiceError()

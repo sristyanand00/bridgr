@@ -35,6 +35,14 @@ class AIServiceError(BridgrException):
         )
 
 
+class RoadmapError(BridgrException):
+    def __init__(self):
+        super().__init__(
+            message="Unable to generate roadmap. Please try again.",
+            status_code=503,
+        )
+
+
 async def bridgr_exception_handler(request: Request, exc: BridgrException):
     return JSONResponse(
         status_code=exc.status_code,

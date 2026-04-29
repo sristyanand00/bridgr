@@ -14,7 +14,7 @@ const QuizOption = ({ option, isSelected, onClick }) => (
   </button>
 );
 
-const Quiz = ({ onComplete }) => {
+const Quiz = ({ onComplete, onSkip }) => {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [textValue, setTextValue] = useState("");
@@ -162,18 +162,25 @@ const Quiz = ({ onComplete }) => {
 
         {/* Navigation */}
         <div style={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center", 
-          marginTop: 28 
+          display:"flex", 
+          justifyContent:"space-between", 
+          alignItems:"center", 
+          marginTop:28 
         }}>
-          {currentQuestion.optional ? (
-            <Button variant="secondary" size="small" onClick={skipQuestion}>
-              Skip for now
-            </Button>
-          ) : (
-            <div />
-          )}
+          <div style={{ display:"flex", gap:8 }}>
+            {currentQuestion.optional ? (
+              <Button variant="secondary" size="small" onClick={skipQuestion}>
+                Skip for now
+              </Button>
+            ) : (
+              <div />
+            )}
+            {questionIndex === 0 && (
+              <Button variant="secondary" size="small" onClick={onSkip}>
+                Skip quiz →
+              </Button>
+            )}
+          </div>
           <Button 
             onClick={handleNext} 
             disabled={!canProceed}

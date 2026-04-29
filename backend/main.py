@@ -1,24 +1,35 @@
 # backend/main.py
 
+import os
+import sys
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.core.config import get_settings
-from backend.core.exceptions import BridgrException, bridgr_exception_handler
-from backend.ml.model_loader import get_core
-from backend.routes import analyze, chat, roadmap, market_pulse, interview
+# Add current directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from core.config import get_settings
+from core.exceptions import BridgrException, bridgr_exception_handler
+from ml.model_loader import get_core
+from routes import analyze, chat, roadmap, market_pulse, interview
+
+# Global flag to track when ML core is ready
+_core_ready = False
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Runs at startup and shutdown."""
+    global _core_ready
     # STARTUP: load the ML engine once
     print("🌉 Starting Bridgr server...")
     get_core()   # this creates + caches the IntelligenceCore
+    _core_ready = True
     print("🌉 Bridgr is ready!")
     yield
     # SHUTDOWN: nothing to clean up
+    _core_ready = False
 
 
 settings = get_settings()
@@ -57,4 +68,4 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok", "ready": _core_ready}

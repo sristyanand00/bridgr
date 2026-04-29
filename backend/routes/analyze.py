@@ -1,13 +1,17 @@
 # backend/routes/analyze.py
 
 import os
+import sys
 import tempfile
 from fastapi import APIRouter, UploadFile, File, Form, Depends
 from fastapi.responses import JSONResponse
 
-from backend.ml.model_loader import get_core
-from backend.core.exceptions import ResumeParseFailed, JobRoleNotFound
-from backend.models.analysis import AnalysisResult
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from ml.model_loader import get_core
+from core.exceptions import ResumeParseFailed, JobRoleNotFound
+from models.analysis import AnalysisResult
 
 router = APIRouter()
 

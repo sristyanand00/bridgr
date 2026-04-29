@@ -2,22 +2,20 @@ import React from 'react';
 import { Button, Icon, Chip } from '../ui';
 import { NAVIGATION_ITEMS, BOTTOM_NAV_ITEMS } from '../../constants/navigation';
 
-const Sidebar = ({ currentPage, setCurrentPage, user }) => {
+const Sidebar = ({ currentPage, setCurrentPage, user, mobileMenuOpen, setMobileMenuOpen }) => {
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${mobileMenuOpen ? 'open' : ''}`}>
       <div style={{ padding:"4px 12px 24px", display:"flex", alignItems:"center", gap:10 }}>
-        <div style={{ 
-          width:30, 
-          height:30, 
-          borderRadius:9, 
-          background:"linear-gradient(135deg,var(--p2),var(--i))", 
-          display:"flex", 
-          alignItems:"center", 
-          justifyContent:"center", 
-          boxShadow:"0 0 20px rgba(139,92,246,.4)" 
-        }}>
-          <Icon name="brain" s={15} c="white" />
-        </div>
+        <img 
+          src="/bridgr-logo.svg" 
+          alt="Bridgr logo" 
+          style={{ 
+            width:30, 
+            height:30, 
+            objectFit:"contain",
+            borderRadius:6
+          }}
+        />
         <span style={{ 
           fontFamily:"'Fraunces',serif", 
           fontWeight:300, 

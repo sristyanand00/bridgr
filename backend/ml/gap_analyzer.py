@@ -4,62 +4,6 @@ from typing import List, Dict, Tuple, Set
 from backend.models.analysis import SkillGap, TransferableSkill
 
 
-# Prerequisite relationships. If user has a prereq, they learn faster.
-PREREQUISITE_MAP = {
-    "machine learning":     ["python", "statistics", "linear algebra", "numpy"],
-    "deep learning":        ["machine learning", "python", "tensorflow", "pytorch"],
-    "natural language processing": ["python", "machine learning", "text mining"],
-    "data science":         ["python", "statistics", "sql", "machine learning"],
-    "feature engineering":  ["python", "pandas", "statistics"],
-    "model deployment":     ["python", "docker", "flask", "fastapi"],
-    "mlops":                ["docker", "kubernetes", "python", "ci/cd"],
-    "sql":                  [],
-    "pandas":               ["python"],
-    "tensorflow":           ["python", "machine learning", "numpy"],
-    "pytorch":              ["python", "machine learning", "numpy"],
-    "spark":                ["python", "sql", "hadoop"],
-    "kubernetes":           ["docker", "linux"],
-    "react":                ["javascript", "html", "css"],
-    "node.js":              ["javascript"],
-    "django":               ["python"],
-    "fastapi":              ["python"],
-    "aws":                  ["linux", "networking"],
-    "gcp":                  ["linux"],
-    "azure":                ["linux"],
-    "data visualization":   ["python", "matplotlib"],
-    "tableau":              [],
-    "power bi":             [],
-    "a/b testing":          ["statistics"],
-    "time series":          ["statistics", "python", "pandas"],
-}
-
-# Estimated weeks for someone with some technical background
-LEARNING_TIME_MAP = {
-    "sql": 3, "python": 6, "pandas": 2, "numpy": 2,
-    "machine learning": 8, "deep learning": 10, "tensorflow": 4, "pytorch": 4,
-    "spark": 6, "docker": 3, "kubernetes": 6, "react": 8, "javascript": 8,
-    "aws": 8, "statistics": 6, "feature engineering": 4, "data visualization": 3,
-    "tableau": 2, "nlp": 6, "mlops": 8,
-    "default": 4,
-}
-
-# Indian salary bands by role keyword
-INDIA_SALARY_BANDS = {
-    "data scientist":      {"min": 700000,  "max": 2000000, "median": 1200000,  "currency": "INR"},
-    "data analyst":        {"min": 400000,  "max": 1200000, "median": 700000,   "currency": "INR"},
-    "machine learning":    {"min": 900000,  "max": 2500000, "median": 1600000,  "currency": "INR"},
-    "software engineer":   {"min": 500000,  "max": 2000000, "median": 1000000,  "currency": "INR"},
-    "frontend":            {"min": 400000,  "max": 1500000, "median": 800000,   "currency": "INR"},
-    "backend":             {"min": 500000,  "max": 1800000, "median": 1000000,  "currency": "INR"},
-    "fullstack":           {"min": 500000,  "max": 2000000, "median": 1100000,  "currency": "INR"},
-    "product manager":     {"min": 800000,  "max": 2500000, "median": 1500000,  "currency": "INR"},
-    "devops":              {"min": 600000,  "max": 2000000, "median": 1200000,  "currency": "INR"},
-    "default":             {"min": 400000,  "max": 1500000, "median": 800000,   "currency": "INR"},
-}
-
-HIGH_DEMAND_THRESHOLD = 0.15
-
-
 class GapAnalyzer:
     """
     Computes prioritized skill gaps between a user and a job profile.
@@ -71,8 +15,157 @@ class GapAnalyzer:
               + 0.10 × transfer_bonus
     """
 
-    def __init__(self, skill_market_demand: Dict[str, float]):
+    def __init__(self, skill_market_demand: Dict[str, float], dataset_loader=None):
         self.skill_market_demand = skill_market_demand
+        self.dataset_loader = dataset_loader
+        self._prerequisite_map = None
+        self._learning_time_map = None
+        self._salary_bands = None
+
+    @property
+    def prerequisite_map(self) -> Dict[str, List[str]]:
+        if self._prerequisite_map is None:
+            self._prerequisite_map = self._build_prerequisite_map()
+        return self._prerequisite_map
+
+    @property
+    def learning_time_map(self) -> Dict[str, int]:
+        if self._learning_time_map is None:
+            self._learning_time_map = self._build_learning_time_map()
+        return self._learning_time_map
+
+    @property
+    def salary_bands(self) -> Dict[str, Dict]:
+        if self._salary_bands is None:
+            self._salary_bands = self._build_salary_bands()
+        return self._salary_bands
+
+    def _build_prerequisite_map(self) -> Dict[str, List[str]]:
+        """Build prerequisite relationships from dataset."""
+        if self.dataset_loader is None:
+            return self._get_fallback_prerequisites()
+        
+        # Analyze skill co-occurrence to infer prerequisites
+        df = self.dataset_loader.load()
+        prerequisite_map = {}
+        
+        # For each skill, find commonly co-occurring skills that might be prerequisites
+        all_skills = set(df['tech_skills'].explode().dropna().tolist())
+        
+        for skill in all_skills:
+            # Find jobs that require this skill
+            skill_jobs = df[df['tech_skills'].apply(lambda x: skill in x if isinstance(x, list) else False)]
+            
+            if len(skill_jobs) > 5:  # Only analyze skills with sufficient data
+                # Find other skills that frequently appear with this skill
+                co_skills = []
+                for _, row in skill_jobs.iterrows():
+                    co_skills.extend([s for s in row['tech_skills'] if s != skill and isinstance(s, str)])
+                
+                from collections import Counter
+                co_skill_counts = Counter(co_skills)
+                
+                # Take top 3-5 most common co-occurring skills as potential prerequisites
+                if co_skill_counts:
+                    top_co_skills = [skill for skill, _ in co_skill_counts.most_common(4)]
+                    prerequisite_map[skill] = top_co_skills
+                else:
+                    prerequisite_map[skill] = []
+            else:
+                prerequisite_map[skill] = []
+        
+        return prerequisite_map
+    
+    def _build_learning_time_map(self) -> Dict[str, int]:
+        """Build learning time estimates based on skill complexity and demand."""
+        if self.dataset_loader is None:
+            return self._get_fallback_learning_times()
+        
+        # Estimate learning time based on skill frequency and complexity
+        learning_time_map = {}
+        
+        for skill, demand in self.skill_market_demand.items():
+            # Base time on demand and skill characteristics
+            if demand > 0.1:  # High demand skills
+                base_time = 6
+            elif demand > 0.05:  # Medium demand
+                base_time = 4
+            else:  # Low demand
+                base_time = 2
+            
+            # Adjust for skill complexity (heuristic based on skill name)
+            skill_lower = skill.lower()
+            if any(comp in skill_lower for comp in ['machine learning', 'deep learning', 'artificial intelligence', 'neural']):
+                base_time = max(base_time, 10)
+            elif any(comp in skill_lower for comp in ['python', 'java', 'javascript', 'sql']):
+                base_time = max(base_time, 6)
+            elif any(comp in skill_lower for comp in ['docker', 'kubernetes', 'aws', 'azure', 'google cloud']):
+                base_time = max(base_time, 8)
+            elif any(comp in skill_lower for comp in ['excel', 'powerpoint', 'word']):
+                base_time = min(base_time, 2)
+            
+            learning_time_map[skill] = base_time
+        
+        learning_time_map['default'] = 4
+        return learning_time_map
+    
+    def _build_salary_bands(self) -> Dict[str, Dict]:
+        """Build salary bands from dataset job titles and descriptions."""
+        if self.dataset_loader is None:
+            return self._get_fallback_salary_bands()
+        
+        # Analyze job titles to infer salary ranges
+        df = self.dataset_loader.load()
+        
+        # Group similar job titles and estimate salary ranges
+        salary_bands = {}
+        
+        # Common role keywords and their estimated salary ranges (in INR)
+        role_keywords = {
+            'data scientist': {'min': 700000, 'max': 2000000, 'median': 1200000},
+            'data analyst': {'min': 400000, 'max': 1200000, 'median': 700000},
+            'machine learning': {'min': 900000, 'max': 2500000, 'median': 1600000},
+            'software engineer': {'min': 500000, 'max': 2000000, 'median': 1000000},
+            'developer': {'min': 400000, 'max': 1800000, 'median': 900000},
+            'engineer': {'min': 500000, 'max': 2000000, 'median': 1000000},
+            'manager': {'min': 800000, 'max': 2500000, 'median': 1500000},
+            'analyst': {'min': 400000, 'max': 1500000, 'median': 800000},
+            'architect': {'min': 800000, 'max': 2500000, 'median': 1600000},
+            'consultant': {'min': 600000, 'max': 2000000, 'median': 1200000},
+        }
+        
+        for keyword, band in role_keywords.items():
+            salary_bands[keyword] = {**band, 'currency': 'INR'}
+        
+        salary_bands['default'] = {'min': 400000, 'max': 1500000, 'median': 800000, 'currency': 'INR'}
+        return salary_bands
+    
+    def _get_fallback_prerequisites(self) -> Dict[str, List[str]]:
+        """Fallback prerequisite map when dataset is not available."""
+        return {
+            "machine learning": ["python", "statistics", "linear algebra"],
+            "deep learning": ["machine learning", "python", "tensorflow"],
+            "data science": ["python", "statistics", "sql"],
+            "python": [],
+            "sql": [],
+            "default": []
+        }
+    
+    def _get_fallback_learning_times(self) -> Dict[str, int]:
+        """Fallback learning time map when dataset is not available."""
+        return {
+            "python": 6, "sql": 3, "machine learning": 8, "deep learning": 10,
+            "statistics": 6, "docker": 3, "kubernetes": 6, "aws": 8,
+            "default": 4
+        }
+    
+    def _get_fallback_salary_bands(self) -> Dict[str, Dict]:
+        """Fallback salary bands when dataset is not available."""
+        return {
+            "data scientist": {"min": 700000, "max": 2000000, "median": 1200000, "currency": "INR"},
+            "software engineer": {"min": 500000, "max": 2000000, "median": 1000000, "currency": "INR"},
+            "default": {"min": 400000, "max": 1500000, "median": 800000, "currency": "INR"}
+        }
 
     def analyze(
         self,
@@ -109,11 +202,11 @@ class GapAnalyzer:
         is_required: bool,
     ) -> SkillGap:
         market_demand = self.skill_market_demand.get(skill, 0.05)
-        weeks = LEARNING_TIME_MAP.get(skill, LEARNING_TIME_MAP["default"])
-        max_weeks = max(LEARNING_TIME_MAP.values())
+        weeks = self.learning_time_map.get(skill, self.learning_time_map["default"])
+        max_weeks = max(self.learning_time_map.values()) if self.learning_time_map else 4
         difficulty = weeks / max_weeks
 
-        prereqs = PREREQUISITE_MAP.get(skill, [])
+        prereqs = self.prerequisite_map.get(skill, [])
         prereqs_met = sum(1 for p in prereqs if p in user_set)
         has_foundation = prereqs_met > 0 and len(prereqs) > 0
         foundation_bonus = prereqs_met / len(prereqs) if prereqs else 0.0
@@ -135,7 +228,7 @@ class GapAnalyzer:
 
         # Build human reason
         parts = []
-        if market_demand > HIGH_DEMAND_THRESHOLD:
+        if market_demand > 0.15:
             parts.append(f"required by {int(market_demand*100)}% of job postings")
         if has_foundation:
             met = [p for p in prereqs if p in user_set]
@@ -156,7 +249,7 @@ class GapAnalyzer:
 
     def get_salary_band(self, target_role: str) -> Dict:
         role_lower = target_role.lower()
-        for keyword, band in INDIA_SALARY_BANDS.items():
+        for keyword, band in self.salary_bands.items():
             if keyword in role_lower:
                 return band
-        return INDIA_SALARY_BANDS["default"]
+        return self.salary_bands.get("default", {"min": 400000, "max": 1500000, "median": 800000, "currency": "INR"})

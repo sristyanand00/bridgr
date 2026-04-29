@@ -2,30 +2,27 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Topbar } from '../components/layout';
 import { Button, Icon, Input, Chip } from '../components/ui';
 
-const Chat = ({ profile, analysisData }) => {
+const Chat = ({ profile, analysisData, mobileMenuOpen, setMobileMenuOpen }) => {
   const city = profile?.city || "Bengaluru";
   const timeline = profile?.timeline || "3–6 months";
   const blocker = profile?.blocker || "I don't know what skills I'm missing";
   const hours = profile?.hours || "7–15 hours";
 
-  const openingMsg = `Hi! Based on your profile I know you're ${profile?.stage || "a student"} in ${city} with a ${timeline} timeline, committing ${hours}/week. Your biggest focus right now: "${blocker}". You're at 72% readiness for Data Scientist — your Python and ML foundations are strong. The #1 gap is SQL — it appears in 89% of ${city} DS postings. Want a focused plan to close that gap this month?`;
+  // Generate dynamic opening message based on real data
+  const generateOpeningMsg = () => {
+    const score = analysisData?.score || 0;
+    const topGap = analysisData?.gaps?.[0]?.n || "skill gaps";
+    const matchedSkills = analysisData?.matched?.length || 0;
+    
+    return `Hi! Based on your profile I know you're ${profile?.stage || "exploring opportunities"} in ${city} with a ${timeline} timeline, committing ${hours}/week. Your biggest focus right now: "${blocker}". You're at ${score}% readiness — your ${matchedSkills} matched skills are a strong foundation. The #1 gap is ${topGap}. Want a focused plan to close that gap this month?`;
+  };
 
-  const [messages, setMessages] = useState([{ role: "ai", text: openingMsg }]);
+  const [messages, setMessages] = useState([{ role: "ai", text: generateOpeningMsg() }]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef();
 
-  const contextualReplies = {
-    apply: timeline === "Interview in the next month"
-      ? `With your interview this month, I'd start applying immediately to 3–5 roles in parallel — don't wait until you feel "ready." Focus applications on companies in ${city} that list Python as the primary requirement, where SQL is listed as "nice to have" rather than required. Your 72% match is enough to get interviews at mid-stage startups.` 
-      : `At 72%, you're close. Give it another 4 weeks on SQL, then apply actively. Mid-stage startups in ${city} are the right target — they value raw ability over credential stacking.`,
-    learn: `Given you have ${hours}/week, here's your week: Mon/Wed/Fri — 45min SQL on Mode Analytics. Tue/Thu — 1 LeetCode SQL problem. Weekend — 1 small feature engineering project in Python. This pace closes your top gap in 3 weeks.`,
-    gap: `Your SQL gap is the one that pays back most immediately — 89% of ${city} DS postings require it. After SQL, Feature Engineering unlocks most of the remaining job postings. Your Python background means you can move through both faster than a newcomer.`,
-  };
-
-  const defaultReply = `Based on what I know about your situation — ${timeline} timeline, ${hours}/week in ${city} — here's my honest take: focus on SQL for 3 weeks, then start applying. Your transferable skills from ${profile?.currentRole || "your background"} are being undersold. Let's work on that framing next.`;
-
-  const sendMessage = (text) => {
+  const sendMessage = async (text) => {
     const messageText = text || inputValue;
     if (!messageText.trim()) return;
     
@@ -33,15 +30,87 @@ const Chat = ({ profile, analysisData }) => {
     setInputValue("");
     setIsTyping(true);
     
-    setTimeout(() => {
+    try {
+      // Call real AI API instead of using hardcoded responses
+      const response = await fetch('http://localhost:8000/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: messageText,
+          context: {
+            target_role: profile?.currentRole || "Data Scientist",
+            match_score: analysisData?.score || 0,
+            readiness_level: analysisData?.score ? (analysisData.score > 70 ? "High" : "Medium") : "Low",
+            user_strengths: analysisData?.matched || [],
+            user_gaps: analysisData?.gaps?.map(g => g.n) || [],
+            top_transferable: ["Statistical reasoning", "A/B testing", "Data interpretation"],
+            city: city,
+            timeline: timeline,
+            hours: hours,
+            blocker: blocker
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
+
+      // Handle streaming response
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let aiResponse = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = JSON.parse(line.slice(6));
+            if (data.text === '[DONE]') {
+              setIsTyping(false);
+              return;
+            }
+            aiResponse += data.text;
+            setMessages(prev => {
+              const newMessages = [...prev];
+              const lastMessage = newMessages[newMessages.length - 1];
+              if (lastMessage && lastMessage.role === 'ai' && lastMessage.typing) {
+                lastMessage.text = aiResponse;
+              } else {
+                newMessages.push({ role: "ai", text: aiResponse, typing: true });
+              }
+              return newMessages;
+            });
+          }
+        }
+      }
+      
+      // Finalize the message
+      setMessages(prev => {
+        const newMessages = [...prev];
+        const lastMessage = newMessages[newMessages.length - 1];
+        if (lastMessage && lastMessage.role === 'ai') {
+          delete lastMessage.typing;
+        }
+        return newMessages;
+      });
+      
+    } catch (error) {
+      console.error('AI Chat Error:', error);
+      // Fallback to a simple response if API fails
       setIsTyping(false);
-      const lowerText = messageText.toLowerCase();
-      const reply = lowerText.includes("apply") ? contextualReplies.apply
-        : lowerText.includes("learn") || lowerText.includes("study") ? contextualReplies.learn
-        : lowerText.includes("gap") || lowerText.includes("missing") ? contextualReplies.gap
-        : defaultReply;
-      setMessages(prev => [...prev, { role: "ai", text: reply }]);
-    }, 1900);
+      setMessages(prev => [...prev, { 
+        role: "ai", 
+        text: `I'm having trouble connecting right now. Based on your profile in ${city}, I'd recommend focusing on your top skill gap first. Would you like me to help you create a learning plan?` 
+      }]);
+    }
   };
 
   useEffect(() => {
@@ -82,6 +151,8 @@ const Chat = ({ profile, analysisData }) => {
             </span>
           </div>
         }
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
       />
       
       <div style={{ flex:1, overflowY:"auto", padding:"24px 28px" }}>

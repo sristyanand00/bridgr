@@ -1,7 +1,105 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Icon, Input } from '../ui';
+import { 
+  auth, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  GoogleAuthProvider, 
+  signInWithPopup 
+} from '../../config/firebase';
 
 const AuthModal = ({ mode = "save", onAuth, onSkip }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(mode === "required");
+  const [error, setError] = useState("");
+
+  const handleEmailAuth = async () => {
+    if (!email.trim() || !password.trim() || (isSignUp && !name.trim())) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+    
+    try {
+      let userCredential;
+      
+      if (isSignUp) {
+        userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+        // Update profile with display name
+        await userCredential.user.updateProfile({ displayName: name.trim() });
+      } else {
+        userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
+      }
+      
+      const user = userCredential.user;
+      const userData = {
+        uid: user.uid,
+        name: user.displayName || name.trim(),
+        email: user.email,
+        avatar: (user.displayName || name).charAt(0).toUpperCase(),
+        authenticated: true
+      };
+      
+      onAuth(userData);
+    } catch (error) {
+      let errorMessage = "Authentication failed";
+      
+      switch (error.code) {
+        case 'auth/user-not-found':
+          errorMessage = "No account found with this email";
+          break;
+        case 'auth/wrong-password':
+          errorMessage = "Incorrect password";
+          break;
+        case 'auth/email-already-in-use':
+          errorMessage = "Email already registered";
+          break;
+        case 'auth/weak-password':
+          errorMessage = "Password should be at least 6 characters";
+          break;
+        case 'auth/invalid-email':
+          errorMessage = "Invalid email address";
+          break;
+        default:
+          errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    setIsLoading(true);
+    setError("");
+    
+    try {
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      const user = userCredential.user;
+      
+      const userData = {
+        uid: user.uid,
+        name: user.displayName,
+        email: user.email,
+        avatar: user.displayName.charAt(0).toUpperCase(),
+        authenticated: true
+      };
+      
+      onAuth(userData);
+    } catch (error) {
+      setError("Google sign-in failed: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div style={{ 
       position: "fixed", 
@@ -111,10 +209,54 @@ const AuthModal = ({ mode = "save", onAuth, onSkip }) => {
           </>
         )}
 
-        {/* Google OAuth button */}
+        {/* Error Display */}
+        {error && (
+          <div style={{
+            background:"rgba(239,68,68,.1)",
+            border:"1px solid rgba(239,68,68,.2)",
+            borderRadius:"var(--rm)",
+            padding:12,
+            marginBottom:16,
+            fontSize:13,
+            color:"var(--error)"
+          }}>
+            {error}
+          </div>
+        )}
+
+        {/* Name Input (only for sign up) */}
+        {isSignUp && (
+          <Input 
+            placeholder="Your name" 
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            style={{ marginBottom: 10 }} 
+          />
+        )}
+        
+        {/* Email Input */}
+        <Input 
+          placeholder="Email address" 
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{ marginBottom: 10 }} 
+        />
+        
+        {/* Password Input */}
+        <Input 
+          type="password"
+          placeholder="Password" 
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={{ marginBottom: 16 }} 
+        />
+
+        {/* Google Sign-in Button */}
         <button 
           className="google-btn" 
-          onClick={() => onAuth({ name: "Ananya Sharma", email: "ananya@gmail.com", avatar: "A" })}
+          onClick={handleGoogleAuth}
+          disabled={isLoading}
+          style={{ marginBottom: 16 }}
         >
           {/* Google G logo */}
           <svg width="18" height="18" viewBox="0 0 18 18">
@@ -132,11 +274,54 @@ const AuthModal = ({ mode = "save", onAuth, onSkip }) => {
           <span style={{ fontSize: 12, color: "var(--t3)" }}>or</span>
           <div className="dv" style={{ flex: 1 }} />
         </div>
-
-        <Input placeholder="Email address" style={{ marginBottom: 10 }} />
-        <Button variant="secondary" style={{ width: "100%", justifyContent: "center" }}>
-          Continue with email
+        
+        {/* Email Auth Button */}
+        <Button 
+          onClick={handleEmailAuth}
+          disabled={isLoading || !email.trim() || !password.trim() || (isSignUp && !name.trim())}
+          style={{ 
+            width: "100%", 
+            justifyContent: "center",
+            background: isLoading ? "var(--g)" : "linear-gradient(135deg,var(--p2),var(--i))"
+          }}
+        >
+          {isLoading ? (
+            <>
+              <div style={{ 
+                width: 16, 
+                height: 16, 
+                border: "2px solid white", 
+                borderTop: "2px solid transparent", 
+                borderRadius: "50%", 
+                animation: "spin 1s linear infinite",
+                marginRight: 8
+              }} />
+              {isSignUp ? "Creating account..." : "Signing in..."}
+            </>
+          ) : (
+            isSignUp ? "Create account" : "Sign in"
+          )}
         </Button>
+
+        {/* Toggle Sign In/Sign Up */}
+        <div style={{ textAlign: "center", marginTop: 16 }}>
+          <button 
+            onClick={() => {
+              setIsSignUp(!isSignUp);
+              setError("");
+            }}
+            style={{ 
+              background: "none", 
+              border: "none", 
+              color: "var(--p3)", 
+              fontSize: 13, 
+              cursor: "pointer",
+              textDecoration: "underline"
+            }}
+          >
+            {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
+          </button>
+        </div>
 
         {mode === "save" && onSkip && (
           <button 

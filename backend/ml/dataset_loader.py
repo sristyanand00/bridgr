@@ -1,6 +1,7 @@
 # backend/ml/dataset_loader.py
 
 import zipfile
+import glob
 import pandas as pd
 from pathlib import Path
 from typing import Optional, List, Dict
@@ -35,15 +36,27 @@ class OnetDatasetLoader:
         return self._df
 
     def _extract_zip(self):
-        if not Path(self.extract_path).exists():
+        # Check if data is already extracted
+        db_folders = glob.glob(f"{self.extract_path}/db_*")
+        if db_folders:
+            print("📦 O*NET data already extracted")
+            return
+        
+        # Try to extract from ZIP if available
+        if self.zip_path and Path(self.zip_path).exists():
             print("📦 Extracting O*NET dataset...")
             with zipfile.ZipFile(self.zip_path, "r") as z:
                 z.extractall(self.extract_path)
         else:
-            print("📦 O*NET already extracted")
+            print("⚠️  No ZIP file available, expecting pre-extracted data")
 
     def _build_dataset(self) -> pd.DataFrame:
-        base = f"{self.extract_path}/db_30_2_text"
+        # Find the extracted O*NET folder dynamically
+        db_folders = glob.glob(f"{self.extract_path}/db_*")
+        if not db_folders:
+            raise FileNotFoundError(f"No O*NET database folder found in {self.extract_path}. Expected pattern: db_*")
+        base = db_folders[0]
+        print(f"📂 Using O*NET database folder: {base}")
 
         occ    = pd.read_csv(f"{base}/Occupation Data.txt",   sep="\t")
         skills = pd.read_csv(f"{base}/Skills.txt",            sep="\t")
@@ -51,8 +64,7 @@ class OnetDatasetLoader:
 
         # Filter soft skills: only importance-rated ("IM" scale) above 3/5
         soft = (
-            skills[skills["Scale ID"] == "IM"]
-            [skills["Data Value"] > 3.0]
+            skills[(skills["Scale ID"] == "IM") & (skills["Data Value"] > 3.0)]
             [["O*NET-SOC Code", "Element Name", "Data Value"]]
             .rename(columns={"Element Name": "soft_skill", "Data Value": "soft_skill_importance"})
         )

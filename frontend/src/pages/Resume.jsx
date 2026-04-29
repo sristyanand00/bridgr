@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { Topbar } from '../components/layout';
 import { Button, Card, Chip, ProgressBar, Icon, Input } from '../components/ui';
 
-const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData }) => {
+const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenuOpen, setMobileMenuOpen, setCurrentPage }) => {
   const [stage, setStage] = useState("upload");
   const [showRoleGuide, setShowRoleGuide] = useState(false);
   const [targetRole, setTargetRole] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
   const [progress, setProgress] = useState(0);
   const [step, setStep] = useState(0);
   const [showSaveGate, setShowSaveGate] = useState(false);
+  const [error, setError] = useState("");
 
   const steps = [
     "Extracting text from PDF…",
@@ -18,49 +20,69 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData }) => {
     "Generating gap analysis…"
   ];
 
-  // Simulated analysis results
-  const mockAnalysis = {
-    score: 72,
-    matched: ["Python", "Machine Learning", "Data Analysis", "Pandas", "NumPy"],
-    gaps: [
-      { n: "SQL", p: "Critical", d: 89, reason: "Appears in 89% of DS job postings in your city" },
-      { n: "Feature Engineering", p: "High", d: 76, reason: "Key differentiator for senior roles" },
-      { n: "Docker", p: "Medium", d: 45, reason: "Increasingly required for production ML" },
-      { n: "System Design", p: "Medium", d: 38, reason: "Essential for tech interviews" }
-    ],
-    salary: { min: "₹8L", median: "₹14.5L", max: "₹22L" }
+  // Remove mock analysis - use real API data only
+
+  const handleFileUpload = async () => {
+    if (!selectedFile) {
+      setError("Please select a file first");
+      return;
+    }
+    
+    if (!targetRole.trim()) {
+      setError("Please enter your target job role");
+      return;
+    }
+
+    setStage("analyzing");
+    setError("");
+    
+    try {
+      const formData = new FormData();
+      formData.append('resume', selectedFile);
+      formData.append('target_role', targetRole);
+
+      const response = await fetch('http://localhost:8000/api/analyze', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Analysis failed');
+      }
+
+      const result = await response.json();
+      setAnalysisData(result);
+      setStage("results");
+      
+      if (!profile?.authenticated) {
+        setShowSaveGate(true);
+      }
+    } catch (err) {
+      setError("Failed to analyze resume. Please try again.");
+      setStage("upload");
+    }
   };
 
-  const handleFileUpload = () => {
-    setStage("analyzing");
-    
-    // Simulate analysis progress
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            setStage("results");
-            setAnalysisData(mockAnalysis);
-            if (!profile?.authenticated) {
-              setShowSaveGate(true);
-            }
-          }, 500);
-          return 100;
-        }
-        return prev + 20;
-      });
-      
-      if (progress < 100) {
-        setStep(prev => Math.min(prev + 1, steps.length - 1));
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        setError("File too large. Maximum size is 10MB.");
+        return;
       }
-    }, 800);
+      if (!file.name.toLowerCase().endsWith('.pdf')) {
+        setError("Only PDF files are supported.");
+        return;
+      }
+      setSelectedFile(file);
+      setError("");
+    }
   };
 
   if (stage === "upload") {
     return (
       <div className="main">
-        <Topbar title="Resume Analysis" />
+        <Topbar title="Resume Analysis" mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
         <div className="page" style={{ maxWidth:580, margin:"0 auto" }}>
           <div style={{ textAlign:"center", marginBottom:36 }}>
             <h1 className="serif" style={{ fontSize:36, marginBottom:10, color:"var(--t1)" }}>
@@ -90,13 +112,74 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData }) => {
               Drop your resume here
             </h3>
             <p style={{ fontSize:13, color:"var(--t3)", marginBottom:24 }}>
-              PDF, DOC, DOCX • Max 5MB • We'll extract skills automatically
+              PDF only • Max 10MB • We'll extract skills automatically
             </p>
             
+            {/* Target Role Input */}
+            <div style={{ marginBottom:24, textAlign:"left" }}>
+              <label style={{ display:"block", fontSize:14, fontWeight:600, color:"var(--t1)", marginBottom:8 }}>
+                Target Job Role *
+              </label>
+              <Input
+                type="text"
+                placeholder="e.g. Data Scientist, Software Engineer, Product Manager"
+                value={targetRole}
+                onChange={(e) => setTargetRole(e.target.value)}
+                style={{ width:"100%" }}
+              />
+            </div>
+            
+            {/* File Selection */}
+            <div style={{ marginBottom:24 }}>
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={handleFileSelect}
+                style={{ display:"none" }}
+                id="resume-upload"
+              />
+              <label htmlFor="resume-upload" style={{ cursor:"pointer" }}>
+                <div style={{
+                  border:"2px dashed var(--gb)",
+                  borderRadius:"var(--rm)",
+                  padding:"20px",
+                  textAlign:"center",
+                  background:"rgba(139,92,246,.02)",
+                  transition:"all 0.2s"
+                }}>
+                  <Icon name="upload" s={24} c="var(--p3)" style={{ marginBottom:8 }}/>
+                  <div style={{ fontSize:14, color:"var(--t1)", marginBottom:4 }}>
+                    {selectedFile ? selectedFile.name : "Choose a PDF file"}
+                  </div>
+                  <div style={{ fontSize:12, color:"var(--t3)" }}>
+                    or drag and drop
+                  </div>
+                </div>
+              </label>
+            </div>
+            
+            {/* Error Display */}
+            {error && (
+              <div style={{
+                background:"rgba(239,68,68,.1)",
+                border:"1px solid rgba(239,68,68,.2)",
+                borderRadius:"var(--rm)",
+                padding:12,
+                marginBottom:20,
+                fontSize:13,
+                color:"var(--error)"
+              }}>
+                {error}
+              </div>
+            )}
+            
             <div style={{ display:"flex", gap:12, justifyContent:"center" }}>
-              <Button onClick={handleFileUpload}>
+              <Button 
+                onClick={handleFileUpload}
+                disabled={!selectedFile || !targetRole.trim()}
+              >
                 <Icon name="upload" s={14} c="white"/>
-                Choose File
+                Analyze Resume
               </Button>
               <Button variant="secondary">
                 Browse Templates
@@ -126,7 +209,7 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData }) => {
   if (stage === "analyzing") {
     return (
       <div className="main">
-        <Topbar title="Analyzing Resume" />
+        <Topbar title="Analyzing Resume" mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
         <div className="page" style={{ maxWidth:480, margin:"0 auto" }}>
           <div style={{ textAlign:"center", marginBottom:40 }}>
             <div style={{ 
@@ -172,7 +255,7 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData }) => {
     );
   }
 
-  const { matched, gaps, salary } = analysisData || mockAnalysis;
+  const { matched = [], gaps = [], salary = {} } = analysisData || {};
 
   return (
     <div className="main">
@@ -180,6 +263,8 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData }) => {
         title="Resume Analysis" 
         sub={`${targetRole || "Data Scientist"} • ${profile?.city || "Bengaluru"}`}
         right={<Button size="small">Export PDF</Button>}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
       />
       
       <div className="page">
@@ -193,6 +278,23 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData }) => {
           </div>
           <div style={{ fontSize:13, color:"var(--t2)", maxWidth:400, margin:"0 auto" }}>
             Your resume matches <strong>{matched.length}</strong> key skills for {targetRole || "Data Scientist"} roles in {profile?.city || "Bengaluru"}
+          </div>
+          
+          {/* Generate Roadmap Button */}
+          <div style={{ marginTop:24 }}>
+            <Button 
+              size="medium"
+              onClick={() => setCurrentPage("roadmap")}
+              style={{ 
+                background:"linear-gradient(135deg, #8b5cf6, #3b82f6)",
+                border:"none",
+                fontSize:16,
+                padding:"14px 32px"
+              }}
+            >
+              <Icon name="route" s={16} c="white"/>
+              Generate My Career Roadmap
+            </Button>
           </div>
         </Card>
 

@@ -1,10 +1,15 @@
 # backend/routes/market_pulse.py
 
+import os
+import sys
 from fastapi import APIRouter, Query
 from pydantic import BaseModel
 from typing import List
 
-from backend.ml.model_loader import get_core
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from ml.model_loader import get_core
 
 router = APIRouter()
 

@@ -56,9 +56,8 @@ class MatchingEngine:
 
         # Blend
         raw = 0.60 * semantic_sim + 0.40 * weighted_jaccard
-
-        # Scale: 0.5 raw → 65 displayed (50% skill overlap is actually decent)
-        scaled = min(100, int(raw * 100 * 1.15))
+        # Scale: raw score directly to percentage (0-100)
+        scaled = min(100, int(raw * 100))
 
         # Confidence: higher when both sides have more skills to compare
         coverage = min(len(user_set), len(job_all)) / max(len(job_all), 1)

@@ -7,6 +7,7 @@ from functools import lru_cache
 class Settings(BaseSettings):
     # OpenAI (GPT)
     OPENAI_API_KEY: str
+    OPENAI_BASE_URL: str = "https://api.openai.com/v1"
 
     # Supabase (database + auth)
     SUPABASE_URL: str = ""
@@ -25,8 +26,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     CORS_ORIGINS: list = ["http://localhost:5173", "http://localhost:3000"]
 
-    class Config:
-        env_file = ".env"
+    model_config = {"env_file": ".env"}
 
 
 @lru_cache()

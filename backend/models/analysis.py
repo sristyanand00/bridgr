@@ -6,10 +6,10 @@ from typing import List, Dict, Optional
 
 class ExtractedSkill(BaseModel):
     """One skill found in the user's resume."""
-    name: str
+    original: str          # original skill name from resume
     normalized: str        # lowercase version, used for comparisons
     confidence: float      # 0.0 to 1.0 — how sure we are
-    source: str            # "phrase_match", "semantic", or "llm_fallback"
+    source: str = "resume" # "phrase_match", "semantic", or "llm_fallback"
     context: str = ""      # the surrounding sentence it was found in
 
 
@@ -17,11 +17,13 @@ class SkillGap(BaseModel):
     """A skill the user is missing, with context about how important it is."""
     name: str
     priority: str          # "Critical", "High", "Medium", or "Low"
-    priority_score: float  # numeric 0–1 used for sorting
-    market_demand: float   # what fraction of jobs need this skill
+    priority_score: float = 0.5  # numeric 0–1 used for sorting
+    market_demand: float = 0.5   # what fraction of jobs need this skill
     reason: str            # human-readable explanation for the user
-    estimated_weeks: int   # how long to learn it
-    has_foundation: bool   # does the user have a related skill already?
+    estimated_weeks: int = 4    # how long to learn it
+    has_foundation: bool = False # does the user have a related skill already?
+    demand_percentage: int = 50  # percentage of jobs requiring this skill
+    learning_resources: List[str] = []  # resources to learn this skill
 
 
 class TransferableSkill(BaseModel):

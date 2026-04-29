@@ -1,0 +1,14 @@
+<svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ladder icon with curved top -->
+  <g fill="#7C3AED" stroke="#7C3AED" stroke-width="1.5">
+    <!-- Left side rail -->
+    <path d="M8 25 L8 8 Q8 5 10 5 Q12 5 12 8 L12 25" fill="none"/>
+    <!-- Right side rail -->
+    <path d="M18 25 L18 8 Q18 5 20 5 Q22 5 22 8 L22 25" fill="none"/>
+    <!-- Ladder rungs -->
+    <line x1="10" y1="10" x2="20" y2="10" stroke-width="1.5"/>
+    <line x1="10" y1="14" x2="20" y2="14" stroke-width="1.5"/>
+    <line x1="10" y1="18" x2="20" y2="18" stroke-width="1.5"/>
+    <line x1="10" y1="22" x2="20" y2="22" stroke-width="1.5"/>
+  </g>
+</svg>

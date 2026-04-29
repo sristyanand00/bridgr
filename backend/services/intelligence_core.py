@@ -1,5 +1,6 @@
 # backend/services/intelligence_core.py
 
+import os
 import uuid
 from datetime import datetime, timezone
 from typing import Dict
@@ -9,6 +10,7 @@ from backend.ml.resume_parser import ResumeParser
 from backend.ml.skill_extractor import SkillExtractor
 from backend.ml.similarity import MatchingEngine
 from backend.ml.gap_analyzer import GapAnalyzer, INDIA_SALARY_BANDS, HIGH_DEMAND_THRESHOLD
+from backend.ml.dynamic_job_skills import DynamicJobSkills
 from backend.models.analysis import AnalysisResult
 
 
@@ -28,10 +30,25 @@ class IntelligenceCore:
     def __init__(self, config: Dict):
         print("\n🚀 Initializing Bridgr Intelligence Core...")
 
-        self.dataset_loader = OnetDatasetLoader(
-            zip_path=config["ONET_ZIP_PATH"],
-            extract_path=config["ONET_EXTRACT_PATH"],
-        )
+        # Initialize dataset loader with extracted data path
+        extract_path = config["ONET_EXTRACT_PATH"]
+        db_folder = os.path.join(extract_path, "db_30_2_text")
+        if os.path.exists(db_folder):
+            # Data is already extracted, use it directly
+            self.dataset_loader = OnetDatasetLoader(
+                zip_path="",  # Not needed since data is extracted
+                extract_path=extract_path,
+            )
+        else:
+            # Try to extract from ZIP if available
+            zip_path = config.get("ONET_ZIP_PATH", "")
+            if os.path.exists(zip_path):
+                self.dataset_loader = OnetDatasetLoader(
+                    zip_path=zip_path,
+                    extract_path=extract_path,
+                )
+            else:
+                raise FileNotFoundError(f"O*NET data not found at {db_folder} or {zip_path}")
         df = self.dataset_loader.load()
 
         all_skills = self.dataset_loader.get_all_tech_skills()
@@ -69,10 +86,21 @@ class IntelligenceCore:
         print(f"📋 Loading job profile: {target_role}")
         job_profile = self.dataset_loader.get_job_profile(target_role)
         if job_profile is None:
-            raise ValueError(
-                f"'{target_role}' not found in O*NET. "
-                f"Try 'Data Scientists', 'Software Developers', 'Business Analysts'."
-            )
+            print(f"⚠️  Using dynamic job skills system for {target_role}")
+            skills_data = self.dynamic_skills.load_job_skills(target_role)
+            if skills_data:
+                job_profile = {
+                    "job_title": target_role,
+                    "job_description": skills_data.get("description", f"Requirements for {target_role} role"),
+                    "tech_skills": skills_data.get("tech_skills", []),
+                    "soft_skills": skills_data.get("soft_skills", []),
+                    "all_skills": skills_data.get("tech_skills", []) + skills_data.get("soft_skills", [])
+                }
+            else:
+                raise ValueError(
+                    f"No skills data available for '{target_role}'. "
+                    f"Add custom skills data or ensure O*NET dataset is available."
+                )
 
         job_tech = job_profile["tech_skills"]
         job_soft = job_profile["soft_skills"]

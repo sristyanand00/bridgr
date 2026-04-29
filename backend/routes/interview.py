@@ -1,12 +1,19 @@
 # backend/routes/interview.py
 
-import anthropic
+import os
+import sys
+import json
+import re
+import openai
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List
 
-from backend.core.config import get_settings
-from backend.core.exceptions import AIServiceError
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from core.config import get_settings
+from core.exceptions import AIServiceError
 
 router = APIRouter()
 
@@ -31,7 +38,7 @@ async def start_interview(request: InterviewStartRequest):
     settings = get_settings()
 
     try:
-        client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+        client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
 
         prompt = f"""Generate 5 interview questions for a {request.target_role} role.
 
@@ -53,16 +60,15 @@ Return JSON:
 
 Return ONLY valid JSON."""
 
-        import json, re
-        response = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
             max_tokens=1000,
             messages=[{"role": "user", "content": prompt}]
         )
-        raw = re.sub(r"```json|```", "", response.content[0].text).strip()
+        raw = re.sub(r"```json|```", "", response.choices[0].message.content).strip()
         return json.loads(raw)
 
-    except anthropic.APIError:
+    except openai.APIError:
         raise AIServiceError()
 
 
@@ -72,7 +78,7 @@ async def evaluate_answer(request: InterviewAnswerRequest):
     settings = get_settings()
 
     try:
-        client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+        client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
 
         prompt = f"""Evaluate this interview answer for a {request.target_role} role.
 
@@ -93,14 +99,13 @@ Return JSON:
 
 Return ONLY valid JSON."""
 
-        import json, re
-        response = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
             max_tokens=600,
             messages=[{"role": "user", "content": prompt}]
         )
-        raw = re.sub(r"```json|```", "", response.content[0].text).strip()
+        raw = re.sub(r"```json|```", "", response.choices[0].message.content).strip()
         return json.loads(raw)
 
-    except anthropic.APIError:
+    except openai.APIError:
         raise AIServiceError()
