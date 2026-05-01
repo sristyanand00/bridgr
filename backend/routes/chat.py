@@ -3,9 +3,10 @@
 import os
 import sys
 import json
-import openai
+import google.generativeai as genai
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
+from dotenv import load_dotenv
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -13,6 +14,13 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from core.config import get_settings
 from core.exceptions import AIServiceError
 from models.analysis import ChatRequest, ChatResponse
+
+load_dotenv()
+
+# Configure Gemini
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
 router = APIRouter()
 
@@ -43,30 +51,24 @@ COACHING STYLE:
 @router.post("/chat")
 async def chat(request: ChatRequest):
     """
-    Stream a Claude response to the user's coaching question.
+    Stream a Gemini response to the user's coaching question.
     Uses their analysis context to give personalized advice.
     """
-    settings = get_settings()
+    if not GEMINI_API_KEY:
+        raise AIServiceError("Gemini API key not configured")
 
     try:
-        client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+        model = genai.GenerativeModel("gemini-flash-latest")
 
         context = request.context or {}
         system_prompt = _build_system_prompt(context)
+        full_prompt = f"{system_prompt}\n\nUser: {request.message}\n\nCoach:"
 
         def generate():
-            stream = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                max_tokens=500,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": request.message}
-                ],
-                stream=True,
-            )
-            for chunk in stream:
-                if chunk.choices[0].delta.content:
-                    text = chunk.choices[0].delta.content
+            response = model.generate_content(full_prompt, stream=True)
+            for chunk in response:
+                if chunk.text:
+                    text = chunk.text
                     # Server-Sent Events format — frontend reads this
                     yield f"data: {json.dumps({'text': text})}\n\n"
             yield "data: [DONE]\n\n"
@@ -80,5 +82,6 @@ async def chat(request: ChatRequest):
             }
         )
 
-    except openai.APIError:
-        raise AIServiceError()
+    except Exception as e:
+        print(f"❌ Gemini chat failed: {e}")
+        raise AIServiceError("Chat service unavailable")

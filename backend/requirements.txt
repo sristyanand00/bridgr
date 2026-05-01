@@ -1,13 +1,18 @@
-fastapi==0.111.0
-uvicorn[standard]==0.29.0
-python-multipart==0.0.9
-pdfplumber==0.11.0
-spacy==3.7.4
+fastapi==0.100.1
+uvicorn[standard]==0.23.2
+python-multipart==0.0.6
+pdfplumber==0.10.3
+spacy==3.7.2
 sentence-transformers==2.7.0
 scikit-learn==1.4.2
 pandas==2.2.2
 numpy==1.26.4
 python-dotenv==1.0.1
-openai==1.12.0
 supabase==2.4.3
 pydantic-settings==2.2.1
+
+# LLM: Gemini Flash only (FREE)
+google-generativeai==0.3.0
+
+# Additional dependencies for ML models
+rapidfuzz==3.5.2

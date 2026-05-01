@@ -22,10 +22,10 @@ _core_ready = False
 async def lifespan(app: FastAPI):
     """Runs at startup and shutdown."""
     global _core_ready
-    # STARTUP: load the ML engine once
+    # STARTUP: server starts without loading ML models
     print("🌉 Starting Bridgr server...")
-    get_core()   # this creates + caches the IntelligenceCore
-    _core_ready = True
+    print("🚀 ML models will be loaded on-demand (lazy loading)")
+    _core_ready = True  # Server is ready, ML loads when needed
     print("🌉 Bridgr is ready!")
     yield
     # SHUTDOWN: nothing to clean up
@@ -69,3 +69,14 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "ok", "ready": _core_ready}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+        log_level="info"
+    )

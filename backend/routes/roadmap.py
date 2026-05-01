@@ -4,17 +4,24 @@ import os
 import sys
 import json
 import re
-import openai
+import google.generativeai as genai
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Dict
+from dotenv import load_dotenv
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.config import get_settings
 from core.exceptions import AIServiceError, RoadmapError
 from models.analysis import RoadmapResponse
+
+load_dotenv()
+
+# Configure Gemini
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
 router = APIRouter()
 
@@ -34,10 +41,11 @@ async def generate_roadmap(request: RoadmapRequest):
     Generate a detailed 30/60/90-day learning roadmap
     using the structured gap analysis as context.
     """
-    settings = get_settings()
+    if not GEMINI_API_KEY:
+        raise AIServiceError("Gemini API key not configured")
 
     try:
-        client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+        model = genai.GenerativeModel("gemini-flash-latest")
 
         ri = request.roadmap_inputs
         prompt = f"""Generate a concrete 30-60-90 day learning roadmap for someone targeting {request.target_role}.
@@ -73,14 +81,8 @@ Return a JSON object with this exact structure:
 Be specific. Name actual free resources (Kaggle, freeCodeCamp, fast.ai, official docs). 
 Name actual projects to build. Return ONLY valid JSON."""
 
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            max_tokens=2000,
-            messages=[{"role": "user", "content": prompt}],
-        )
-
-
-        raw = response.choices[0].message.content.strip()
+        response = model.generate_content(prompt)
+        raw = response.text.strip()
         raw = re.sub(r"```json|```", "", raw).strip()
         data = json.loads(raw)
 
@@ -90,5 +92,6 @@ Name actual projects to build. Return ONLY valid JSON."""
             summary=data.get("summary", "")
         )
 
-    except openai.APIError:
-        raise AIServiceError()
+    except Exception as e:
+        print(f"❌ Gemini roadmap generation failed: {e}")
+        raise AIServiceError(f"Roadmap generation failed: {str(e)}")

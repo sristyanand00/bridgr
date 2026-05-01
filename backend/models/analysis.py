@@ -70,6 +70,9 @@ class AnalysisResult(BaseModel):
     # Salary shown on dashboard
     salary_band_estimate: Dict
 
+    # Gemini feasibility analysis
+    feasibility: Optional[Dict] = None
+
     # Plain-English explanations shown to the user
     explanations: List[str]
 

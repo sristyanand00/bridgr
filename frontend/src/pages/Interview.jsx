@@ -74,10 +74,10 @@ const Interview = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          target_role: "Data Scientist",
+          target_role: "Data Scientists",
           weak_areas: ["Docker", "SQL Window Functions"],
           strong_areas: ["Python", "Statistics"],
-          difficulty: "Medium"
+          difficulty: "Intermediate"
         })
       });
       
@@ -123,16 +123,28 @@ const Interview = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          question: questions[0]?.question || "Sample question",
+          question: questions[questionIndex]?.question || "Sample question",
           answer: answer,
-          target_role: "Data Scientist",
-          skill_being_tested: questions[0]?.type || "General"
+          target_role: "Data Scientists",
+          skill_being_tested: questions[questionIndex]?.skill || questions[questionIndex]?.type || "General"
         })
       });
       
       const feedbackData = await response.json();
-      // Store feedback for results display
-      setFeedback(feedbackData.feedback || fallbackFeedback);
+      // Convert backend response to frontend format
+      const formattedFeedback = feedbackData.score ? [{
+        area: "Technical Accuracy",
+        score: feedbackData.score * 10, // Convert to 100 scale
+        comment: feedbackData.verdict + ". " + (feedbackData.what_worked?.join(", ") || "Good attempt") + ". " + (feedbackData.what_to_improve?.join(", ") || "Keep practicing") + ".",
+        weakness: feedbackData.what_to_improve?.[0] || null,
+        resource: feedbackData.what_to_improve?.[0] ? {
+          name: `Practice ${feedbackData.what_to_improve[0]}`,
+          url: "leetcode.com",
+          tag: "Practice"
+        } : null
+      }] : fallbackFeedback;
+      
+      setFeedback(formattedFeedback);
       setStage("results");
       stop();
     } catch (error) {
@@ -278,7 +290,7 @@ const Interview = () => {
             <span style={{ fontSize:13, color:"var(--t3)" }}>
               Q{questionIndex + 1}/{questions.length}
             </span>
-            <Chip name={currentQuestion.type} level="v"/>
+            <Chip name={currentQuestion.skill || currentQuestion.type} level="v"/>
             <Chip 
               name={currentQuestion.difficulty} 
               level={currentQuestion.difficulty === "Hard" ? "bad" : "learn"}

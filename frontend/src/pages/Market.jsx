@@ -29,7 +29,7 @@ const Market = ({ profile, analysisData }) => {
     const fetchMarketData = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/market-pulse?role=${encodeURIComponent(profile?.currentRole || "Data Scientist")}` 
+          `${process.env.REACT_APP_API_URL}/api/market-pulse?role=${encodeURIComponent(profile?.currentRole || "Data Scientists")}` 
         );
         
         const data = await response.json();

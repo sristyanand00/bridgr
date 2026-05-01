@@ -4,16 +4,24 @@ import os
 import sys
 import json
 import re
-import openai
+import google.generativeai as genai
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List
+from dotenv import load_dotenv
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.config import get_settings
 from core.exceptions import AIServiceError
+
+load_dotenv()
+
+# Configure Gemini
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
 router = APIRouter()
 
@@ -35,10 +43,11 @@ class InterviewAnswerRequest(BaseModel):
 @router.post("/interview/start")
 async def start_interview(request: InterviewStartRequest):
     """Generate a set of interview questions tailored to the user's gaps."""
-    settings = get_settings()
+    if not GEMINI_API_KEY:
+        raise AIServiceError("Gemini API key not configured")
 
     try:
-        client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+        model = genai.GenerativeModel("gemini-flash-latest")
 
         prompt = f"""Generate 5 interview questions for a {request.target_role} role.
 
@@ -60,25 +69,23 @@ Return JSON:
 
 Return ONLY valid JSON."""
 
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            max_tokens=1000,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        raw = re.sub(r"```json|```", "", response.choices[0].message.content).strip()
+        response = model.generate_content(prompt)
+        raw = re.sub(r"```json|```", "", response.text).strip()
         return json.loads(raw)
 
-    except openai.APIError:
-        raise AIServiceError()
+    except Exception as e:
+        print(f"❌ Gemini interview start failed: {e}")
+        raise AIServiceError("Interview service unavailable")
 
 
 @router.post("/interview/evaluate")
 async def evaluate_answer(request: InterviewAnswerRequest):
     """Evaluate a user's interview answer and give feedback."""
-    settings = get_settings()
+    if not GEMINI_API_KEY:
+        raise AIServiceError("Gemini API key not configured")
 
     try:
-        client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+        model = genai.GenerativeModel("gemini-flash-latest")
 
         prompt = f"""Evaluate this interview answer for a {request.target_role} role.
 
@@ -99,13 +106,10 @@ Return JSON:
 
 Return ONLY valid JSON."""
 
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            max_tokens=600,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        raw = re.sub(r"```json|```", "", response.choices[0].message.content).strip()
+        response = model.generate_content(prompt)
+        raw = re.sub(r"```json|```", "", response.text).strip()
         return json.loads(raw)
 
-    except openai.APIError:
-        raise AIServiceError()
+    except Exception as e:
+        print(f"❌ Gemini interview evaluation failed: {e}")
+        raise AIServiceError("Interview service unavailable")

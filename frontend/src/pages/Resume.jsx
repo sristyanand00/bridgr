@@ -262,7 +262,8 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenu
   extracted_skills = [],
   match_score = 0,
   readiness_level = "Unknown",
-  transferable_skills = []
+  transferable_skills = [],
+  feasibility = {}
 } = analysisData || {};
 
   return (
@@ -282,10 +283,15 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenu
             Resume Match Score
           </div>
           <div className="serif" style={{ fontSize:64, color:"var(--t1)", marginBottom:12 }}>
-            {analysisData?.score || 72}%
+            {analysisData?.match_score || 72}%
           </div>
           <div style={{ fontSize:13, color:"var(--t2)", maxWidth:400, margin:"0 auto" }}>
             Your resume matches <strong>{matched_skills.length}</strong> key skills for {targetRole || "Data Scientist"} roles in {profile?.city || "Bengaluru"}
+            {feasibility && feasibility.score && (
+              <div style={{ marginTop: 8, fontSize: 12, color: "var(--t3)" }}>
+                AI feasibility score: {feasibility.score}% - {feasibility.reason || "Assessed by AI"}
+              </div>
+            )}
           </div>
           
           {/* Generate Roadmap Button */}
@@ -352,7 +358,7 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenu
               <Chip name={`${missing_required.length} gaps`} level="bad"/>
             </div>
             {missing_required.map(gap => (
-              <div key={gap.name} style={{ 
+              <div key={gap.name || gap.skill_name} style={{ 
                 marginBottom:10, 
                 padding:"10px 14px", 
                 background:"rgba(255,255,255,.03)", 
@@ -361,19 +367,19 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenu
               }}>
                 <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:4 }}>
                   <span style={{ fontSize:13, fontWeight:500, color:"var(--t1)" }}>
-                    {gap.name}
+                    {gap.name || gap.skill_name}
                   </span>
                   <Chip 
-                    name={gap.priority} 
+                    name={gap.priority || "High"} 
                     level={gap.priority === "Critical" ? "bad" : "learn"} 
                     style={{ fontSize:10, padding:"2px 6px" }} 
                   />
                 </div>
                 <div style={{ fontSize:11.5, color:"var(--t3)", marginBottom:6 }}>
-                  {gap.reason}
+                  {gap.reason || "Important for target role"}
                 </div>
                 <ProgressBar 
-                  v={gap.demand_percentage || gap.priority_score * 100} 
+                  v={gap.demand_percentage || gap.priority_score ? gap.priority_score * 100 : 75} 
                   color={gap.priority === "Critical" ? "#f43f5e" : "#f59e0b"}
                 />
               </div>
@@ -402,7 +408,7 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenu
             </div>
           </div>
           <div style={{ display:"flex", gap:24, textAlign:"center" }}>
-            {[["Min", salary_band_estimate.min],["Median", salary_band_estimate.median],["Max", salary_band_estimate.max]].map(([label, value]) => (
+            {["Min", salary_band_estimate?.min || "₹8L", "Median", salary_band_estimate?.median || "₹14L", "Max", salary_band_estimate?.max || "₹22L"].map(([label, value]) => (
               <div key={label}>
                 <div style={{ fontSize:11, color:"var(--t3)" }}>{label}</div>
                 <div style={{ fontFamily:"'Fraunces',serif", fontSize:20, color:"var(--t1)" }}>

@@ -4,6 +4,13 @@
 # Run cells top-to-bottom in Google Colab.
 # ============================================================
 
+from __future__ import annotations
+
+# Fix 1: Force disable broken HuggingFace behavior
+import os
+os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
+os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
+
 
 # ─────────────────────────────────────────────────────────────
 # CELL 1 — Install dependencies  ← RUN THIS FIRST
@@ -19,11 +26,10 @@
 
 
 # ─────────────────────────────────────────────────────────────
-# CELL 2 — Pydantic models
+# CELL 2 — Imports  ← NO CHANGES NEEDED
 # ─────────────────────────────────────────────────────────────
 # FIXED: removed unused model_validator import.
 
-from __future__ import annotations
 from pydantic import BaseModel, field_validator
 from typing import List, Dict, Optional, Any, Tuple
 
@@ -384,7 +390,18 @@ class SkillExtractor:
         if verbose:
             print("🔧 Loading NLP models...")
         self.nlp         = spacy.load("en_core_web_sm")
-        self.embed_model = SentenceTransformer("all-MiniLM-L6-v2")
+        
+        # Fix 2: Use safer model loading method
+        # Fix 3: HARD PROTECT fallback (CRITICAL)
+        try:
+            self.embed_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+            if verbose:
+                print("✅ Embedding model loaded successfully")
+        except Exception as e:
+            print("⚠️ Embedding model failed:", e)
+            self.embed_model = None
+            if verbose:
+                print("⚠️ Using basic mode without embeddings")
 
         self._matcher = PhraseMatcher(self.nlp.vocab, attr="LOWER")
         patterns = list(self.nlp.pipe(self.skill_list))
@@ -392,10 +409,16 @@ class SkillExtractor:
 
         if verbose:
             print(f"⚡ Encoding {len(self.skill_list)} skills...")
-        self._skill_embeddings = self.embed_model.encode(
-            self.skill_list, batch_size=64,
-            normalize_embeddings=True, show_progress_bar=verbose,
-        )
+        
+        if self.embed_model is not None:
+            self._skill_embeddings = self.embed_model.encode(
+                self.skill_list, batch_size=64,
+                normalize_embeddings=True, show_progress_bar=verbose,
+            )
+        else:
+            self._skill_embeddings = None
+            if verbose:
+                print("⚠️ Skipping skill encoding (no embedding model)")
         if verbose:
             print("✅ Skill extractor ready")
 
@@ -1422,11 +1445,11 @@ def get_core(force_reload: bool = False) -> Union[IntelligenceCore, FallbackInte
     global _core_instance
     if _core_instance is None or force_reload:
         config = {
-            "ONET_EXTRACT_PATH":  _os2.getenv("ONET_EXTRACT_PATH",  "/content/data"),
+            "ONET_EXTRACT_PATH":  _os2.getenv("ONET_EXTRACT_PATH",  "data/"),
             "ONET_ZIP_PATH":      _os2.getenv("ONET_ZIP_PATH",       ""),
             "SEMANTIC_THRESHOLD": float(_os2.getenv("SEMANTIC_THRESHOLD", "0.75")),
             "OPENAI_API_KEY":     _os2.getenv("OPENAI_API_KEY",      ""),
-            "DATA_DIR":           _os2.getenv("DATA_DIR",            "/content/data"),
+            "DATA_DIR":           _os2.getenv("DATA_DIR",            "data/"),
         }
         try:
             _core_instance = IntelligenceCore(config)
@@ -1530,8 +1553,8 @@ def smoke_test_no_pdf():
 
 import os as _os3
 
-_os3.environ["ONET_EXTRACT_PATH"] = "/content/data"           # ← change if needed
-_os3.environ["ONET_ZIP_PATH"]     = "/content/db_30_2_text.zip"  # ← or "" if already extracted
+_os3.environ["ONET_EXTRACT_PATH"] = "data/"           # ← change if needed
+_os3.environ["ONET_ZIP_PATH"]     = ""  # ← or "" if already extracted
 
 print(f"ONET_EXTRACT_PATH : {_os3.environ['ONET_EXTRACT_PATH']}")
 print(f"ONET_ZIP_PATH     : {_os3.environ['ONET_ZIP_PATH']}")

@@ -44,7 +44,7 @@ const Chat = ({ profile, analysisData, mobileMenuOpen, setMobileMenuOpen }) => {
             match_score: analysisData?.match_score || 0,
             readiness_level: analysisData?.readiness_level || "Unknown",
             user_strengths: analysisData?.matched_skills || [],
-            user_gaps: analysisData?.missing_required?.map(g => g.name) || [],
+            user_gaps: analysisData?.missing_required?.map(g => g.name || g.skill_name) || [],
             top_transferable: analysisData?.transferable_skills?.slice(0, 3)?.map(t => ({
               from: t.user_skill,
               to: t.maps_to_job_skill

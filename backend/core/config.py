@@ -5,9 +5,8 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    # OpenAI (GPT)
-    OPENAI_API_KEY: str
-    OPENAI_BASE_URL: str = "https://api.openai.com/v1"
+    # Gemini API
+    GEMINI_API_KEY: str = ""
 
     # Supabase (database + auth)
     SUPABASE_URL: str = ""
@@ -26,7 +25,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     CORS_ORIGINS: list = ["http://localhost:5173", "http://localhost:3000"]
 
-    model_config = {"env_file": ".env"}
+    model_config = {"env_file": ".env", "extra": "ignore"}
 
 
 @lru_cache()

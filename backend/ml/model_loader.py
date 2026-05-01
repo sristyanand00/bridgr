@@ -1,5 +1,4 @@
 # backend/ml/model_loader.py
-# Integrated with Colab-trained models from bridgr_final.py
 
 import os
 import sys
@@ -17,10 +16,11 @@ from models.bridgr_final import (
     reset_core
 )
 
+# Import LLM service
+from services.llm_service import llm_service
+
 load_dotenv()
 
-# This is created ONCE when the module is imported.
-# FastAPI imports this at startup and reuses the instance.
 _core_instance: Union[IntelligenceCore, FallbackIntelligenceCore, None] = None
 
 
@@ -31,7 +31,6 @@ def get_core() -> Union[IntelligenceCore, FallbackIntelligenceCore]:
     """
     global _core_instance
     if _core_instance is None:
-        # Update config paths for local environment
         config = {
             "ONET_EXTRACT_PATH": os.getenv("ONET_EXTRACT_PATH", "data/"),
             "ONET_ZIP_PATH": os.getenv("ONET_ZIP_PATH", ""),
@@ -48,14 +47,12 @@ def get_core() -> Union[IntelligenceCore, FallbackIntelligenceCore]:
         os.environ["DATA_DIR"] = config["DATA_DIR"]
         
         try:
-            # Use your Colab IntelligenceCore
-            print("🚀 Initializing Colab-trained IntelligenceCore...")
+            print(" Initializing Colab-trained IntelligenceCore...")
             _core_instance = get_colab_core()
-            print("✅ Using full IntelligenceCore with O*NET data")
+            print(" Using full IntelligenceCore with O*NET data")
         except Exception as e:
             print(f"⚠️  Failed to load full IntelligenceCore: {e}")
             print("🔄 Falling back to FallbackIntelligenceCore")
-            # Use your Colab FallbackIntelligenceCore
             _core_instance = FallbackIntelligenceCore(config)
     
     return _core_instance
@@ -64,12 +61,29 @@ def get_core() -> Union[IntelligenceCore, FallbackIntelligenceCore]:
 def analyze_resume(resume_path: str, target_role: str) -> Dict[str, Any]:
     """
     Analyze resume using your Colab-trained models.
+    Falls back to Gemini Flash for unknown roles (FREE).
     """
     core = get_core()
     
     try:
         result = core.analyze(resume_path, target_role)
-        return result.model_dump()  # Convert Pydantic to dict for JSON response
+        
+        # If analysis returned empty tech_skills (unknown role), try Gemini
+        if not result.get("tech_skills") or len(result.get("tech_skills", [])) == 0:
+            print(f"⚠️  Role '{target_role}' not in O*NET — fetching from Gemini Flash...")
+            
+            # Fetch from Gemini (FREE, 1500 calls/day)
+            gemini_profile = llm_service.fetch_job_profile_from_gemini(target_role)
+            
+            if gemini_profile:
+                # Inject Gemini skills into result
+                result.tech_skills = gemini_profile.get("tech_skills", [])
+                result.soft_skills = gemini_profile.get("soft_skills", [])
+                result.job_description = gemini_profile.get("job_description", "")
+                print(f"✅ Injected Gemini profile for '{target_role}'")
+        
+        return result.model_dump() if hasattr(result, 'model_dump') else result
+    
     except Exception as e:
         print(f"⚠️  Analysis failed: {e}")
         return {

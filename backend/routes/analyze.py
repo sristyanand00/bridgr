@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # from ml.model_loader import get_core  # Replaced with Colab models
 from core.exceptions import ResumeParseFailed, JobRoleNotFound
 from models.analysis import AnalysisResult
+from services.llm_service import llm_service
 
 router = APIRouter()
 
@@ -26,7 +27,7 @@ async def analyze_resume(
 ):
     """
     Upload a resume PDF and target role.
-    Returns full career gap analysis.
+    Returns full career gap analysis with Gemini-powered feasibility score.
     """
     # Validate file type
     if not resume.filename.endswith(".pdf"):
@@ -48,6 +49,19 @@ async def analyze_resume(
 
         from ml.model_loader import analyze_resume
         result_dict = analyze_resume(tmp_path, target_role)
+        
+        # NEW: Add Gemini feasibility score
+        feasibility = llm_service.generate_feasibility_score_with_gemini(
+            target_role=target_role,
+            match_score=result_dict.get("match_score", 0),
+            user_skills=result_dict.get("matched_skills", []),
+            missing_required=result_dict.get("missing_required", []),
+            current_role=result_dict.get("extracted_skills", [{}])[0].get("original", "Not specified") if result_dict.get("extracted_skills") else "Not specified"
+        )
+        
+        # Add feasibility to result
+        result_dict["feasibility"] = feasibility
+        
         # Convert dict back to AnalysisResult for FastAPI response
         return AnalysisResult(**result_dict)
 

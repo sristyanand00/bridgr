@@ -8,7 +8,7 @@ import sys
 # Add current directory to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from services.fallback_intelligence_core import FallbackIntelligenceCore
+from models.bridgr_final import FallbackIntelligenceCore
 
 def test_ml_analysis():
     """Test the ML analysis pipeline"""
