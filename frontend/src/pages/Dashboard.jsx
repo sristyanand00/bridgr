@@ -231,7 +231,7 @@ const Dashboard = ({ setCurrentPage, profile, analysisData, mobileMenuOpen, setM
                   fontWeight:300, 
                   color:"var(--t1)" 
                 }}>
-                  {analysisData?.score || "--"}
+                  {analysisData?.match_score || "--"}
                 </div>
                 <div style={{ fontSize:12, color:"var(--t3)" }}>Resume Score</div>
               </div>
@@ -242,7 +242,7 @@ const Dashboard = ({ setCurrentPage, profile, analysisData, mobileMenuOpen, setM
                   fontWeight:300, 
                   color:"var(--t1)" 
                 }}>
-                  {analysisData?.matched?.length || 0}
+                  {analysisData?.matched_skills?.length || 0}
                 </div>
                 <div style={{ fontSize:12, color:"var(--t3)" }}>Skills Matched</div>
               </div>

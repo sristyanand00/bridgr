@@ -41,7 +41,7 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenu
       formData.append('resume', selectedFile);
       formData.append('target_role', targetRole);
 
-      const response = await fetch('http://localhost:8000/api/analyze', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/analyze`, {
         method: 'POST',
         body: formData
       });
@@ -255,7 +255,15 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenu
     );
   }
 
-  const { matched = [], gaps = [], salary = {} } = analysisData || {};
+  const {
+  matched_skills = [],
+  missing_required = [],
+  salary_band_estimate = {},
+  extracted_skills = [],
+  match_score = 0,
+  readiness_level = "Unknown",
+  transferable_skills = []
+} = analysisData || {};
 
   return (
     <div className="main">
@@ -277,7 +285,7 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenu
             {analysisData?.score || 72}%
           </div>
           <div style={{ fontSize:13, color:"var(--t2)", maxWidth:400, margin:"0 auto" }}>
-            Your resume matches <strong>{matched.length}</strong> key skills for {targetRole || "Data Scientist"} roles in {profile?.city || "Bengaluru"}
+            Your resume matches <strong>{matched_skills.length}</strong> key skills for {targetRole || "Data Scientist"} roles in {profile?.city || "Bengaluru"}
           </div>
           
           {/* Generate Roadmap Button */}
@@ -305,10 +313,10 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenu
               <div style={{ fontSize:14, fontWeight:600, color:"var(--t1)" }}>
                 Matched Skills
               </div>
-              <Chip name={`${matched.length} found`} level="ok"/>
+              <Chip name={`${matched_skills.length} found`} level="ok"/>
             </div>
             <div style={{ display:"flex", flexWrap:"wrap", gap:7 }}>
-              {matched.map(skill => <Chip key={skill} name={skill} level="ok"/>)}
+              {matched_skills.map(skill => <Chip key={skill} name={skill} level="ok"/>)}
             </div>
             
             {/* Transferable skills */}
@@ -341,10 +349,10 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenu
               <div style={{ fontSize:14, fontWeight:600, color:"var(--t1)" }}>
                 Gap Analysis
               </div>
-              <Chip name={`${gaps.length} gaps`} level="bad"/>
+              <Chip name={`${missing_required.length} gaps`} level="bad"/>
             </div>
-            {gaps.map(gap => (
-              <div key={gap.n} style={{ 
+            {missing_required.map(gap => (
+              <div key={gap.name} style={{ 
                 marginBottom:10, 
                 padding:"10px 14px", 
                 background:"rgba(255,255,255,.03)", 
@@ -353,11 +361,11 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenu
               }}>
                 <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:4 }}>
                   <span style={{ fontSize:13, fontWeight:500, color:"var(--t1)" }}>
-                    {gap.n}
+                    {gap.name}
                   </span>
                   <Chip 
-                    name={gap.p} 
-                    level={gap.p === "Critical" ? "bad" : "learn"} 
+                    name={gap.priority} 
+                    level={gap.priority === "Critical" ? "bad" : "learn"} 
                     style={{ fontSize:10, padding:"2px 6px" }} 
                   />
                 </div>
@@ -365,8 +373,8 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenu
                   {gap.reason}
                 </div>
                 <ProgressBar 
-                  v={gap.d} 
-                  color={gap.p === "Critical" ? "#f43f5e" : "#f59e0b"}
+                  v={gap.demand_percentage || gap.priority_score * 100} 
+                  color={gap.priority === "Critical" ? "#f43f5e" : "#f59e0b"}
                 />
               </div>
             ))}
@@ -394,7 +402,7 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenu
             </div>
           </div>
           <div style={{ display:"flex", gap:24, textAlign:"center" }}>
-            {[["Min", salary.min],["Median", salary.median],["Max", salary.max]].map(([label, value]) => (
+            {[["Min", salary_band_estimate.min],["Median", salary_band_estimate.median],["Max", salary_band_estimate.max]].map(([label, value]) => (
               <div key={label}>
                 <div style={{ fontSize:11, color:"var(--t3)" }}>{label}</div>
                 <div style={{ fontFamily:"'Fraunces',serif", fontSize:20, color:"var(--t1)" }}>

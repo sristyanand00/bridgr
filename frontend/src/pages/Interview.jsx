@@ -7,9 +7,12 @@ const Interview = () => {
   const [stage, setStage] = useState("setup");
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answer, setAnswer] = useState("");
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [feedback, setFeedback] = useState([]);
   const { seconds, isRunning, start, stop, reset, formattedTime } = useTimer(120);
 
-  const questions = [
+  const fallbackQuestions = [
     {
       question: "Explain the bias-variance tradeoff and how you'd handle it in practice.",
       type: "ML Theory",
@@ -27,7 +30,7 @@ const Interview = () => {
     },
   ];
 
-  const feedback = [
+  const fallbackFeedback = [
     {
       area: "Technical Accuracy",
       score: 74,
@@ -64,10 +67,35 @@ const Interview = () => {
     }
   }, [seconds, stage, stop]);
 
-  const handleStartSession = () => {
-    setStage("live");
-    reset();
-    start();
+  const handleStartSession = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/interview/start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          target_role: "Data Scientist",
+          weak_areas: ["Docker", "SQL Window Functions"],
+          strong_areas: ["Python", "Statistics"],
+          difficulty: "Medium"
+        })
+      });
+      
+      const data = await response.json();
+      setQuestions(data.questions || fallbackQuestions);
+      setStage("live");
+      reset();
+      start();
+    } catch (error) {
+      console.error('Failed to start interview:', error);
+      // Fallback to hardcoded questions
+      setQuestions(fallbackQuestions);
+      setStage("live");
+      reset();
+      start();
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleNextQuestion = () => {
@@ -89,9 +117,29 @@ const Interview = () => {
     }
   };
 
-  const handleSubmitSession = () => {
-    setStage("results");
-    stop();
+  const handleSubmitSession = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/interview/evaluate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: questions[0]?.question || "Sample question",
+          answer: answer,
+          target_role: "Data Scientist",
+          skill_being_tested: questions[0]?.type || "General"
+        })
+      });
+      
+      const feedbackData = await response.json();
+      // Store feedback for results display
+      setFeedback(feedbackData.feedback || fallbackFeedback);
+      setStage("results");
+      stop();
+    } catch (error) {
+      console.error('Failed to evaluate answer:', error);
+      setStage("results");
+      stop();
+    }
   };
 
   const handleNewSession = () => {
@@ -197,6 +245,22 @@ const Interview = () => {
   }
 
   if (stage === "live") {
+    if (!questions || questions.length === 0) {
+      return (
+        <div className="main">
+          <Topbar title="Mock Interview Simulator"/>
+          <div className="page" style={{ maxWidth:580, margin:"0 auto", textAlign:"center" }}>
+            <div style={{ padding:"40px 20px" }}>
+              <Icon name="alert-circle" s={48} c="var(--p3)" style={{ marginBottom:16 }}/>
+              <h3 style={{ color:"var(--t1)", marginBottom:8 }}>Error loading interview questions</h3>
+              <p style={{ color:"var(--t3)", marginBottom:20 }}>Please try starting the interview again.</p>
+              <Button onClick={() => setStage("setup")}>Back to Setup</Button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
     const currentQuestion = questions[questionIndex];
     
     return (

@@ -32,7 +32,7 @@ const Chat = ({ profile, analysisData, mobileMenuOpen, setMobileMenuOpen }) => {
     
     try {
       // Call real AI API instead of using hardcoded responses
-      const response = await fetch('http://localhost:8000/api/chat', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -41,11 +41,14 @@ const Chat = ({ profile, analysisData, mobileMenuOpen, setMobileMenuOpen }) => {
           message: messageText,
           context: {
             target_role: profile?.currentRole || "Data Scientist",
-            match_score: analysisData?.score || 0,
-            readiness_level: analysisData?.score ? (analysisData.score > 70 ? "High" : "Medium") : "Low",
-            user_strengths: analysisData?.matched || [],
-            user_gaps: analysisData?.gaps?.map(g => g.n) || [],
-            top_transferable: ["Statistical reasoning", "A/B testing", "Data interpretation"],
+            match_score: analysisData?.match_score || 0,
+            readiness_level: analysisData?.readiness_level || "Unknown",
+            user_strengths: analysisData?.matched_skills || [],
+            user_gaps: analysisData?.missing_required?.map(g => g.name) || [],
+            top_transferable: analysisData?.transferable_skills?.slice(0, 3)?.map(t => ({
+              from: t.user_skill,
+              to: t.maps_to_job_skill
+            })) || [],
             city: city,
             timeline: timeline,
             hours: hours,

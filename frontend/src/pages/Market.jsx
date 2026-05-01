@@ -1,23 +1,49 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Topbar } from '../components/layout';
 import { Button, Card, Chip, ProgressBar, Icon } from '../components/ui';
-import { SKILLS_DATA, USER_GAPS } from '../constants/skills';
+import { SKILLS_DATA_FALLBACK, USER_GAPS_FALLBACK } from '../constants/skills';
 
 const Market = ({ profile, analysisData }) => {
   const city = profile?.city || "Bengaluru";
+  const [marketData, setMarketData] = useState(null);
+  const [marketLoading, setMarketLoading] = useState(true);
   
   // Intersection: user's gaps that are also high-demand
-  const personalROI = SKILLS_DATA
-    .filter(skill => USER_GAPS.includes(skill.n))
+  const personalROI = marketData?.top_demanded_skills?.filter(skill => 
+    USER_GAPS_FALLBACK.includes(skill.skill)
+  ).sort((a, b) => b.demand_pct - a.demand_pct) || SKILLS_DATA_FALLBACK
+    .filter(skill => USER_GAPS_FALLBACK.includes(skill.n))
     .sort((a, b) => b.d - a.d);
 
-  const companies = [
+  const fallbackCompanies = [
     { name: "Flipkart", openings: 124, role: "Data Scientist" },
     { name: "Razorpay", openings: 87, role: "ML Engineer" },
     { name: "Zomato", openings: 63, role: "Data Analyst" },
     { name: "CRED", openings: 41, role: "Data Scientist" },
     { name: "PhonePe", openings: 78, role: "ML Engineer" },
   ];
+
+  const companies = marketData?.top_companies || fallbackCompanies;
+
+  useEffect(() => {
+    const fetchMarketData = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/market-pulse?role=${encodeURIComponent(profile?.currentRole || "Data Scientist")}` 
+        );
+        
+        const data = await response.json();
+        setMarketData(data);
+      } catch (error) {
+        console.error('Failed to fetch market data:', error);
+        // Keep using hardcoded fallback
+      } finally {
+        setMarketLoading(false);
+      }
+    };
+    
+    fetchMarketData();
+  }, [profile?.currentRole]);
 
   const marketMetrics = [
     { 
@@ -120,7 +146,7 @@ const Market = ({ profile, analysisData }) => {
           </div>
           
           {personalROI.map((skill, index) => (
-            <div key={skill.n} className="insight-row">
+            <div key={skill.skill || skill.n} className="insight-row">
               <div style={{ 
                 width:28, 
                 height:28, 
@@ -145,11 +171,11 @@ const Market = ({ profile, analysisData }) => {
                   marginBottom:4 
                 }}>
                   <span style={{ 
-                    fontSize:14, 
+                    fontSize:13, 
                     fontWeight:600, 
                     color:"var(--t1)" 
                   }}>
-                    {skill.n}
+                    {skill.skill || skill.n}
                   </span>
                   <Chip 
                     name={`Your Gap #${index + 1}`} 
@@ -157,21 +183,21 @@ const Market = ({ profile, analysisData }) => {
                     style={{ fontSize:10, padding:"2px 6px" }} 
                   />
                   <Chip 
-                    name={`${skill.d}% market demand`} 
+                    name={`${skill.demand_pct || skill.d}% market demand`} 
                     className="tv" 
                     style={{ fontSize:10, padding:"2px 6px" }} 
                   />
                   <Chip 
-                    name={`↑ ${skill.g}% growth`} 
+                    name={`↑ ${skill.g || 'N/A'}% growth`} 
                     level="ok" 
                     style={{ fontSize:10, padding:"2px 6px" }} 
                   />
                 </div>
                 <div style={{ fontSize:12.5, color:"var(--t2)" }}>
-                  {skill.n} is your #{index + 1} skill gap <strong style={{ color:"var(--t1)" }}>AND</strong> appears in {skill.d}% of {city} DS job postings. Closing this gap has the highest return on your study hours.
+                  {skill.skill || skill.n} is your #{index + 1} skill gap <strong style={{ color:"var(--t1)" }}>AND</strong> appears in {skill.demand_pct || skill.d}% of {city} DS job postings. Closing this gap has the highest return on your study hours.
                 </div>
               </div>
-              <ProgressBar value={skill.d} />
+              <ProgressBar value={skill.demand_pct || skill.d} />
             </div>
           ))}
         </Card>
@@ -187,8 +213,8 @@ const Market = ({ profile, analysisData }) => {
             }}>
               Full Skill Demand — {city}
             </div>
-            {SKILLS_DATA.slice(0, 8).map(skill => (
-              <div key={skill.n} style={{ marginBottom:13 }}>
+            {(marketData?.top_demanded_skills || SKILLS_DATA_FALLBACK).slice(0, 8).map(skill => (
+              <div key={skill.skill || skill.n} style={{ marginBottom:13 }}>
                 <div style={{ 
                   display:"flex", 
                   justifyContent:"space-between", 
@@ -197,11 +223,11 @@ const Market = ({ profile, analysisData }) => {
                 }}>
                   <div style={{ display:"flex", alignItems:"center", gap:7 }}>
                     <span style={{ 
-                      color:USER_GAPS.includes(skill.n) ? "var(--t1)" : "var(--t2)" 
+                      color:USER_GAPS_FALLBACK.includes(skill.skill || skill.n) ? "var(--t1)" : "var(--t2)" 
                     }}>
-                      {skill.n}
+                      {skill.skill || skill.n}
                     </span>
-                    {USER_GAPS.includes(skill.n) && (
+                    {USER_GAPS_FALLBACK.includes(skill.skill || skill.n) && (
                       <span style={{ 
                         fontSize:10, 
                         color:"var(--p3)", 
@@ -214,18 +240,18 @@ const Market = ({ profile, analysisData }) => {
                     )}
                   </div>
                   <span style={{ display:"flex", gap:12 }}>
-                    <span style={{ color:"var(--t3)" }}>{skill.d}%</span>
+                    <span style={{ color:"var(--t3)" }}>{skill.demand_pct || skill.d}%</span>
                     <span style={{ 
-                      color:skill.g > 0 ? "var(--g)" : "var(--r)", 
+                      color:(skill.g || 0) > 0 ? "var(--g)" : "var(--r)", 
                       fontWeight:600 
                     }}>
-                      {skill.g > 0 ? "↑" : "↓"}{Math.abs(skill.g)}%
+                      {(skill.g || 0) > 0 ? "↑" : "↓"}{Math.abs(skill.g || 0)}%
                     </span>
                   </span>
                 </div>
                 <ProgressBar 
-                  value={skill.d} 
-                  color={USER_GAPS.includes(skill.n) ? "#8b5cf6" : undefined}
+                  value={skill.demand_pct || skill.d} 
+                  color={USER_GAPS_FALLBACK.includes(skill.skill || skill.n) ? "#8b5cf6" : undefined}
                 />
               </div>
             ))}
@@ -247,12 +273,12 @@ const Market = ({ profile, analysisData }) => {
                 gridTemplateColumns:"repeat(4,1fr)", 
                 gap:6 
               }}>
-                {SKILLS_DATA.map(skill => {
-                  const intensity = Math.min(1, Math.abs(skill.g) / 220);
-                  const isWarm = skill.g > 50;
+                {(marketData?.top_demanded_skills || SKILLS_DATA_FALLBACK).map(skill => {
+                  const intensity = Math.min(1, Math.abs(skill.g || 0) / 220);
+                  const isWarm = (skill.g || 0) > 50;
                   return (
                     <div 
-                      key={skill.n}
+                      key={skill.skill || skill.n}
                       className="hmc" 
                       style={{ 
                         background:isWarm ? 
@@ -260,7 +286,7 @@ const Market = ({ profile, analysisData }) => {
                           `rgba(139,92,246,${0.08 + intensity * 0.4})`, 
                         padding:"9px 5px", 
                         textAlign:"center", 
-                        border:USER_GAPS.includes(skill.n) ? 
+                        border:USER_GAPS_FALLBACK.includes(skill.skill || skill.n) ? 
                           "1px solid rgba(244,63,94,.3)" : "none" 
                       }}
                     >
@@ -271,14 +297,14 @@ const Market = ({ profile, analysisData }) => {
                         marginBottom:2, 
                         lineHeight:1.3 
                       }}>
-                        {skill.n}
+                        {skill.skill || skill.n}
                       </div>
                       <div style={{ 
                         fontSize:9.5, 
                         color:isWarm ? "#fcd34d" : "var(--p3)", 
                         fontWeight:600 
                       }}>
-                        {skill.g > 0 ? "+" : ""}{skill.g}%
+                        {(skill.g || 0) > 0 ? "+" : ""}{skill.g || 0}%
                       </div>
                     </div>
                   );

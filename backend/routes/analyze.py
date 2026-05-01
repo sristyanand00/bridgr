@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from ml.model_loader import get_core
+# from ml.model_loader import get_core  # Replaced with Colab models
 from core.exceptions import ResumeParseFailed, JobRoleNotFound
 from models.analysis import AnalysisResult
 
@@ -46,9 +46,10 @@ async def analyze_resume(
             tmp.write(contents)
             tmp_path = tmp.name
 
-        core = get_core()
-        result = core.analyze(tmp_path, target_role)
-        return result
+        from ml.model_loader import analyze_resume
+        result_dict = analyze_resume(tmp_path, target_role)
+        # Convert dict back to AnalysisResult for FastAPI response
+        return AnalysisResult(**result_dict)
 
     except ValueError as e:
         # ValueError is raised by ResumeParser for scanned PDFs, bad files, etc.

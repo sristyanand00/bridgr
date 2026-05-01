@@ -7,6 +7,9 @@ const Roadmap = ({ profile, analysisData }) => {
   const [targetCareer, setTargetCareer] = useState("");
   const [assessmentComplete, setAssessmentComplete] = useState(!!analysisData);
   const [feasibilityScore, setFeasibilityScore] = useState(analysisData?.score || 0);
+  const [roadmapLoading, setRoadmapLoading] = useState(false);
+  const [generatedPhases, setGeneratedPhases] = useState(null);
+  const [error, setError] = useState("");
 
   const careerOptions = [
     "Data Scientist", "Product Manager", "UX Designer", "DevOps Engineer",
@@ -24,60 +27,7 @@ const Roadmap = ({ profile, analysisData }) => {
   const baseWeeks = 14;
   const adjustedWeeks = Math.round(baseWeeks * (10 / hours));
 
-  const phases = React.useMemo(() => {
-    if (analysisData && analysisData.gaps) {
-      // Create phases based on actual resume analysis gaps
-      const criticalGaps = analysisData.gaps.filter(gap => gap.p === "Critical").slice(0, 3);
-      const otherGaps = analysisData.gaps.filter(gap => gap.p !== "Critical").slice(0, 3);
-      
-      return [
-        { 
-          label: "Phase 1 — Bridge Critical Gaps", 
-          weeks: `Weeks 1–${Math.round(adjustedWeeks * 0.4)}`, 
-          active: true, 
-          skills: criticalGaps.map(gap => gap.n), 
-          milestone: `Master ${criticalGaps.length} critical skills for ${targetCareer}`, 
-          resources: criticalGaps.map(gap => ({ 
-            name: `${gap.n} Learning Path`, 
-            url: "coursera.org", 
-            free: false 
-          }))
-        },
-        { 
-          label: "Phase 2 — Strengthen Foundation", 
-          weeks: `Weeks ${Math.round(adjustedWeeks * 0.4)}–${Math.round(adjustedWeeks * 0.7)}`, 
-          skills: otherGaps.map(gap => gap.n), 
-          milestone: `Complete ${otherGaps.length} additional skill areas`, 
-          resources: otherGaps.map(gap => ({ 
-            name: `${gap.n} Tutorial`, 
-            url: "youtube.com", 
-            free: true 
-          }))
-        },
-        { 
-          label: "Phase 3 — Build Portfolio", 
-          weeks: `Weeks ${Math.round(adjustedWeeks * 0.7)}–${Math.round(adjustedWeeks * 0.9)}`, 
-          skills: ["Portfolio Projects", "Case Studies", "Technical Writing"], 
-          milestone: "Create 3 portfolio projects showcasing new skills", 
-          resources: [
-            { name: "GitHub Portfolio", url: "github.com", free: true }, 
-            { name: "Project Templates", url: "github.com", free: true }
-          ]
-        },
-        { 
-          label: "Phase 4 — Job Application", 
-          weeks: `Weeks ${Math.round(adjustedWeeks * 0.9)}–${adjustedWeeks}`, 
-          skills: ["Interview Prep", "Networking", "Resume Optimization"], 
-          milestone: "Apply to 10+ ${targetCareer} positions per week", 
-          resources: [
-            { name: "Interview Practice", url: "leetcode.com", free: true }
-          ]
-        },
-      ];
-    }
-    
-    // Fallback to generic phases if no analysis data
-    return [
+  const fallbackPhases = [
       { 
         label: "Phase 1 — Foundation", 
         weeks: `Weeks 1–${Math.round(adjustedWeeks * 0.28)}`, 
@@ -120,38 +70,47 @@ const Roadmap = ({ profile, analysisData }) => {
         ]
       },
     ];
-  }, [analysisData, adjustedWeeks, targetCareer]);
 
-  const calculateFeasibility = () => {
-    // If we have analysis data from resume, use that score
-    if (analysisData) {
-      setFeasibilityScore(analysisData.score);
-      setAssessmentComplete(true);
+  const phases = React.useMemo(() => {
+    return generatedPhases || fallbackPhases;
+  }, [generatedPhases, fallbackPhases]);
+
+  const calculateFeasibility = async () => {
+    if (!targetCareer) {
+      setError("Please select a target career");
       return;
     }
     
-    // Otherwise, simulate feasibility calculation based on career transition
-    const careerTransitions = {
-      "Software Engineer": {
-        "Data Scientist": 75,
-        "Product Manager": 65,
-        "UX Designer": 55,
-        "DevOps Engineer": 85,
-        "Machine Learning Engineer": 70,
-        "Full Stack Developer": 90,
-        "Backend Engineer": 85,
-        "Frontend Developer": 75,
-        "Mobile Developer": 60,
-        "Cloud Architect": 70
-      }
-    };
+    setRoadmapLoading(true);
     
-    const baseScore = careerTransitions[currentCareer]?.[targetCareer] || 50;
-    const experienceBonus = profile?.stage === "Senior" ? 10 : profile?.stage === "Mid" ? 5 : 0;
-    const finalScore = Math.min(95, baseScore + experienceBonus);
-    
-    setFeasibilityScore(finalScore);
-    setAssessmentComplete(true);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/roadmap`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          target_role: targetCareer,
+          match_score: analysisData?.match_score || 0,
+          readiness_level: analysisData?.readiness_level || "Foundation Stage",
+          roadmap_inputs: analysisData?.learning_roadmap_inputs || {},
+          matched_skills: analysisData?.matched_skills || [],
+          missing_required: analysisData?.missing_required || []
+        })
+      });
+      
+      const roadmapData = await response.json();
+      setGeneratedPhases(roadmapData.phases);
+      setFeasibilityScore(analysisData?.match_score || 65);
+      setAssessmentComplete(true);
+      
+    } catch (error) {
+      console.error('Failed to generate roadmap:', error);
+      setError("Failed to generate roadmap. Please try again.");
+      // Fallback to client-side generation
+      setFeasibilityScore(65);
+      setAssessmentComplete(true);
+    } finally {
+      setRoadmapLoading(false);
+    }
   };
 
   // Initialize with analysis data if available
