@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Chip = ({ name, level = "n", className = "" }) => {
+const Chip = ({ name, level = "n", className = "", style = {} }) => {
   const levelStyles = {
     ok:   { bg:"rgba(16,185,129,.1)",  c:"#6ee7b7", b:"rgba(16,185,129,.2)" },
     bad:  { bg:"rgba(244,63,94,.1)",   c:"#fda4af", b:"rgba(244,63,94,.2)" },
@@ -9,7 +9,7 @@ const Chip = ({ name, level = "n", className = "" }) => {
     n:    { bg:"rgba(255,255,255,.04)",c:"var(--t2)",b:"var(--gb)" },
   };
 
-  const style = levelStyles[level] || levelStyles.n;
+  const defaultStyle = levelStyles[level] || levelStyles.n;
 
   return (
     <span 
@@ -21,9 +21,10 @@ const Chip = ({ name, level = "n", className = "" }) => {
         borderRadius:100, 
         fontSize:12, 
         fontWeight:500, 
-        background:style.bg, 
-        color:style.c, 
-        border:`1px solid ${style.b}` 
+        background:defaultStyle.bg, 
+        color:defaultStyle.c, 
+        border:`1px solid ${defaultStyle.b}`,
+        ...style 
       }}
     >
       {name}

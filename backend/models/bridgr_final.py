@@ -91,6 +91,7 @@ class AnalysisResult(BaseModel):
     career_chat_context:     Dict[str, Any]
 
     salary_band_estimate: Dict[str, Any]
+    feasibility: Optional[Dict[str, Any]] = None
     explanations:         List[str]
 
 
@@ -394,7 +395,7 @@ class SkillExtractor:
         # Fix 2: Use safer model loading method
         # Fix 3: HARD PROTECT fallback (CRITICAL)
         try:
-            self.embed_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+            self.embed_model = SentenceTransformer("all-MiniLM-L6-v2")
             if verbose:
                 print("✅ Embedding model loaded successfully")
         except Exception as e:
@@ -410,13 +411,15 @@ class SkillExtractor:
         if verbose:
             print(f"⚡ Encoding {len(self.skill_list)} skills...")
         
+        # Initialize _skill_embeddings to empty array to prevent AttributeError
+        self._skill_embeddings = np.array([])
+        
         if self.embed_model is not None:
             self._skill_embeddings = self.embed_model.encode(
                 self.skill_list, batch_size=64,
                 normalize_embeddings=True, show_progress_bar=verbose,
             )
         else:
-            self._skill_embeddings = None
             if verbose:
                 print("⚠️ Skipping skill encoding (no embedding model)")
         if verbose:
@@ -476,6 +479,9 @@ class SkillExtractor:
         return results
 
     def _tier2_semantic(self, text: str, already_normalized: set) -> List[ExtractedSkill]:
+        # FIXED: Return empty if no embedding model available
+        if self.embed_model is None:
+            return []
         doc    = self.nlp(text)
         chunks = list({
             c.text.strip() for c in doc.noun_chunks
@@ -529,6 +535,11 @@ class SkillExtractor:
         if not windows:
             return []
 
+        # FIXED: Check if embed_model is None before encoding
+        if self.embed_model is None:
+            print("⚠️  Tier-3 skipped: no embedding model available")
+            return []
+        
         try:
             window_vecs = self.embed_model.encode(windows, batch_size=64, normalize_embeddings=True)
         except Exception as e:
@@ -580,9 +591,13 @@ except ImportError:
 
 
 class MatchingEngine:
-    def __init__(self, embed_model: SentenceTransformer):
+    def __init__(self, embed_model):
         self.embed_model = embed_model
-        self._embed_dim  = embed_model.get_sentence_embedding_dimension()
+        # FIXED: Handle case when embed_model is None
+        if embed_model is not None:
+            self._embed_dim  = embed_model.get_sentence_embedding_dimension()
+        else:
+            self._embed_dim = 384  # Default dimension for MiniLM-L6-v2
         # FIXED: bounded LRU cache — no unbounded memory growth
         if _lru_available:
             self._vec_cache = _LRUCache(maxsize=512)
@@ -617,9 +632,13 @@ class MatchingEngine:
         denominator      = len(job_tech) * 3.0 + len(job_soft) * 1.0
         weighted_jaccard = numerator / denominator if denominator > 0 else 0.0
 
-        user_vec     = self._embed_skill_set(list(user_set))
-        job_vec      = self._embed_skill_set(list(job_all))
-        semantic_sim = max(0.0, float(cosine_similarity([user_vec], [job_vec])[0][0]))
+        # FIXED: Handle case when embed_model is None
+        if self.embed_model is not None:
+            user_vec     = self._embed_skill_set(list(user_set))
+            job_vec      = self._embed_skill_set(list(job_all))
+            semantic_sim = max(0.0, float(cosine_similarity([user_vec], [job_vec])[0][0]))
+        else:
+            semantic_sim = 0.0  # No semantic similarity without embeddings
 
         raw      = 0.60 * semantic_sim + 0.40 * weighted_jaccard
         ceiling  = 0.60 * 1.0 + 0.40 * 1.0
@@ -635,7 +654,7 @@ class MatchingEngine:
         missing_skills: List[str],
         min_score:      float = 0.72,
     ) -> List[TransferableSkill]:
-        if not user_skills or not missing_skills:
+        if not user_skills or not missing_skills or self.embed_model is None:
             return []
         user_vecs    = self.embed_model.encode(user_skills,    normalize_embeddings=True)
         missing_vecs = self.embed_model.encode(missing_skills, normalize_embeddings=True)
@@ -659,7 +678,7 @@ class MatchingEngine:
         return results
 
     def _embed_skill_set(self, skills: List[str]) -> np.ndarray:
-        if not skills:
+        if not skills or self.embed_model is None:
             return np.zeros(self._embed_dim)
         cache_key = hashlib.md5("|".join(sorted(skills)).encode()).hexdigest()
         cached    = self._vec_cache.get(cache_key)

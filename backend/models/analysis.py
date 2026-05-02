@@ -22,8 +22,11 @@ class SkillGap(BaseModel):
     reason: str            # human-readable explanation for the user
     estimated_weeks: int = 4    # how long to learn it
     has_foundation: bool = False # does the user have a related skill already?
-    demand_percentage: int = 50  # percentage of jobs requiring this skill
     learning_resources: List[str] = []  # resources to learn this skill
+
+    @property
+    def demand_percentage(self) -> int:
+        return int(self.market_demand * 100)
 
 
 class TransferableSkill(BaseModel):

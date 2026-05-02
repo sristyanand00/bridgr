@@ -31,12 +31,16 @@ def get_core() -> Union[IntelligenceCore, FallbackIntelligenceCore]:
     """
     global _core_instance
     if _core_instance is None:
+        # Use absolute paths to prevent relative path issues
+        backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        data_dir = os.path.join(backend_dir, "data")
+        
         config = {
-            "ONET_EXTRACT_PATH": os.getenv("ONET_EXTRACT_PATH", "data/"),
+            "ONET_EXTRACT_PATH": os.getenv("ONET_EXTRACT_PATH", data_dir),
             "ONET_ZIP_PATH": os.getenv("ONET_ZIP_PATH", ""),
             "SEMANTIC_THRESHOLD": float(os.getenv("SEMANTIC_THRESHOLD", "0.75")),
             "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY", ""),
-            "DATA_DIR": os.getenv("DATA_DIR", "data/"),
+            "DATA_DIR": os.getenv("DATA_DIR", data_dir),
         }
         
         # Set environment variables for the Colab models
@@ -68,29 +72,34 @@ def analyze_resume(resume_path: str, target_role: str) -> Dict[str, Any]:
     try:
         result = core.analyze(resume_path, target_role)
         
-        # If analysis returned empty tech_skills (unknown role), try Gemini
-        if not result.get("tech_skills") or len(result.get("tech_skills", [])) == 0:
+        # If analysis returned empty matched_skills (unknown role), try Gemini
+        result_dict = result.model_dump() if hasattr(result, 'model_dump') else result
+        if not result_dict.get("matched_skills") or len(result_dict.get("matched_skills", [])) == 0:
             print(f"⚠️  Role '{target_role}' not in O*NET — fetching from Gemini Flash...")
             
             # Fetch from Gemini (FREE, 1500 calls/day)
             gemini_profile = llm_service.fetch_job_profile_from_gemini(target_role)
             
             if gemini_profile:
-                # Inject Gemini skills into result
-                result.tech_skills = gemini_profile.get("tech_skills", [])
-                result.soft_skills = gemini_profile.get("soft_skills", [])
-                result.job_description = gemini_profile.get("job_description", "")
+                # Inject Gemini skills into result by updating the dict
+                result_dict["matched_skills"] = gemini_profile.get("tech_skills", [])
+                result_dict["missing_required"] = []  # Clear missing skills since we're using Gemini
+                result_dict["explanations"].append(f"Used Gemini Flash to fetch skills for '{target_role}'")
                 print(f"✅ Injected Gemini profile for '{target_role}'")
+                return result_dict
         
         return result.model_dump() if hasattr(result, 'model_dump') else result
     
     except Exception as e:
         print(f"⚠️  Analysis failed: {e}")
+        from datetime import datetime
         return {
-            "analysis_id": "error",
+            "analysis_id": f"error_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "generated_at": datetime.now().isoformat(),
             "target_role": target_role,
             "match_score": 0,
             "readiness_level": "Analysis Failed",
+            "confidence_score": 0.0,
             "extracted_skills": [],
             "matched_skills": [],
             "missing_required": [],
@@ -98,6 +107,10 @@ def analyze_resume(resume_path: str, target_role: str) -> Dict[str, Any]:
             "transferable_skills": [],
             "priority_skills": [],
             "market_demand_skills": [],
+            "learning_roadmap_inputs": {},
+            "mock_interview_inputs": {},
+            "career_chat_context": {},
+            "salary_band_estimate": {},
             "explanations": [f"Analysis failed: {str(e)}"],
             "error": str(e)
         }

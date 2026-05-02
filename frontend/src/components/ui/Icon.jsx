@@ -25,16 +25,23 @@ const ICON_PATHS = {
   pin: <><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></>,
   refresh: <><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></>,
   sparkle: <><path d="M12 3L13.4 8.4L19 9l-4.5 4.3L15.8 19 12 16.5 8.2 19l1.3-5.7L5 9l5.6-.6L12 3z"/></>,
+  menu: <><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></>,
+  route: <><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></>,
+  "alert-circle": <><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></>,
 };
 
-const Icon = ({ name, size = 16, color = "currentColor" }) => {
+const Icon = ({ name, size, color, s, c }) => {
+  // Accept both shorthand (s, c) and full (size, color) parameters
+  const finalSize = size !== undefined ? size : (s !== undefined ? s : 16);
+  const finalColor = color !== undefined ? color : (c !== undefined ? c : "currentColor");
+  
   return (
     <svg 
-      width={size} 
-      height={size} 
+      width={finalSize} 
+      height={finalSize} 
       viewBox="0 0 24 24" 
       fill="none" 
-      stroke={color} 
+      stroke={finalColor} 
       strokeWidth="1.7" 
       strokeLinecap="round" 
       strokeLinejoin="round"

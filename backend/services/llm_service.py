@@ -28,7 +28,7 @@ class LLMService:
             return None
         
         try:
-            model = genai.GenerativeModel("gemini-flash-latest")
+            model = genai.GenerativeModel("gemini-3-flash-preview")
             
             prompt = f"""You are a career expert. Extract the key skills required for a "{role}" position.
 
@@ -92,7 +92,7 @@ Now extract skills for: {role}"""
             }
         
         try:
-            model = genai.GenerativeModel("gemini-flash-latest")
+            model = genai.GenerativeModel("gemini-3-flash-preview")
             
             prompt = f"""You are a career coach assessing career transition feasibility.
 
@@ -170,7 +170,7 @@ Return ONLY valid JSON:
             }
         
         try:
-            model = genai.GenerativeModel("gemini-flash-latest")
+            model = genai.GenerativeModel("gemini-3-flash-preview")
             
             top_gaps = [g.get('name', g) if isinstance(g, dict) else g for g in missing_required[:5]]
             

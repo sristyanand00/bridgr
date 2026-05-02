@@ -28,9 +28,10 @@ class JobRoleNotFound(BridgrException):
 
 
 class AIServiceError(BridgrException):
-    def __init__(self):
+    def __init__(self, message: str = None):
+        final_message = message or "AI service temporarily unavailable. Please try again in a moment."
         super().__init__(
-            message="AI service temporarily unavailable. Please try again in a moment.",
+            message=final_message,
             status_code=503,
         )
 
@@ -44,6 +45,38 @@ class RoadmapError(BridgrException):
 
 
 async def bridgr_exception_handler(request: Request, exc: BridgrException):
+    from datetime import datetime
+    
+    # For analyze endpoint failures, return a proper AnalysisResult structure
+    if "/api/analyze" in str(request.url):
+        error_result = {
+            "analysis_id": f"error_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "generated_at": datetime.now().isoformat(),
+            "target_role": "unknown",
+            "match_score": 0,
+            "readiness_level": "Analysis Failed",
+            "confidence_score": 0.0,
+            "extracted_skills": [],
+            "matched_skills": [],
+            "missing_required": [],
+            "missing_preferred": [],
+            "transferable_skills": [],
+            "priority_skills": [],
+            "market_demand_skills": [],
+            "learning_roadmap_inputs": {},
+            "mock_interview_inputs": {},
+            "career_chat_context": {},
+            "salary_band_estimate": {},
+            "feasibility": None,
+            "explanations": [exc.message],
+            "error": exc.message
+        }
+        return JSONResponse(
+            status_code=exc.status_code,
+            content=error_result,
+        )
+    
+    # For other endpoints, return simple error
     return JSONResponse(
         status_code=exc.status_code,
         content={"error": exc.message, "type": type(exc).__name__},
