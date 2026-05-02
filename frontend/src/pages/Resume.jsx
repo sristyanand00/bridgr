@@ -5,6 +5,16 @@ import { Topbar } from '../components/layout';
 import { Button, Card, Chip, ProgressBar, Icon, Input } from '../components/ui';
 
 
+// Format salary numbers to Indian rupees
+const formatSalary = (num) => {
+  if (typeof num !== 'number') return num;
+  if (num >= 10000000) return `₹${(num / 10000000).toFixed(1)}Cr`;
+  if (num >= 100000) return `₹${(num / 100000).toFixed(1)}L`;
+  if (num >= 1000) return `₹${(num / 1000).toFixed(1)}K`;
+  return `₹${num.toLocaleString('en-IN')}`;
+};
+
+
 
 const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenuOpen, setMobileMenuOpen, setCurrentPage }) => {
 
@@ -818,7 +828,11 @@ const Resume = ({ profile, onSaveGate, analysisData, setAnalysisData, mobileMenu
 
           <div style={{ display:"flex", gap:24, textAlign:"center" }}>
 
-            {["Min", salary_band_estimate?.min || "₹8L", "Median", salary_band_estimate?.median || "₹14L", "Max", salary_band_estimate?.max || "₹22L"].map(([label, value]) => (
+            {[
+              ["Min", formatSalary(salary_band_estimate?.min) || "₹8L"],
+              ["Median", formatSalary(salary_band_estimate?.median) || "₹14L"],
+              ["Max", formatSalary(salary_band_estimate?.max) || "₹22L"]
+            ].map(([label, value]) => (
 
               <div key={label}>
 
