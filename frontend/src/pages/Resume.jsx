@@ -188,7 +188,6 @@ const Resume = ({ profile, onSaveGate, mobileMenuOpen, setMobileMenuOpen, setCur
                 <Icon name="upload" s={14} c="white" />
                 Analyze Resume
               </Button>
-              <Button variant="secondary">Browse Templates</Button>
             </div>
           </Card>
 

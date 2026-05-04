@@ -41,7 +41,6 @@ const Topbar = ({ title, sub, right, onBack, mobileMenuOpen, setMobileMenuOpen }
           }}
         >
           <Icon name="back" s={14}/>
-          Back
         </button>
       )}
 

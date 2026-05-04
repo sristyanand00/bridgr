@@ -6,3 +6,4 @@ export { default as Market } from './Market.jsx';
 export { default as Interview } from './Interview.jsx';
 export { default as Pricing } from './Pricing.jsx';
 export { default as Settings } from './Settings.jsx';
+export { default as History } from './History.jsx';

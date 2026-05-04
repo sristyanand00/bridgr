@@ -13,6 +13,7 @@ import {
   Interview,
   Pricing,
   Settings,
+  History,
 } from './pages';
 import { auth, signOut } from './config/firebase';
 
@@ -246,6 +247,15 @@ const App = () => {
         setMobileMenuOpen={setMobileMenuOpen}
         onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
         onSignOut={handleSignOut}
+      />
+    ),
+    history: (
+      <History
+        profile={mergedProfile}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
+        setCurrentPage={navigateTo}
+        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
       />
     ),
   };
