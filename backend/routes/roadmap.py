@@ -7,12 +7,17 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from dotenv import load_dotenv
 
 from core.exceptions import AIServiceError
 from models.analysis import RoadmapResponse
 from services.llm_service import llm_service
+from services.auth_service import get_user_optional
+from db.database import get_db
+from db.models import Roadmap, Analysis
+from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends
 
 load_dotenv()
 
@@ -28,7 +33,8 @@ class RoadmapRequest(BaseModel):
     roadmap_inputs: Dict[str, Any]
     matched_skills: List[Any] = []
     missing_required: List[Any] = []
-    total_days: int = 90          # ← NEW: user-supplied day count
+    total_days: int = 90
+    analysis_id: Optional[int] = None # Link to the analysis record
 
 
 def _extract_name(gap: Any) -> str:
@@ -98,7 +104,11 @@ def _build_fallback_from_inputs(
 
 
 @router.post("/roadmap", response_model=RoadmapResponse)
-async def generate_roadmap(request: RoadmapRequest):
+def generate_roadmap(
+    request: RoadmapRequest,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_user_optional)
+):
     """
     Generate a detailed learning roadmap for the requested number of days.
     Uses Gemini for rich topic-by-topic teacher format; falls back to the
@@ -108,13 +118,15 @@ async def generate_roadmap(request: RoadmapRequest):
     if not request.target_role.strip():
         raise AIServiceError("target_role cannot be empty.")
 
-    total_days = max(7, request.total_days)  # minimum 7 days
+    total_days = max(7, request.total_days)
 
     # ── 2. Serialize missing_required to plain strings ────────────────────────
     missing_names = [_extract_name(g) for g in request.missing_required]
 
     # ── 3. Extract matched_skills as plain strings ────────────────────────────
     matched = [str(s) for s in request.matched_skills]
+
+    final_response = None
 
     # ── 4. Try Gemini first ───────────────────────────────────────────────────
     if GEMINI_API_KEY:
@@ -127,7 +139,7 @@ async def generate_roadmap(request: RoadmapRequest):
                 missing_required=missing_dicts,
                 available_hours_per_week=10,
                 matched_skills=matched,
-                total_days=total_days,        # ← passed through
+                total_days=total_days,
             )
 
             phases = result.get("phases", [])
@@ -137,7 +149,6 @@ async def generate_roadmap(request: RoadmapRequest):
             if phases:
                 normalised = []
                 for ph in phases:
-                    skills = ph.get("skills", [])
                     dur = int(ph.get("duration_weeks", total_days // (7 * 3)))
                     phase_num = ph.get("phase", len(normalised) + 1)
                     start = (phase_num - 1) * dur + 1
@@ -149,17 +160,15 @@ async def generate_roadmap(request: RoadmapRequest):
                         "duration_weeks": dur,
                         "duration": ph.get("day_range") or ph.get("duration", f"Weeks {start}–{end}"),
                         "goal": ph.get("goal", ""),
-                        "skills": skills,
-                        "topics": ph.get("topics", []),      # ← NEW: teacher topics
+                        "skills": ph.get("skills", []),
+                        "topics": ph.get("topics", []),
                         "weeks": ph.get("weeks", []),
                         "resources": ph.get("resources", []),
                         "milestones": ph.get("milestones", []),
-                        "milestone": (
-                            ph["weeks"][0].get("milestone", "") if ph.get("weeks") else ""
-                        ),
+                        "milestone": ph["weeks"][0].get("milestone", "") if ph.get("weeks") else ""
                     })
 
-                return RoadmapResponse(
+                final_response = RoadmapResponse(
                     phases=normalised,
                     total_weeks=int(total_weeks),
                     total_days=total_days,
@@ -170,10 +179,28 @@ async def generate_roadmap(request: RoadmapRequest):
             print(f"⚠️  Gemini roadmap failed, using ML fallback: {e}")
 
     # ── 5. Fallback ───────────────────────────────────────────────────────────
-    print("ℹ️  Using ML-computed roadmap fallback")
-    return _build_fallback_from_inputs(
-        roadmap_inputs=request.roadmap_inputs,
-        target_role=request.target_role,
-        match_score=request.match_score,
-        total_days=total_days,
-    )
+    if not final_response:
+        print("ℹ️  Using ML-computed roadmap fallback")
+        final_response = _build_fallback_from_inputs(
+            roadmap_inputs=request.roadmap_inputs,
+            target_role=request.target_role,
+            match_score=request.match_score,
+            total_days=total_days,
+        )
+
+    # ── 6. Save to database if user is authenticated ─────────────────────
+    if current_user and final_response:
+        uid = current_user.get("uid")
+        
+        db_roadmap = Roadmap(
+            user_id=uid,
+            analysis_id=request.analysis_id,
+            target_role=request.target_role,
+            total_days=total_days,
+            phases=[p.dict() if hasattr(p, "dict") else p for p in final_response.phases],
+            summary=final_response.summary
+        )
+        db.add(db_roadmap)
+        db.commit()
+        
+    return final_response

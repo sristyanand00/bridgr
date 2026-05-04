@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from core.config import get_settings
 from core.exceptions import BridgrException, bridgr_exception_handler
 from ml.model_loader import get_core
-from routes import analyze, chat, roadmap, market_pulse, interview
+from routes import analyze, chat, roadmap, market_pulse, interview, user
 
 # Global flag to track when ML core is ready
 _core_ready = False
@@ -22,13 +22,29 @@ _core_ready = False
 async def lifespan(app: FastAPI):
     """Runs at startup and shutdown."""
     global _core_ready
-    # STARTUP: server starts without loading ML models
-    print("🌉 Starting Bridgr server...")
-    print("🚀 ML models will be loaded on-demand (lazy loading)")
-    _core_ready = True  # Server is ready, ML loads when needed
-    print("🌉 Bridgr is ready!")
+    # STARTUP: Load ML models immediately to avoid first-request hang
+    print("Starting Bridgr server...")
+    print("Pre-loading ML models (this may take 30-60 seconds)...")
+    try:
+        # Load core in a background thread to not block the main thread
+        import threading
+        def load_models():
+            global _core_ready
+            try:
+                get_core()
+                _core_ready = True
+                print("[OK] ML models loaded and ready!")
+            except Exception as e:
+                print(f"[ERROR] Failed to load ML models: {e}")
+        
+        thread = threading.Thread(target=load_models)
+        thread.start()
+        
+    except Exception as e:
+        print(f"Startup error: {e}")
+    
     yield
-    # SHUTDOWN: nothing to clean up
+    # SHUTDOWN
     _core_ready = False
 
 
@@ -59,6 +75,7 @@ app.include_router(chat.router,         prefix="/api")
 app.include_router(roadmap.router,      prefix="/api")
 app.include_router(market_pulse.router, prefix="/api")
 app.include_router(interview.router,    prefix="/api")
+app.include_router(user.router,         prefix="/api")
 
 
 @app.get("/")

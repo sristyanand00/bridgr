@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Topbar } from '../components/layout';
 import { Button, Card, Chip, ProgressBar, Icon } from '../components/ui';
 import { useAnalysis } from '../App';
+import { auth } from '../config/firebase';
 
 const Roadmap = ({ profile, mobileMenuOpen, setMobileMenuOpen, onBack }) => {
   const {
@@ -48,12 +49,20 @@ const Roadmap = ({ profile, mobileMenuOpen, setMobileMenuOpen, onBack }) => {
         roadmap_inputs:   analysisData?.learning_roadmap_inputs ?? {},
         matched_skills:   analysisData?.matched_skills   ?? [],
         missing_required: analysisData?.missing_required ?? [],
-        total_days:       parseInt(days, 10) || 90,   // ← NEW field
+        total_days:       parseInt(days, 10) || 90,
+        analysis_id:      analysisData?.analysis_id, // Link to DB record
       };
+
+      // Get ID token if user is logged in
+      const headers = { 'Content-Type': 'application/json' };
+      if (auth.currentUser) {
+        const token = await auth.currentUser.getIdToken();
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/roadmap`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
         body: JSON.stringify(payload),
       });
 

@@ -1,12 +1,50 @@
 import React, { useState, useEffect, useRef } from 'react';
-
 import { Topbar } from '../components/layout';
-
 import { Button, Icon, Input, Chip } from '../components/ui';
-
-
+import { auth } from '../config/firebase';
 
 const Chat = ({ profile, analysisData, mobileMenuOpen, setMobileMenuOpen, onBack }) => {
+  const [messages, setMessages] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (auth.currentUser) {
+        setLoadingHistory(true);
+        try {
+          const token = await auth.currentUser.getIdToken();
+          const analysis_id = analysisData?.analysis_id;
+          let url = `${process.env.REACT_APP_API_URL}/api/chat/history`;
+          if (analysis_id) url += `?analysis_id=${analysis_id}`;
+          
+          const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            if (data.messages && data.messages.length > 0) {
+              setMessages(data.messages.map(m => ({
+                role: m.sender === "coach" ? "ai" : "user",
+                text: m.message
+              })));
+            } else {
+              setMessages([{ role: "ai", text: generateOpeningMsg() }]);
+            }
+          } else {
+            setMessages([{ role: "ai", text: generateOpeningMsg() }]);
+          }
+        } catch (err) {
+          console.error("Failed to load chat history:", err);
+          setMessages([{ role: "ai", text: generateOpeningMsg() }]);
+        } finally {
+          setLoadingHistory(false);
+        }
+      } else {
+        setMessages([{ role: "ai", text: generateOpeningMsg() }]);
+      }
+    };
+    fetchHistory();
+  }, [analysisData?.analysis_id]);
 
   const city = profile?.city || "Bengaluru";
 
@@ -36,8 +74,6 @@ const Chat = ({ profile, analysisData, mobileMenuOpen, setMobileMenuOpen, onBack
 
 
 
-  const [messages, setMessages] = useState([{ role: "ai", text: generateOpeningMsg() }]);
-
   const [inputValue, setInputValue] = useState("");
 
   const [isTyping, setIsTyping] = useState(false);
@@ -64,21 +100,19 @@ const Chat = ({ profile, analysisData, mobileMenuOpen, setMobileMenuOpen, onBack
 
     try {
 
-      // Call real AI API instead of using hardcoded responses
+      // Get ID token if user is logged in
+      const headers = { 'Content-Type': 'application/json' };
+      if (auth.currentUser) {
+        const token = await auth.currentUser.getIdToken();
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/chat`, {
-
         method: 'POST',
-
-        headers: {
-
-          'Content-Type': 'application/json',
-
-        },
-
+        headers: headers,
         body: JSON.stringify({
-
           message: messageText,
+          analysis_id: analysisData?.analysis_id, // Link to DB record
 
           context: {
 

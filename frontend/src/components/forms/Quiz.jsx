@@ -38,7 +38,11 @@ const Quiz = ({ onComplete, onSkip }) => {
       setQuestionIndex(prev => prev + 1);
       setAnimationKey(prev => prev + 1);
     } else {
-      onComplete(finalAnswers);
+      try {
+        onComplete(finalAnswers);
+      } catch (err) {
+        console.error("Quiz completion error:", err);
+      }
     }
   };
 

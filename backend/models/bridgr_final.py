@@ -1,5 +1,5 @@
 # ============================================================
-# BRIDGR ML — FINAL FIXED COLAB NOTEBOOK
+# BRIDGR ML   FINAL FIXED COLAB NOTEBOOK
 # All issues from the review document fixed.
 # Run cells top-to-bottom in Google Colab.
 # ============================================================
@@ -12,22 +12,22 @@ os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
 os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 1 — Install dependencies  ← RUN THIS FIRST
-# ─────────────────────────────────────────────────────────────
+#                                                              
+# CELL 1   Install dependencies    RUN THIS FIRST
+#                                                              
 # FIXED: was wrapped in a triple-quoted string (dead code).
-# Now live executable code — just run this cell.
+# Now live executable code   just run this cell.
 
 # Uncomment and run in Colab:
 # !pip install -q spacy sentence-transformers scikit-learn pandas \
 #              pdfplumber openai python-dotenv pydantic numpy rapidfuzz
 # !python -m spacy download en_core_web_sm -q
-# print("✅ All dependencies installed")
+# print("[OK] All dependencies installed")
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 2 — Imports  ← NO CHANGES NEEDED
-# ─────────────────────────────────────────────────────────────
+#                                                              
+# CELL 2   Imports    NO CHANGES NEEDED
+#                                                              
 # FIXED: removed unused model_validator import.
 
 from pydantic import BaseModel, field_validator
@@ -116,12 +116,12 @@ class RoadmapResponse(BaseModel):
     summary:     str
 
 
-print("✅ CELL 2 — models loaded")
+print("[OK] CELL 2   models loaded")
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 3 — Dataset loader
-# ─────────────────────────────────────────────────────────────
+#                                                              
+# CELL 3   Dataset loader
+#                                                              
 
 import zipfile, glob as _glob
 import pandas as pd
@@ -141,19 +141,19 @@ class OnetDatasetLoader:
             return self._df
         self._extract_zip()
         self._df = self._build_dataset()
-        print(f"✅ Dataset loaded: {len(self._df)} job profiles")
+        print(f"[OK] Dataset loaded: {len(self._df)} job profiles")
         return self._df
 
     def _extract_zip(self):
         if _glob.glob(f"{self.extract_path}/db_*"):
-            print("📦 Dataset already extracted")
+            print("  Dataset already extracted")
             return
         if self.zip_path and Path(self.zip_path).exists():
-            print("📦 Extracting dataset...")
+            print("  Extracting dataset...")
             with zipfile.ZipFile(self.zip_path, "r") as z:
                 z.extractall(self.extract_path)
         else:
-            print("⚠️  No ZIP file found — expecting pre-extracted db_* folder")
+            print("[INFO]  No ZIP file found   expecting pre-extracted db_* folder")
 
     @staticmethod
     def _agg_skills(series) -> List[str]:
@@ -171,7 +171,7 @@ class OnetDatasetLoader:
                 "Provide the dataset ZIP or pre-extracted folder."
             )
         base = sorted(folders)[-1]
-        print(f"📂 Using folder: {base}")
+        print(f"  Using folder: {base}")
 
         occ    = pd.read_csv(f"{base}/Occupation Data.txt",   sep="\t")
         skills = pd.read_csv(f"{base}/Skills.txt",            sep="\t")
@@ -223,7 +223,7 @@ class OnetDatasetLoader:
             partial = partial.copy()
             partial["_dist"] = partial["job_title"].str.len().sub(len(t)).abs()
             row = partial.sort_values("_dist").iloc[0]
-            print(f"⚠️  Closest match: '{row['job_title']}'")
+            print(f"[INFO]  Closest match: '{row['job_title']}'")
             return row
         return None
 
@@ -232,12 +232,12 @@ class OnetDatasetLoader:
         return list({s for s in df["tech_skills"].explode().dropna() if s})
 
 
-print("✅ CELL 3 — dataset loader loaded")
+print("[OK] CELL 3   dataset loader loaded")
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 4 — Resume parser
-# ─────────────────────────────────────────────────────────────
+#                                                              
+# CELL 4   Resume parser
+#                                                              
 # FIXED:
 #   - Section regex: ^experience$ anchor inside alternation group
 #     now uses word-boundary instead of regex anchor (which was
@@ -296,7 +296,7 @@ class ResumeParser:
         except ImportError:
             pass
         except Exception as e:
-            print(f"⚠️  pymupdf failed ({e}), trying pdfplumber")
+            print(f"[INFO]  pymupdf failed ({e}), trying pdfplumber")
 
         # Fallback: pdfplumber
         try:
@@ -314,7 +314,7 @@ class ResumeParser:
         if not text.strip():
             raise ValueError(
                 "This PDF appears to be image-based (scanned). "
-                "Bridgr needs a text-based PDF — please export from Google Docs or Word."
+                "Bridgr needs a text-based PDF   please export from Google Docs or Word."
             )
         return text, pages
 
@@ -330,7 +330,7 @@ class ResumeParser:
 
             matched = None
             # Test lines up to 80 chars that don't look like bullet body text
-            if 1 < len(line_clean) < 80 and not line_clean.startswith(("•", "-", "*")):
+            if 1 < len(line_clean) < 80 and not line_clean.startswith((" ", "-", "*")):
                 for sec_name, pattern in self.SECTION_PATTERNS.items():
                     if re.search(pattern, line_clean):
                         matched = sec_name
@@ -344,22 +344,22 @@ class ResumeParser:
         return {k: "\n".join(v) for k, v in sections.items() if v}
 
     def parse_dict(self, resume_dict: Dict) -> Dict:
-        """Accept a pre-built dict — for testing without a PDF."""
+        """Accept a pre-built dict   for testing without a PDF."""
         return resume_dict
 
 
-print("✅ CELL 4 — resume parser loaded")
+print("[OK] CELL 4   resume parser loaded")
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 5 — Skill extractor
-# ─────────────────────────────────────────────────────────────
+#                                                              
+# CELL 5   Skill extractor
+#                                                              
 # FIXED:
 #   - openai_key is stored but the condition if len < 5 and openai_key
 #     now clearly documents that tier-3 is MiniLM-based (no key needed).
 #     The openai_key param is kept for API compatibility but ignored.
 #   - LLM fallback threshold raised from 5 to 8 (5 was too low;
-#     a real resume should yield 10-20 skills — under 8 = parse failure)
+#     a real resume should yield 10-20 skills   under 8 = parse failure)
 
 import json as _json
 import numpy as np
@@ -386,10 +386,10 @@ class SkillExtractor:
         self.skill_list = [s for s in skill_list if s.lower() not in STOP_SKILLS]
         self.threshold  = semantic_threshold
         # openai_key retained so callers don't break, but tier-3 no longer needs it
-        self._has_fallback = True   # always available — MiniLM is already loaded
+        self._has_fallback = True   # always available   MiniLM is already loaded
 
         if verbose:
-            print("🔧 Loading NLP models...")
+            print("  Loading NLP models...")
         self.nlp         = spacy.load("en_core_web_sm")
         
         # Fix 2: Use safer model loading method
@@ -397,19 +397,19 @@ class SkillExtractor:
         try:
             self.embed_model = SentenceTransformer("all-MiniLM-L6-v2")
             if verbose:
-                print("✅ Embedding model loaded successfully")
+                print("[OK] Embedding model loaded successfully")
         except Exception as e:
-            print("⚠️ Embedding model failed:", e)
+            print("[INFO] Embedding model failed:", e)
             self.embed_model = None
             if verbose:
-                print("⚠️ Using basic mode without embeddings")
+                print("[INFO] Using basic mode without embeddings")
 
         self._matcher = PhraseMatcher(self.nlp.vocab, attr="LOWER")
         patterns = list(self.nlp.pipe(self.skill_list))
         self._matcher.add("SKILLS", patterns)
 
         if verbose:
-            print(f"⚡ Encoding {len(self.skill_list)} skills...")
+            print(f"  Encoding {len(self.skill_list)} skills...")
         
         # Initialize _skill_embeddings to empty array to prevent AttributeError
         self._skill_embeddings = np.array([])
@@ -421,9 +421,9 @@ class SkillExtractor:
             )
         else:
             if verbose:
-                print("⚠️ Skipping skill encoding (no embedding model)")
+                print("[INFO] Skipping skill encoding (no embedding model)")
         if verbose:
-            print("✅ Skill extractor ready")
+            print("[OK] Skill extractor ready")
 
     def extract(self, resume_data: Dict, debug: bool = False) -> List[ExtractedSkill]:
         full_text = resume_data["full_text"]
@@ -445,7 +445,7 @@ class SkillExtractor:
         # FIXED: threshold raised to 8 (was 5); logs a warning so the issue
         # is visible instead of silently triggering fallback
         if len(all_skills) < 8:
-            print(f"⚠️  Only {len(all_skills)} skills found — PDF may have "
+            print(f"[INFO]  Only {len(all_skills)} skills found   PDF may have "
                   "parsing issues. Running tier-3 MiniLM window pass...")
             t3 = self._tier3_miniLM_fallback(full_text, all_skills)
             all_skills += t3
@@ -537,13 +537,13 @@ class SkillExtractor:
 
         # FIXED: Check if embed_model is None before encoding
         if self.embed_model is None:
-            print("⚠️  Tier-3 skipped: no embedding model available")
+            print("[INFO]  Tier-3 skipped: no embedding model available")
             return []
         
         try:
             window_vecs = self.embed_model.encode(windows, batch_size=64, normalize_embeddings=True)
         except Exception as e:
-            print(f"⚠️  Tier-3 encode failed: {e}")
+            print(f"[INFO]  Tier-3 encode failed: {e}")
             return []
 
         results: List[ExtractedSkill] = []
@@ -569,14 +569,14 @@ class SkillExtractor:
         return results
 
 
-print("✅ CELL 5 — skill extractor loaded")
+print("[OK] CELL 5   skill extractor loaded")
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 6 — Matching engine
-# ─────────────────────────────────────────────────────────────
+#                                                              
+# CELL 6   Matching engine
+#                                                              
 # FIXED:
-#   - _vec_cache now LRU-bounded (cachetools) — no memory leak
+#   - _vec_cache now LRU-bounded (cachetools)   no memory leak
 #   - Returns (score, confidence, "empty job profile") message
 #     instead of silent (0, 0.3) so callers can show useful error
 
@@ -598,7 +598,7 @@ class MatchingEngine:
             self._embed_dim  = embed_model.get_sentence_embedding_dimension()
         else:
             self._embed_dim = 384  # Default dimension for MiniLM-L6-v2
-        # FIXED: bounded LRU cache — no unbounded memory growth
+        # FIXED: bounded LRU cache   no unbounded memory growth
         if _lru_available:
             self._vec_cache = _LRUCache(maxsize=512)
         else:
@@ -618,7 +618,7 @@ class MatchingEngine:
         # FIXED: return explicit sentinel with print so caller knows why score is 0
         if not user_skills or not job_all:
             if not job_all:
-                print("⚠️  Job profile has no skills — cannot compute match score. "
+                print("[INFO]  Job profile has no skills   cannot compute match score. "
                       "Check that the role was found in the dataset.")
             return 0, 0.3
 
@@ -693,17 +693,17 @@ class MatchingEngine:
         return pooled
 
 
-print("✅ CELL 6 — matching engine loaded")
+print("[OK] CELL 6   matching engine loaded")
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 7 — Gap analyser
-# ─────────────────────────────────────────────────────────────
+#                                                              
+# CELL 7   Gap analyser
+#                                                              
 # FIXED:
-#   - get_salary_band: keys use underscores, lookup uses spaces →
+#   - get_salary_band: keys use underscores, lookup uses spaces  
 #     NEVER matched. Fixed by normalising both sides consistently
 #     AND using a keyword-in-string approach that works with spaces.
-#   - _build_prerequisite_map: still O(skills²) on full O*NET.
+#   - _build_prerequisite_map: still O(skills ) on full O*NET.
 #     Added tqdm progress + a max_skills cap (500) so it doesn't
 #     hang the kernel on first call.
 
@@ -799,7 +799,7 @@ def update_salary_bands(overrides: Dict[str, Dict]) -> None:
     for role_key, band in overrides.items():
         # Store with lowercase spaces so get_salary_band lookup always matches
         INDIA_SALARY_BANDS[role_key.lower().strip()] = copy.deepcopy(band)
-    print(f"✅ Salary bands updated for: {list(overrides.keys())}")
+    print(f"[OK] Salary bands updated for: {list(overrides.keys())}")
 
 
 class GapAnalyzer:
@@ -842,7 +842,7 @@ class GapAnalyzer:
         skill_to_jobs = exploded.groupby("skill")["job_title"].apply(set)
         all_skills    = skill_to_jobs.index.tolist()
 
-        # FIXED: cap at 500 skills to avoid O(N²) hang on full O*NET
+        # FIXED: cap at 500 skills to avoid O(N ) hang on full O*NET
         # and add progress dots so the user knows it's working
         if len(all_skills) > 500:
             print(f"   Capping prerequisite map at 500 skills (full set: {len(all_skills)})")
@@ -971,7 +971,7 @@ class GapAnalyzer:
         )
 
     def get_salary_band(self, target_role: str) -> Dict:
-        # FIXED: both keys and lookup use lowercase with spaces — always matches
+        # FIXED: both keys and lookup use lowercase with spaces   always matches
         role_lower = target_role.lower().strip()
         # Sort by key length descending so "data scientist" beats "scientist"
         for keyword in sorted(INDIA_SALARY_BANDS.keys(), key=len, reverse=True):
@@ -1028,12 +1028,12 @@ class GapAnalyzer:
         }
 
 
-print("✅ CELL 7 — gap analyser loaded")
+print("[OK] CELL 7   gap analyser loaded")
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 8 — Dynamic job skills
-# ─────────────────────────────────────────────────────────────
+#                                                              
+# CELL 8   Dynamic job skills
+#                                                              
 
 import json as _json2, copy as _copy
 from pathlib import Path as _Path
@@ -1069,7 +1069,7 @@ class DynamicJobSkills:
             with open(path, encoding="utf-8") as f:
                 return _json2.load(f)
         except Exception as e:
-            print(f"⚠️  Custom skills load failed for {role_key}: {e}")
+            print(f"[INFO]  Custom skills load failed for {role_key}: {e}")
             return None
 
     def _load_onet_skills(self, role_key: str) -> Optional[Dict]:
@@ -1085,12 +1085,12 @@ class DynamicJobSkills:
                 "source":      "onet_dataset",
             }
         except Exception as e:
-            print(f"⚠️  O*NET lookup failed for {role_key}: {e}")
+            print(f"[WARN]  O*NET lookup failed for {role_key}: {e}")
             return None
 
     def _get_default_skills(self, role: str) -> Optional[Dict]:
         from services.llm_service import llm_service
-        print(f"⚠️  Role '{role}' not in local dataset — fetching from LLM...")
+        print(f"[INFO]  Role '{role}' not in local dataset   fetching from LLM...")
         llm_profile = llm_service.fetch_job_profile_from_gemini(role)
         if llm_profile:
             return {
@@ -1122,16 +1122,16 @@ class DynamicJobSkills:
                 _json2.dump(skills_data, f, indent=2, ensure_ascii=False)
             return True
         except Exception as e:
-            print(f"⚠️  Could not save custom skills: {e}")
+            print(f"[INFO]  Could not save custom skills: {e}")
             return False
 
 
-print("✅ CELL 8 — dynamic job skills loaded")
+print("[OK] CELL 8   dynamic job skills loaded")
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 9 — IntelligenceCore
-# ─────────────────────────────────────────────────────────────
+#                                                              
+# CELL 9   IntelligenceCore
+#                                                              
 
 import os as _os, uuid, glob as _glob2
 from datetime import datetime, timezone
@@ -1139,7 +1139,7 @@ from datetime import datetime, timezone
 
 class IntelligenceCore:
     def __init__(self, config: Dict):
-        print("\n🚀 Initialising Bridgr Intelligence Core...")
+        print("\n  Initialising Bridgr Intelligence Core...")
         extract_path = config["ONET_EXTRACT_PATH"]
         db_folders   = _glob2.glob(_os.path.join(extract_path, "db_*"))
 
@@ -1170,10 +1170,10 @@ class IntelligenceCore:
         )
         self.dynamic_job_skills = DynamicJobSkills(data_dir=config.get("DATA_DIR", "data/"))
         self.dynamic_job_skills.set_onet_loader(self.dataset_loader)
-        print("✅ Bridgr Intelligence Core ready\n")
+        print("[OK] Bridgr Intelligence Core ready\n")
 
     def analyze(self, resume_path: str, target_role: str) -> AnalysisResult:
-        print(f"📄 Parsing: {resume_path}")
+        print(f"  Parsing: {resume_path}")
         resume_data = self.resume_parser.parse(resume_path)
         return self._run(resume_data, target_role)
 
@@ -1181,12 +1181,12 @@ class IntelligenceCore:
         return self._run(resume_dict, target_role)
 
     def _run(self, resume_data: Dict, target_role: str) -> AnalysisResult:
-        print("🔍 Extracting skills...")
+        print("  Extracting skills...")
         extracted   = self.skill_extractor.extract(resume_data)
         user_skills = [s.normalized for s in extracted]
         print(f"   {len(extracted)} skills extracted")
 
-        print(f"📋 Loading profile for: {target_role}")
+        print(f"  Loading profile for: {target_role}")
         job_profile = self.dataset_loader.get_job_profile(target_role)
         if job_profile is None:
             skills_data = self.dynamic_job_skills.load_job_skills(target_role)
@@ -1207,16 +1207,16 @@ class IntelligenceCore:
 
         # Guard: if job profile is empty warn clearly before scoring
         if not job_tech and not job_soft:
-            print(f"⚠️  Role '{target_role}' resolved to an empty skill profile. "
+            print(f"[INFO]  Role '{target_role}' resolved to an empty skill profile. "
                   "Match score will be 0. Consider adding a custom_skills JSON.")
 
-        print("⚡ Computing match score...")
+        print("  Computing match score...")
         match_score, confidence = self.matching_engine.compute_match(user_skills, job_tech, job_soft)
 
         missing_all  = list((set(job_tech) | set(job_soft)) - set(user_skills))
         transferable = self.matching_engine.find_transferable_skills(user_skills, missing_all)
 
-        print("📊 Analysing gaps...")
+        print("  Analysing gaps...")
         missing_required, missing_preferred = self.gap_analyzer.analyze(
             user_skills, job_tech, job_soft, transferable
         )
@@ -1241,7 +1241,7 @@ class IntelligenceCore:
 
         explanations = _build_explanations(match_score, matched, missing_required, transferable)
 
-        print(f"✅ Analysis complete: {readiness} ({match_score}%)\n")
+        print(f"[OK] Analysis complete: {readiness} ({match_score}%)\n")
 
         return AnalysisResult(
             analysis_id=str(uuid.uuid4()),
@@ -1299,7 +1299,7 @@ def _build_explanations(
         out.append(f"Your {match_score}% match is driven by: {', '.join(matched[:3])}.")
     if missing:
         top = missing[0]
-        out.append(f"Top gap: '{top.name}' — {top.reason}.")
+        out.append(f"Top gap: '{top.name}'   {top.reason}.")
     if transferable:
         t = transferable[0]
         out.append(
@@ -1309,12 +1309,12 @@ def _build_explanations(
     return out
 
 
-print("✅ CELL 9 — IntelligenceCore loaded")
+print("[OK] CELL 9   IntelligenceCore loaded")
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 10 — FallbackIntelligenceCore
-# ─────────────────────────────────────────────────────────────
+#                                                              
+# CELL 10   FallbackIntelligenceCore
+#                                                              
 # FIXED:
 #   - uuid and datetime imported at top of THIS cell so it works
 #     standalone without depending on Cell 9 having run first.
@@ -1323,7 +1323,7 @@ print("✅ CELL 9 — IntelligenceCore loaded")
 #   - Empty tech_skills for unrecognised role: now falls back to a
 #     generic skill set instead of returning [] silently.
 #   - FallbackCore now populates learning_roadmap_inputs, mock_interview_inputs,
-#     career_chat_context (were empty dicts before — broke the results display).
+#     career_chat_context (were empty dicts before   broke the results display).
 #   - KNOWN_ROLES expanded from 7 to 15 roles.
 
 import uuid as _uuid_fb
@@ -1350,7 +1350,7 @@ class FallbackIntelligenceCore:
     }
 
     def __init__(self, config: Dict):
-        print("\n🔄 Initialising FallbackIntelligenceCore (no dataset needed)...")
+        print("\n  Initialising FallbackIntelligenceCore (no dataset needed)...")
         self.config = config
 
         self.resume_parser = ResumeParser()
@@ -1363,7 +1363,7 @@ class FallbackIntelligenceCore:
         self.matching_engine = MatchingEngine(self.skill_extractor.embed_model)
         uniform_demand       = {s: 0.10 for s in all_skills}
         self.gap_analyzer    = GapAnalyzer(uniform_demand)
-        print("✅ FallbackIntelligenceCore ready\n")
+        print("[OK] FallbackIntelligenceCore ready\n")
 
     def _get_job_profile(self, role: str) -> Dict:
         role_lower = role.lower().strip()
@@ -1371,7 +1371,7 @@ class FallbackIntelligenceCore:
         if role_lower in self.KNOWN_ROLES:
             val = self.KNOWN_ROLES[role_lower]
             return {"job_title": role_lower, "tech_skills": val["tech"], "soft_skills": val["soft"]}
-        # Substring match — longest key wins to avoid "engineer" beating "data engineer"
+        # Substring match   longest key wins to avoid "engineer" beating "data engineer"
         best_key, best_len = None, 0
         for key in self.KNOWN_ROLES:
             if (key in role_lower or role_lower in key) and len(key) > best_len:
@@ -1382,7 +1382,7 @@ class FallbackIntelligenceCore:
 
         # Fallback to LLM
         from services.llm_service import llm_service
-        print(f"⚠️  Role '{role}' not in known roles — fetching from LLM...")
+        print(f"[INFO]  Role '{role}' not in known roles   fetching from LLM...")
         llm_profile = llm_service.fetch_job_profile_from_gemini(role)
         if llm_profile:
             return {
@@ -1458,12 +1458,12 @@ class FallbackIntelligenceCore:
         )
 
 
-print("✅ CELL 10 — FallbackIntelligenceCore loaded")
+print("[OK] CELL 10   FallbackIntelligenceCore loaded")
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 11 — Model loader
-# ─────────────────────────────────────────────────────────────
+#                                                              
+# CELL 11   Model loader
+#                                                              
 
 import os as _os2
 from typing import Union
@@ -1482,11 +1482,11 @@ def get_core(force_reload: bool = False) -> Union[IntelligenceCore, FallbackInte
             "DATA_DIR":           _os2.getenv("DATA_DIR",            "data/"),
         }
         try:
+            print("[OK] Using full IntelligenceCore (dataset loaded)")
             _core_instance = IntelligenceCore(config)
-            print("✅ Using full IntelligenceCore (dataset loaded)")
         except Exception as e:
-            print(f"⚠️  Full core failed ({e}).")
-            print("    → Using FallbackIntelligenceCore (15 built-in roles, no dataset needed).")
+            print(f"[WARN] Full core failed ({e}).")
+            print("      Using FallbackIntelligenceCore (15 built-in roles, no dataset needed).")
             _core_instance = FallbackIntelligenceCore(config)
     return _core_instance
 
@@ -1494,32 +1494,32 @@ def get_core(force_reload: bool = False) -> Union[IntelligenceCore, FallbackInte
 def reset_core() -> None:
     global _core_instance
     _core_instance = None
-    print("🔄 Core reset — next get_core() will reinitialise.")
+    print("  Core reset   next get_core() will reinitialise.")
 
 
-print("✅ CELL 11 — model loader loaded")
+print("[OK] CELL 11   model loader loaded")
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 12 — Smoke test  (no PDF, runs automatically)
-# ─────────────────────────────────────────────────────────────
+#                                                              
+# CELL 12   Smoke test  (no PDF, runs automatically)
+#                                                              
 # FIXED: wrapped in if __name__ == "__main__" guard so production
 # servers importing this file don't pay the 30-second test cost.
 # In Colab, call smoke_test_no_pdf() manually from a cell.
 
 def smoke_test_no_pdf():
     print("\n" + "=" * 60)
-    print("SMOKE TEST — synthetic resume, no PDF required")
+    print("SMOKE TEST   synthetic resume, no PDF required")
     print("=" * 60)
 
     synthetic = {
         "full_text": (
-            "Jane Doe — Senior Data Scientist\n"
+            "Jane Doe   Senior Data Scientist\n"
             "SKILLS\n"
             "Python (4 years), SQL, Machine Learning, TensorFlow, Pandas, NumPy, "
             "Scikit-learn, Statistics, Git, Docker\n"
             "PROFESSIONAL EXPERIENCE\n"
-            "Built ML pipelines at Acme Corp (2020–2024). "
+            "Built ML pipelines at Acme Corp (2020 2024). "
             "Predictive models with Python and scikit-learn. "
             "Large SQL databases. Deployed with Docker. Tableau dashboards.\n"
             "EDUCATION\n"
@@ -1539,7 +1539,7 @@ def smoke_test_no_pdf():
 
     extractor = SkillExtractor(skill_list=all_skills, verbose=False)
     extracted = extractor.extract(synthetic, debug=True)
-    print(f"\n✅ Extracted {len(extracted)} skills:")
+    print(f"\n[OK] Extracted {len(extracted)} skills:")
     for s in extracted[:8]:
         print(f"   [{s.source:16s}] {s.normalized!r:30s} conf={s.confidence:.2f}")
 
@@ -1549,7 +1549,7 @@ def smoke_test_no_pdf():
 
     engine      = MatchingEngine(extractor.embed_model)
     score, conf = engine.compute_match(user_skills, job_tech, job_soft)
-    print(f"\n✅ Match score: {score}%  (confidence {conf:.2f})")
+    print(f"\n[OK] Match score: {score}%  (confidence {conf:.2f})")
 
     demand = {s: 0.10 for s in all_skills}
     demand.update({"python": 0.40, "sql": 0.30, "machine learning": 0.25, "docker": 0.20})
@@ -1557,29 +1557,29 @@ def smoke_test_no_pdf():
     transferable = engine.find_transferable_skills(user_skills, list(set(job_tech + job_soft) - set(user_skills)))
     req_gaps, _ = analyzer.analyze(user_skills, job_tech, job_soft, transferable)
 
-    print(f"\n✅ Required gaps ({len(req_gaps)}):")
+    print(f"\n[OK] Required gaps ({len(req_gaps)}):")
     for g in req_gaps:
         print(f"   [{g.priority:8s}] {g.name!r:30s}  ~{g.estimated_weeks}w  "
               f"demand={g.demand_percentage}%  resources={len(g.learning_resources)}")
 
-    # Test salary lookup (underscores vs spaces — was always returning default before)
+    # Test salary lookup (underscores vs spaces   was always returning default before)
     test_roles = ["Data Scientist", "Senior Software Engineer", "ML Engineer",
                   "Product Manager", "NLP Engineer", "some unknown role xyz"]
-    print("\n✅ Salary band lookup:")
+    print("\n[OK] Salary band lookup:")
     for r in test_roles:
         band = analyzer.get_salary_band(r)
-        print(f"   '{r}' → ₹{band['median']:,} median  ({band['currency']})")
+        print(f"   '{r}'    {band['median']:,} median  ({band['currency']})")
 
-    print("\n🎉 Smoke test passed!\n")
-
-
-# FIXED: do NOT auto-run in production — call manually in Colab
-# smoke_test_no_pdf()   # ← uncomment this line to run in Colab
+    print("\n  Smoke test passed!\n")
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 13 — Dataset path setup  ← EDIT PATHS BEFORE RUNNING
-# ─────────────────────────────────────────────────────────────
+# FIXED: do NOT auto-run in production   call manually in Colab
+# smoke_test_no_pdf()   #   uncomment this line to run in Colab
+
+
+#                                                              
+# CELL 13   Dataset path setup    EDIT PATHS BEFORE RUNNING
+#                                                              
 
 import os as _os3
 
@@ -1590,37 +1590,37 @@ if "ONET_ZIP_PATH" not in _os3.environ:
 
 print(f"ONET_EXTRACT_PATH : {_os3.environ['ONET_EXTRACT_PATH']}")
 print(f"ONET_ZIP_PATH     : {_os3.environ['ONET_ZIP_PATH']}")
-print("✅ Paths set — run CELL 14 to upload your resume")
+print("[OK] Paths set   run CELL 14 to upload your resume")
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 14 — Upload resume + enter target role
-# ─────────────────────────────────────────────────────────────
+#                                                              
+# CELL 14   Upload resume + enter target role
+#                                                              
 
 # Uncomment and run in Colab:
 # from google.colab import files as _colab_files
 #
-# print("📎 Select your resume PDF (text-based, not scanned)...")
+# print("  Select your resume PDF (text-based, not scanned)...")
 # _uploaded = _colab_files.upload()
 # if not _uploaded:
 #     raise RuntimeError("No file uploaded. Re-run this cell and select a PDF.")
 #
 # RESUME_PATH = list(_uploaded.keys())[0]
-# print(f"✅ Uploaded: {RESUME_PATH}")
+# print(f"[OK] Uploaded: {RESUME_PATH}")
 #
-# TARGET_ROLE = input("\n🎯 Enter your target job title (e.g. 'Data Scientist'): ").strip()
+# TARGET_ROLE = input("\n  Enter your target job title (e.g. 'Data Scientist'): ").strip()
 # if not TARGET_ROLE:
 #     raise ValueError("Target role cannot be empty.")
 #
-# print(f"✅ Target role: '{TARGET_ROLE}'")
+# print(f"[OK] Target role: '{TARGET_ROLE}'")
 # print("Run CELL 15 to analyse your resume.")
 
-print("ℹ️  CELL 14: uncomment the lines above in Colab to upload a PDF.")
+print("    CELL 14: uncomment the lines above in Colab to upload a PDF.")
 
 
-# ─────────────────────────────────────────────────────────────
-# CELL 15 — Run analysis + display results
-# ─────────────────────────────────────────────────────────────
+#                                                              
+# CELL 15   Run analysis + display results
+#                                                              
 
 # Uncomment and run in Colab after CELL 14:
 # _core   = get_core()
@@ -1628,61 +1628,61 @@ print("ℹ️  CELL 14: uncomment the lines above in Colab to upload a PDF.")
 #
 # def _bar(pct: int, width: int = 30) -> str:
 #     filled = int(width * pct / 100)
-#     return "█" * filled + "░" * (width - filled)
+#     return " " * filled + " " * (width - filled)
 #
 # def _fmt_inr(amount) -> str:
-#     try:    return f"₹{int(amount):,}"
+#     try:    return f" {int(amount):,}"
 #     except: return str(amount)
 #
-# print("\n" + "═"*60)
-# print(f"  BRIDGR ANALYSIS  —  {TARGET_ROLE.upper()}")
-# print("═"*60)
+# print("\n" + " "*60)
+# print(f"  BRIDGR ANALYSIS     {TARGET_ROLE.upper()}")
+# print(" "*60)
 # print(f"\n  Match score   {_bar(_result.match_score)}  {_result.match_score}%")
 # print(f"  Readiness     {_result.readiness_level}")
 # print(f"  Confidence    {int(_result.confidence_score * 100)}%")
 #
 # if _result.explanations:
-#     print("\n── What this means ──────────────────────────────────────")
+#     print("\n   What this means                                       ")
 #     for line in _result.explanations:
-#         print(f"  • {line}")
+#         print(f"    {line}")
 #
 # if _result.matched_skills:
-#     print("\n── Skills you already have ──────────────────────────────")
+#     print("\n   Skills you already have                               ")
 #     print(f"  {', '.join(sorted(_result.matched_skills)[:15])}")
 #
 # if _result.missing_required:
-#     print("\n── Skill gaps (required) ────────────────────────────────")
+#     print("\n   Skill gaps (required)                                 ")
 #     print(f"  {'SKILL':<28} {'PRIORITY':<10} {'WEEKS':<6} {'DEMAND'}")
-#     print(f"  {'─'*28} {'─'*10} {'─'*6} {'─'*6}")
+#     print(f"  {' '*28} {' '*10} {' '*6} {' '*6}")
 #     for g in _result.missing_required[:8]:
 #         print(f"  {g.name:<28} {g.priority:<10} ~{g.estimated_weeks:<5} {g.demand_percentage}%")
 #
 # if _result.transferable_skills:
-#     print("\n── Transferable skills ──────────────────────────────────")
+#     print("\n   Transferable skills                                   ")
 #     for t in _result.transferable_skills[:4]:
-#         print(f"  {t.user_skill}  →  {t.maps_to_job_skill}  ({int(t.transfer_score*100)}% overlap)")
+#         print(f"  {t.user_skill}     {t.maps_to_job_skill}  ({int(t.transfer_score*100)}% overlap)")
 #
 # rmap = _result.learning_roadmap_inputs
 # if rmap and rmap.get("phases"):
 #     total_w = rmap.get("total_estimated_weeks", "?")
-#     print(f"\n── Roadmap  (~{total_w} weeks) ──────────────────────────────")
+#     print(f"\n   Roadmap  (~{total_w} weeks)                               ")
 #     for ph in rmap["phases"]:
 #         if not ph.get("skills"): continue
-#         print(f"\n  Phase {ph['phase']} — {ph['label']} ({ph['duration_weeks']} weeks)")
+#         print(f"\n  Phase {ph['phase']}   {ph['label']} ({ph['duration_weeks']} weeks)")
 #         print(f"    Skills: {', '.join(ph['skills'])}")
 #         for res in ph.get("resources", [])[:2]:
 #             parts = res.split("|")
-#             print(f"    • {parts[0]}  {parts[1] if len(parts)>1 else ''}")
+#             print(f"      {parts[0]}  {parts[1] if len(parts)>1 else ''}")
 #
 # sb = _result.salary_band_estimate
 # if sb:
-#     print("\n── Salary estimate (India, Tier-1, mid-career) ──────────")
+#     print("\n   Salary estimate (India, Tier-1, mid-career)           ")
 #     print(f"  Min     {_fmt_inr(sb.get('min',0))}")
 #     print(f"  Median  {_fmt_inr(sb.get('median',0))}")
 #     print(f"  Max     {_fmt_inr(sb.get('max',0))}")
 #
-# print("\n" + "═"*60)
+# print("\n" + " "*60)
 
-print("ℹ️  CELL 15: uncomment the lines above in Colab to run analysis.")
+print("    CELL 15: uncomment the lines above in Colab to run analysis.")
 
-print("\n✅ All cells loaded successfully. Ready to use.")
+print("[OK] All cells loaded successfully. Ready to use.")

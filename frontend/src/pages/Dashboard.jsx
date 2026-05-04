@@ -1,8 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Topbar } from '../components/layout';
 import { Button, Card, Chip, Counter, Ring, ProgressBar, Icon } from '../components/ui';
+import { auth } from '../config/firebase';
 
 const Dashboard = ({ setCurrentPage, profile, analysisData, mobileMenuOpen, setMobileMenuOpen }) => {
+  const [history, setHistory] = useState({ analyses: [], roadmaps: [] });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (profile?.authenticated) {
+        setLoading(true);
+        try {
+          const token = await auth.currentUser.getIdToken();
+          const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/history`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setHistory(data);
+          }
+        } catch (err) {
+          console.error("Error fetching history:", err);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    fetchHistory();
+  }, [profile?.authenticated]);
   const city = profile?.city || "Bengaluru";
 
   const features = [
@@ -130,6 +156,63 @@ const Dashboard = ({ setCurrentPage, profile, analysisData, mobileMenuOpen, setM
             </div>
           </div>
         </Card>
+
+        {/* RECENT ACTIVITY SECTION */}
+        {profile?.authenticated && (history.analyses.length > 0 || history.roadmaps.length > 0) && (
+          <div style={{ marginBottom:32 }}>
+            <div style={{ 
+              fontSize:20, 
+              fontWeight:600, 
+              color:"var(--t1)", 
+              marginBottom:16,
+              fontFamily:"'Fraunces', serif",
+              display: "flex",
+              alignItems: "center",
+              gap: 8
+            }}>
+              <Icon name="activity" s={20} c="var(--p1)" />
+              Your Recent Activity
+            </div>
+            
+            <div style={{ 
+              display: "grid", 
+              gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", 
+              gap: 16 
+            }}>
+              {history.analyses.slice(0, 3).map((a) => (
+                <Card key={`anal-${a.id}`} className="gl" style={{ padding: 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                    <div style={{ fontSize: 20 }}>📄</div>
+                    <div style={{ fontWeight: 600 }}>{a.target_role}</div>
+                  </div>
+                  <div style={{ fontSize: 13, color: "var(--t2)", marginBottom: 12 }}>
+                    Analyzed on {new Date(a.created_at).toLocaleDateString()}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "var(--p1)" }}>{a.match_score}% Match</div>
+                    <Button size="small" variant="ghost" onClick={() => setCurrentPage("resume")}>View</Button>
+                  </div>
+                </Card>
+              ))}
+              
+              {history.roadmaps.slice(0, 3).map((r) => (
+                <Card key={`road-${r.id}`} className="gl" style={{ padding: 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                    <div style={{ fontSize: 20 }}>🗺️</div>
+                    <div style={{ fontWeight: 600 }}>{r.target_role} Plan</div>
+                  </div>
+                  <div style={{ fontSize: 13, color: "var(--t2)", marginBottom: 12 }}>
+                    Generated {new Date(r.created_at).toLocaleDateString()}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ fontSize: 12, color: "var(--t2)" }}>{r.total_days} Day Roadmap</div>
+                    <Button size="small" variant="ghost" onClick={() => setCurrentPage("roadmap")}>View</Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* FEATURES GRID */}
         <div style={{ marginBottom:24 }}>

@@ -47,12 +47,31 @@ const App = () => {
   const [showAuth, setShowAuth]           = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // ── Sync with PostgreSQL backend ────────────────────────────────────────
+  const syncUserWithBackend = async (firebaseUser) => {
+    try {
+      const token = await firebaseUser.getIdToken();
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/sync`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const dbUser = await response.json();
+        if (dbUser.quiz_data) {
+          setProfile(prev => ({ ...prev, ...dbUser.quiz_data }));
+        }
+      }
+    } catch (err) {
+      console.error("Failed to sync user with backend:", err);
+    }
+  };
+
   // ── Firebase persistent auth check ──────────────────────────────────────
   useEffect(() => {
     let unsubscribe = () => {};
 
     if (auth && typeof auth.onAuthStateChanged === 'function') {
-      unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+      unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
         if (firebaseUser) {
           // User was previously logged in — restore session
           const userData = {
@@ -64,8 +83,11 @@ const App = () => {
           };
           setUser(userData);
           setProfile(prev => ({ ...(prev || {}), ...userData }));
-          // Skip auth + quiz screens for returning users — go straight to app
+          
           setScreen("app");
+          
+          // Sync with DB in background
+          syncUserWithBackend(firebaseUser);
         } else {
           // No active session — show landing
           if (screen === "loading") setScreen("landing");
@@ -99,8 +121,29 @@ const App = () => {
 
   // ── Auth handlers ────────────────────────────────────────────────────────
   const handleQuizComplete = (answers) => {
-    setProfile(prev => ({ ...(prev || {}), ...answers }));
+    // Navigate immediately to the app
     setScreen("app");
+    setProfile(prev => ({ ...(prev || {}), ...answers }));
+    
+    // Save quiz to DB in the background if authenticated
+    if (user?.authenticated || auth.currentUser) {
+      const syncQuiz = async () => {
+        try {
+          const token = await auth.currentUser.getIdToken();
+          await fetch(`${process.env.REACT_APP_API_URL}/api/user/quiz`, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify({ quiz_data: answers })
+          });
+        } catch (err) {
+          console.error("Background sync failed:", err);
+        }
+      };
+      syncQuiz();
+    }
   };
 
   const handleSkipQuiz = () => {

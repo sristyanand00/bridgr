@@ -75,22 +75,24 @@ class LLMService:
             return None
         
         try:
+            print(f"[API] Sending Gemini request for {method_name}...")
             model = genai.GenerativeModel(_GEMINI_MODEL)
             response = model.generate_content(prompt)
             result = json.loads(_clean_json(response.text))
-            print(f"✅ Gemini {method_name} succeeded")
+            print(f"[OK] Gemini {method_name} succeeded")
             return result
         except Exception as e:
-            print(f"⚠️  Gemini {method_name} failed: {e}")
+            print(f"    Gemini {method_name} failed: {e}")
             return None
 
     def _try_groq(self, prompt: str, method_name: str) -> Optional[Dict[str, Any]]:
         """Try Groq as fallback, return None if fails"""
         if not self.groq_client:
-            print("⚠️  Groq client not available")
+            print("    Groq client not available")
             return None
         
         try:
+            print(f"[API] Sending Groq request for {method_name}...")
             response = self.groq_client.chat.completions.create(
                 model=_GROQ_MODEL,
                 messages=[{"role": "user", "content": prompt}],
@@ -98,13 +100,13 @@ class LLMService:
                 max_tokens=2048
             )
             result = json.loads(_clean_json(response.choices[0].message.content))
-            print(f"✅ Groq {method_name} succeeded")
+            print(f"[OK] Groq {method_name} succeeded")
             return result
         except Exception as e:
-            print(f"⚠️  Groq {method_name} failed: {e}")
+            print(f"    Groq {method_name} failed: {e}")
             return None
 
-    # ── job profile ──────────────────────────────────────────────────────────
+    #    job profile                                                           
 
     def fetch_job_profile_from_gemini(self, role: str) -> Optional[Dict[str, Any]]:
         """
@@ -136,10 +138,10 @@ Now extract skills for: {role}"""
             result["source"] = "groq"
             return result
 
-        print(f"❌ All LLM providers failed for job profile: {role}")
+        print(f"  All LLM providers failed for job profile: {role}")
         return None
 
-    # ── feasibility score ────────────────────────────────────────────────────
+    #    feasibility score                                                     
 
     def generate_feasibility_score_with_gemini(
         self,
@@ -198,14 +200,14 @@ Return ONLY valid JSON (no markdown, no explanation):
             return result
 
         # Final fallback to simple calculation
-        print(f"⚠️  Using match score fallback for feasibility: {target_role}")
+        print(f"[WARN] Using match score fallback for feasibility: {target_role}")
         return {
             "score": match_score,
             "reasoning": "Using match score as fallback (all LLM providers unavailable).",
             "confidence": 0.6,
         }
 
-    # ── roadmap ──────────────────────────────────────────────────────────────
+    #    roadmap                                                               
 
     def generate_roadmap_with_gemini(
         self,
@@ -239,13 +241,13 @@ Student profile:
 - Available study time: {available_hours_per_week} hours/week
 
 Create a 3-phase syllabus split as:
-  Phase 1: Days 1–{p1_end}   (Foundation)
-  Phase 2: Days {p1_end+1}–{p2_end} (Core Skills)
-  Phase 3: Days {p2_end+1}–{p3_end} (Job Ready)
+  Phase 1: Days 1 {p1_end}   (Foundation)
+  Phase 2: Days {p1_end+1} {p2_end} (Core Skills)
+  Phase 3: Days {p2_end+1} {p3_end} (Job Ready)
 
 Rules:
-- Each phase has 2–4 topics
-- Each topic has a title, day range within the phase, 3–5 subtopics to learn, one mini project, and one specific FREE resource
+- Each phase has 2 4 topics
+- Each topic has a title, day range within the phase, 3 5 subtopics to learn, one mini project, and one specific FREE resource
 - Resources must be real URLs: freeCodeCamp, Kaggle, fast.ai, official docs, YouTube, MDN, CS50, etc.
 - Do NOT teach skills they already have
 - Mini projects should be concrete and buildable
@@ -256,14 +258,14 @@ Return ONLY valid JSON (no markdown, no extra text):
     {{
       "phase": 1,
       "label": "Foundation",
-      "day_range": "Days 1–{p1_end}",
+      "day_range": "Days 1 {p1_end}",
       "goal": "one sentence goal for this phase",
       "skills": ["skill1", "skill2"],
       "milestones": ["Built X", "Completed Y"],
       "topics": [
         {{
           "title": "Topic Name",
-          "days": "Days 1–{p1_end // 3}",
+          "days": "Days 1 {p1_end // 3}",
           "subtopics": [
             "Specific thing to learn 1",
             "Specific thing to learn 2",
@@ -284,7 +286,7 @@ Return ONLY valid JSON (no markdown, no extra text):
     {{
       "phase": 2,
       "label": "Core Skills",
-      "day_range": "Days {p1_end+1}–{p2_end}",
+      "day_range": "Days {p1_end+1} {p2_end}",
       "goal": "one sentence goal",
       "skills": ["skill3", "skill4"],
       "milestones": ["Built X", "Completed Y"],
@@ -294,7 +296,7 @@ Return ONLY valid JSON (no markdown, no extra text):
     {{
       "phase": 3,
       "label": "Job Ready",
-      "day_range": "Days {p2_end+1}–{p3_end}",
+      "day_range": "Days {p2_end+1} {p3_end}",
       "goal": "one sentence goal",
       "skills": ["skill5"],
       "milestones": ["Portfolio live", "Applied to 5 roles"],
@@ -320,7 +322,7 @@ Return ONLY valid JSON (no markdown, no extra text):
             return result
 
         # Final fallback
-        print(f"⚠️  All LLM providers failed for roadmap: {target_role}")
+        print(f"    All LLM providers failed for roadmap: {target_role}")
         return {
             "phases": [], 
             "total_weeks": total_days // 7, 

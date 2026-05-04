@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Topbar } from '../components/layout';
 import { Button, Card, Chip, ProgressBar, Icon, Input } from '../components/ui';
 import { useAnalysis } from '../App';
+import { auth } from '../config/firebase';
 
 const formatSalary = (num) => {
   if (typeof num !== 'number') return num;
@@ -46,8 +47,16 @@ const Resume = ({ profile, onSaveGate, mobileMenuOpen, setMobileMenuOpen, setCur
       formData.append('resume', selectedFile);
       formData.append('target_role', targetRole.trim());
 
+      // Get ID token if user is logged in
+      let headers = {};
+      if (auth.currentUser) {
+        const token = await auth.currentUser.getIdToken();
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/analyze`, {
         method: 'POST',
+        headers: headers,
         body: formData,
       });
 

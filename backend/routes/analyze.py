@@ -12,12 +12,17 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from core.exceptions import ResumeParseFailed, JobRoleNotFound
 from models.analysis import AnalysisResult
 from services.llm_service import llm_service
+from services.auth_service import get_user_optional
+from db.database import get_db
+from db.models import Analysis, User
+from sqlalchemy.orm import Session
+from fastapi import APIRouter, UploadFile, File, Form, Depends
 
 router = APIRouter()
 
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
-# ── helpers ──────────────────────────────────────────────────────────────────
+#    helpers                                                                   
 
 _GARBAGE_ROLE_RE = re.compile(r"^[^a-zA-Z]{0,3}$|^\d+$|^(.)\1{4,}$")  # "123", "aaaa", "   "
 
@@ -69,25 +74,27 @@ def _serialize_skill_gaps(gaps) -> list:
     return result
 
 
-# ── route ────────────────────────────────────────────────────────────────────
+#    route                                                                     
 
 @router.post("/analyze", response_model=AnalysisResult)
-async def analyze_resume(
+def analyze_resume(
     resume: UploadFile = File(..., description="PDF resume file"),
     target_role: str = Form(..., description="Target job role, e.g. 'Data Scientist'"),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_user_optional)
 ):
     """
     Upload a resume PDF and target role.
     Returns full career gap analysis with Gemini-powered feasibility score.
     """
-    # ── 1. Validate inputs before touching the file ──────────────────────────
+    #    1. Validate inputs before touching the file                           
     target_role = _validate_target_role(target_role)
 
     if not resume.filename or not resume.filename.lower().endswith(".pdf"):
         raise ResumeParseFailed("Only PDF files are supported. Please upload a .pdf file.")
 
-    # ── 2. Read & size-check ─────────────────────────────────────────────────
-    contents = await resume.read()
+    #    2. Read & size-check (synchronous read)
+    contents = resume.file.read()
     if len(contents) == 0:
         raise ResumeParseFailed("The uploaded file is empty.")
     if len(contents) > MAX_FILE_SIZE:
@@ -100,25 +107,25 @@ async def analyze_resume(
             "Please export your resume as a PDF from Word or Google Docs."
         )
 
-    # ── 3. Write to temp file & run ML pipeline ──────────────────────────────
+    #    3. Write to temp file & run ML pipeline                               
     tmp_path = None
     try:
+        print(f"[RESUME] Processing resume for: {target_role}")
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
             tmp.write(contents)
             tmp_path = tmp.name
 
-        # FIX: import get_core and call .analyze() — there is no standalone
-        # analyze_resume function; the entry-point is IntelligenceCore.analyze()
+        print("[ML] Loading ML models...")
         from ml.model_loader import get_core
         core = get_core()
+        
+        print("[MATCH] Running NLP extraction and gap analysis...")
         result = core.analyze(tmp_path, target_role)
 
-        # result is already an AnalysisResult Pydantic model.
-        # Convert to dict so we can augment it with the feasibility score.
         result_dict = result.model_dump() if hasattr(result, "model_dump") else result.dict()
 
-        # ── 4. Gemini feasibility score ──────────────────────────────────────
-        # FIX: serialize SkillGap objects → plain dicts before passing to LLM
+        #    4. Gemini feasibility score                                       
+        print("[AI] Generating Gemini feasibility score...")
         missing_required_dicts = _serialize_skill_gaps(result_dict.get("missing_required", []))
 
         feasibility = llm_service.generate_feasibility_score_with_gemini(
@@ -133,6 +140,43 @@ async def analyze_resume(
         )
 
         result_dict["feasibility"] = feasibility
+
+        #    5. Save to database if user is authenticated                      
+        if current_user:
+            uid = current_user.get("uid")
+            print(f"[DB] Saving results to database for user: {uid}")
+            
+            # Ensure user exists in database
+            db_user = db.query(User).filter(User.id == uid).first()
+            if not db_user:
+                print(f"[USER] Creating new user record for: {uid}")
+                db_user = User(
+                    id=uid,
+                    email=current_user.get("email"),
+                    name=current_user.get("name") or current_user.get("email", "").split("@")[0]
+                )
+                db.add(db_user)
+                db.commit()
+            
+            # Save analysis
+            db_analysis = Analysis(
+                user_id=uid,
+                target_role=target_role,
+                match_score=result_dict.get("match_score", 0),
+                feasibility_score=feasibility,
+                skill_gaps=missing_required_dicts,
+                matched_skills=result_dict.get("matched_skills", []),
+                roadmap_inputs=result_dict.get("learning_roadmap_inputs", {})
+            )
+            db.add(db_analysis)
+            db.commit()
+            db.refresh(db_analysis)
+            
+            # Add the DB ID to the response
+            result_dict["analysis_id"] = str(db_analysis.id)
+            print(f"[OK] Analysis saved with ID: {db_analysis.id}")
+            
+        print("[DONE] Analysis request completed successfully")
         return AnalysisResult(**result_dict)
 
     except (ResumeParseFailed, JobRoleNotFound):
@@ -142,6 +186,8 @@ async def analyze_resume(
         raise ResumeParseFailed(str(e))
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         err = str(e)
         if "not found" in err.lower():
             raise JobRoleNotFound(target_role)

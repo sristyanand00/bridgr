@@ -55,8 +55,8 @@ def get_core() -> Union[IntelligenceCore, FallbackIntelligenceCore]:
             _core_instance = get_colab_core()
             print(" Using full IntelligenceCore with O*NET data")
         except Exception as e:
-            print(f"⚠️  Failed to load full IntelligenceCore: {e}")
-            print("🔄 Falling back to FallbackIntelligenceCore")
+            print(f"[WARN] Failed to load full IntelligenceCore: {e}")
+            print("[FB] Falling back to FallbackIntelligenceCore")
             _core_instance = FallbackIntelligenceCore(config)
     
     return _core_instance
@@ -75,7 +75,7 @@ def analyze_resume(resume_path: str, target_role: str) -> Dict[str, Any]:
         # If analysis returned empty matched_skills (unknown role), try Gemini
         result_dict = result.model_dump() if hasattr(result, 'model_dump') else result
         if not result_dict.get("matched_skills") or len(result_dict.get("matched_skills", [])) == 0:
-            print(f"⚠️  Role '{target_role}' not in O*NET — fetching from Gemini Flash...")
+            print(f"[WARN] Role '{target_role}' not in O*NET   fetching from Gemini Flash...")
             
             # Fetch from Gemini (FREE, 1500 calls/day)
             gemini_profile = llm_service.fetch_job_profile_from_gemini(target_role)
@@ -85,13 +85,13 @@ def analyze_resume(resume_path: str, target_role: str) -> Dict[str, Any]:
                 result_dict["matched_skills"] = gemini_profile.get("tech_skills", [])
                 result_dict["missing_required"] = []  # Clear missing skills since we're using Gemini
                 result_dict["explanations"].append(f"Used Gemini Flash to fetch skills for '{target_role}'")
-                print(f"✅ Injected Gemini profile for '{target_role}'")
+                print(f"[OK] Injected Gemini profile for '{target_role}'")
                 return result_dict
         
         return result.model_dump() if hasattr(result, 'model_dump') else result
     
     except Exception as e:
-        print(f"⚠️  Analysis failed: {e}")
+        print(f"[WARN] Analysis failed: {e}")
         from datetime import datetime
         return {
             "analysis_id": f"error_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
@@ -121,4 +121,4 @@ def reset_models():
     global _core_instance
     reset_core()
     _core_instance = None
-    print("🔄 Models reset - next call will reinitialize.")
+    print("[OK] Models reset - next call will reinitialize.")

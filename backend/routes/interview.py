@@ -41,7 +41,7 @@ class InterviewAnswerRequest(BaseModel):
 
 
 @router.post("/interview/start")
-async def start_interview(request: InterviewStartRequest):
+def start_interview(request: InterviewStartRequest):
     """Generate a set of interview questions tailored to the user's gaps."""
     if not GEMINI_API_KEY:
         raise AIServiceError("Gemini API key not configured")
@@ -79,7 +79,7 @@ Return ONLY valid JSON."""
 
 
 @router.post("/interview/evaluate")
-async def evaluate_answer(request: InterviewAnswerRequest):
+def evaluate_answer(request: InterviewAnswerRequest):
     """Evaluate a user's interview answer and give feedback."""
     if not GEMINI_API_KEY:
         raise AIServiceError("Gemini API key not configured")
