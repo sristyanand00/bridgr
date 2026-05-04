@@ -1,5 +1,5 @@
 export const NAVIGATION_ITEMS = [
-  { id:"dashboard", i:"home",  l:"Overview" },
+  { id:"dashboard", i:"home",  l:"Dashboard" },
   { id:"resume",    i:"file",  l:"Resume Analysis" },
   { id:"roadmap",   i:"map",   l:"Roadmap" },
   { id:"history",   i:"clock", l:"History" },

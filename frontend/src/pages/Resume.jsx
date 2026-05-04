@@ -274,7 +274,6 @@ const Resume = ({ profile, onSaveGate, mobileMenuOpen, setMobileMenuOpen, setCur
       <Topbar
         title="Resume Analysis"
         sub={`${displayRole} • ${profile?.city || "Bengaluru"}`}
-        right={<Button size="small">Export PDF</Button>}
         onBack={onBack}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}

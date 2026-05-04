@@ -61,14 +61,8 @@ const Dashboard = ({ setCurrentPage, profile, analysisData, mobileMenuOpen, setM
   return (
     <div className="main">
       <Topbar 
-        title="Overview" 
+        title="Dashboard" 
         sub={`Good morning, ${(profile?.name || "Ananya").split(" ")[0]}`}
-        right={
-          <Button size="small" onClick={() => setCurrentPage("resume")}>
-            <Icon name="upload" s={13} c="white"/>
-            Upload Resume
-          </Button>
-        }
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
       />

@@ -19,5 +19,7 @@ groq
 rapidfuzz==3.5.2
 firebase-admin==6.2.0
 sqlalchemy==2.0.23
+asyncpg
+psycopg2-binary
 cachetools==5.3.2
 pymupdf==1.23.6
