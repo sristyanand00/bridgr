@@ -77,8 +77,8 @@ const App = () => {
     }
 
     return () => unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // intentionally empty — only run on mount for auth state check
+
 
   // ── Navigation helpers ───────────────────────────────────────────────────
   const navigateTo = (page) => {
