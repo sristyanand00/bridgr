@@ -1055,9 +1055,10 @@ class DynamicJobSkills:
         result = (
             self._load_custom_skills(role_key)
             or self._load_onet_skills(role_key)
-            or self._get_default_skills()
+            or self._get_default_skills(role_name)
         )
-        self.skills_cache[role_key] = result
+        if result:
+            self.skills_cache[role_key] = result
         return result
 
     def _load_custom_skills(self, role_key: str) -> Optional[Dict]:
@@ -1087,12 +1088,17 @@ class DynamicJobSkills:
             print(f"⚠️  O*NET lookup failed for {role_key}: {e}")
             return None
 
-    def _get_default_skills(self) -> Dict:
-        return {
-            "tech_skills": ["python", "sql", "git", "rest api", "documentation"],
-            "soft_skills": ["communication", "problem solving", "teamwork", "time management"],
-            "source":      "default_fallback",
-        }
+    def _get_default_skills(self, role: str) -> Optional[Dict]:
+        from services.llm_service import llm_service
+        print(f"⚠️  Role '{role}' not in local dataset — fetching from LLM...")
+        llm_profile = llm_service.fetch_job_profile_from_gemini(role)
+        if llm_profile:
+            return {
+                "tech_skills": llm_profile.get("tech_skills", []),
+                "soft_skills": llm_profile.get("soft_skills", []),
+                "source": "llm_generated",
+            }
+        return None
 
     def get_skill_market_demand(self, role_key: str) -> Dict[str, float]:
         if self._onet_loader is not None:
@@ -1343,10 +1349,6 @@ class FallbackIntelligenceCore:
         "cloud engineer":            {"tech": ["aws","gcp","azure","terraform","docker","kubernetes","linux","ci/cd"],                                  "soft": ["problem solving","communication","documentation"]},
     }
 
-    # Generic fallback for any role not in KNOWN_ROLES
-    _GENERIC_TECH = ["python", "git", "sql", "rest api", "documentation", "linux"]
-    _GENERIC_SOFT = ["communication", "problem solving", "teamwork", "time management"]
-
     def __init__(self, config: Dict):
         print("\n🔄 Initialising FallbackIntelligenceCore (no dataset needed)...")
         self.config = config
@@ -1378,9 +1380,18 @@ class FallbackIntelligenceCore:
             val = self.KNOWN_ROLES[best_key]
             return {"job_title": best_key, "tech_skills": val["tech"], "soft_skills": val["soft"]}
 
-        # FIXED: no longer returns empty tech_skills silently
-        print(f"⚠️  Role '{role}' not in known roles — using generic tech profile.")
-        return {"job_title": role, "tech_skills": self._GENERIC_TECH, "soft_skills": self._GENERIC_SOFT}
+        # Fallback to LLM
+        from services.llm_service import llm_service
+        print(f"⚠️  Role '{role}' not in known roles — fetching from LLM...")
+        llm_profile = llm_service.fetch_job_profile_from_gemini(role)
+        if llm_profile:
+            return {
+                "job_title": role,
+                "tech_skills": llm_profile.get("tech_skills", []),
+                "soft_skills": llm_profile.get("soft_skills", [])
+            }
+            
+        raise ValueError(f"Could not find job profile for '{role}' and AI generation failed.")
 
     def analyze(self, resume_path: str, target_role: str) -> AnalysisResult:
         resume_data = self.resume_parser.parse(resume_path)
@@ -1572,8 +1583,10 @@ def smoke_test_no_pdf():
 
 import os as _os3
 
-_os3.environ["ONET_EXTRACT_PATH"] = "data/"           # ← change if needed
-_os3.environ["ONET_ZIP_PATH"]     = ""  # ← or "" if already extracted
+if "ONET_EXTRACT_PATH" not in _os3.environ:
+    _os3.environ["ONET_EXTRACT_PATH"] = "data/"
+if "ONET_ZIP_PATH" not in _os3.environ:
+    _os3.environ["ONET_ZIP_PATH"]     = ""
 
 print(f"ONET_EXTRACT_PATH : {_os3.environ['ONET_EXTRACT_PATH']}")
 print(f"ONET_ZIP_PATH     : {_os3.environ['ONET_ZIP_PATH']}")
