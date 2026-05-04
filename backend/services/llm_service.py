@@ -29,35 +29,44 @@ def _extract_name(gap) -> str:
 
 def _clean_json(text: str) -> str:
     """Strip markdown code fences that AI models sometimes wrap around JSON."""
+    if not text:
+        return "{}"
+    
     text = text.strip()
     
-    # Look for JSON content in code blocks
-    if "```" in text:
-        # Find all code blocks and extract the first valid JSON
-        lines = text.split("\n")
-        in_json_block = False
-        json_lines = []
-        
-        for line in lines:
-            if line.strip().startswith("```"):
-                if not in_json_block:
-                    in_json_block = True
-                    continue
-                else:
-                    # End of code block
-                    break
-            elif in_json_block:
-                json_lines.append(line)
-        
-        if json_lines:
-            text = "\n".join(json_lines)
+    # Remove markdown code blocks
+    if text.startswith("```json"):
+        text = text[7:]
+    if text.startswith("```"):
+        text = text[3:]
+    if text.endswith("```"):
+        text = text[:-3]
+    
+    # Remove any leading/trailing whitespace and newlines
+    text = text.strip()
     
     # If still not starting with {, try to find the first { and last }
-    if not text.strip().startswith("{"):
+    if not text.startswith("{"):
         start = text.find("{")
         end = text.rfind("}")
         if start != -1 and end != -1 and end > start:
             text = text[start:end+1]
+    
+    # Remove common JSON formatting issues
+    # Fix trailing commas before closing brackets/braces
+    text = text.replace(",\n}", "\n}").replace(",\n]", "\n]")
+    text = text.replace(",}", "}").replace(",]", "]")
+    
+    # Fix broken line breaks in strings
+    lines = text.split('\n')
+    cleaned_lines = []
+    for line in lines:
+        # Remove excessive whitespace and fix broken string literals
+        line = line.strip()
+        if line and not line.startswith('//'):  # Skip comment lines
+            cleaned_lines.append(line)
+    
+    text = '\n'.join(cleaned_lines)
     
     return text.strip()
 

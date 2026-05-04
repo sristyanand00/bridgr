@@ -17,3 +17,7 @@ data/
 
 # VS Code
 .vscode/
+
+# Firebase credentials (sensitive)
+firebase-admin-key.json
+*.json
