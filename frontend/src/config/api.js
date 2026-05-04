@@ -138,13 +138,13 @@ export const api = {
 
   // Get career roadmap
 
-  getRoadmap: (profile) => {
+  getRoadmap: (payload) => {
 
     return apiRequest(API_ENDPOINTS.ROADMAP, {
 
       method: 'POST',
 
-      body: JSON.stringify({ profile }),
+      body: JSON.stringify(payload),
 
     });
 

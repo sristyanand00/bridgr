@@ -102,4 +102,5 @@ class RoadmapResponse(BaseModel):
     """Structured roadmap returned by /roadmap."""
     phases: List[Dict]
     total_weeks: int
+    total_days: int = 90
     summary: str

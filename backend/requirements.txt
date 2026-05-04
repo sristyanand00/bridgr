@@ -11,8 +11,9 @@ python-dotenv==1.0.1
 supabase==2.4.3
 pydantic-settings==2.2.1
 
-# LLM: Gemini Flash only (FREE)
+# LLM: Gemini Flash + Groq fallback (FREE)
 google-generativeai==0.3.0
+groq
 
 # Additional dependencies for ML models
 rapidfuzz==3.5.2
