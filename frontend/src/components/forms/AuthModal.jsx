@@ -8,7 +8,7 @@ import {
   signInWithPopup 
 } from '../../config/firebase';
 
-const AuthModal = ({ mode = "save", onAuth, onSkip }) => {
+const AuthModal = ({ mode = "save", onAuth, onSkip, onBack }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -114,6 +114,28 @@ const AuthModal = ({ mode = "save", onAuth, onSkip }) => {
       animation: "fadeIn .3s both" 
     }}>
       <div className="auth-card afu">
+        {/* Back to landing */}
+        {onBack && (
+          <button
+            onClick={onBack}
+            style={{
+              display: "flex", alignItems: "center", gap: 6,
+              background: "none", border: "none",
+              color: "var(--t3)", fontSize: 12.5,
+              cursor: "pointer", marginBottom: 16, padding: 0,
+              fontFamily: "'Geist', sans-serif",
+              transition: "color 0.2s",
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = "var(--t2)"}
+            onMouseLeave={e => e.currentTarget.style.color = "var(--t3)"}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"/>
+              <polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Back to home
+          </button>
+        )}
         {/* Logo */}
         <div style={{ 
           display: "flex", 
@@ -333,10 +355,13 @@ const AuthModal = ({ mode = "save", onAuth, onSkip }) => {
               border: "none", 
               color: "var(--t3)", 
               fontSize: 13, 
-              cursor: "none", 
+              cursor: "pointer", 
               padding: "8px", 
-              fontFamily: "'Geist',sans-serif" 
+              fontFamily: "'Geist',sans-serif",
+              transition: "color 0.2s"
             }}
+            onMouseEnter={e => e.currentTarget.style.color = "var(--t2)"}
+            onMouseLeave={e => e.currentTarget.style.color = "var(--t3)"}
           >
             View results without saving →
           </button>

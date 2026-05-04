@@ -3,7 +3,7 @@ import { Topbar } from '../components/layout';
 import { Button, Card, Chip, ProgressBar, Icon } from '../components/ui';
 import { SKILLS_DATA_FALLBACK, USER_GAPS_FALLBACK } from '../constants/skills';
 
-const Market = ({ profile, analysisData }) => {
+const Market = ({ profile, analysisData, mobileMenuOpen, setMobileMenuOpen, onBack }) => {
   const city = profile?.city || "Bengaluru";
   const [marketData, setMarketData] = useState(null);
   const [marketLoading, setMarketLoading] = useState(true);
@@ -82,6 +82,9 @@ const Market = ({ profile, analysisData }) => {
             <option>Delhi / NCR</option>
           </select>
         }
+        onBack={onBack}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
       />
       
       <div className="page">

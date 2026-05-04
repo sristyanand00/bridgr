@@ -11,7 +11,7 @@ const formatSalary = (num) => {
   return `₹${num.toLocaleString('en-IN')}`;
 };
 
-const Resume = ({ profile, onSaveGate, mobileMenuOpen, setMobileMenuOpen, setCurrentPage }) => {
+const Resume = ({ profile, onSaveGate, mobileMenuOpen, setMobileMenuOpen, setCurrentPage, onBack }) => {
   const {
     analysisData, setAnalysisData,
     setRoadmapDays, setAutoGenerate,   // ← from context
@@ -95,7 +95,7 @@ const Resume = ({ profile, onSaveGate, mobileMenuOpen, setMobileMenuOpen, setCur
   if (stage === "upload") {
     return (
       <div className="main">
-        <Topbar title="Resume Analysis" mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
+        <Topbar title="Resume Analysis" onBack={onBack} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
         <div className="page" style={{ maxWidth: 580, margin: "0 auto" }}>
 
           <div style={{ textAlign: "center", marginBottom: 36 }}>
@@ -191,7 +191,7 @@ const Resume = ({ profile, onSaveGate, mobileMenuOpen, setMobileMenuOpen, setCur
   if (stage === "analyzing") {
     return (
       <div className="main">
-        <Topbar title="Resume Analysis" mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
+        <Topbar title="Resume Analysis" onBack={onBack} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
         <div className="page" style={{ maxWidth: 580, margin: "0 auto", textAlign: "center", paddingTop: 60 }}>
           <div style={{ fontSize: 48, marginBottom: 20 }}>⚡</div>
           <h2 className="serif" style={{ fontSize: 28, marginBottom: 12, color: "var(--t1)" }}>
@@ -233,6 +233,7 @@ const Resume = ({ profile, onSaveGate, mobileMenuOpen, setMobileMenuOpen, setCur
         title="Resume Analysis"
         sub={`${displayRole} • ${profile?.city || "Bengaluru"}`}
         right={<Button size="small">Export PDF</Button>}
+        onBack={onBack}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
       />

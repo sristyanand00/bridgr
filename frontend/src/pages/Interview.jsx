@@ -8,7 +8,7 @@ import { useTimer } from '../hooks';
 
 
 
-const Interview = () => {
+const Interview = ({ mobileMenuOpen, setMobileMenuOpen, onBack }) => {
 
   const [stage, setStage] = useState("setup");
 
@@ -348,7 +348,7 @@ const Interview = () => {
 
       <div className="main">
 
-        <Topbar title="Mock Interview Simulator"/>
+        <Topbar title="Mock Interview Simulator" onBack={onBack} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen}/>
 
         <div className="page" style={{ maxWidth:580, margin:"0 auto" }}>
 
@@ -408,7 +408,7 @@ const Interview = () => {
 
                     borderRadius:"var(--rl)", 
 
-                    cursor:"none", 
+                    cursor:"pointer", 
 
                     fontSize:12.5, 
 
@@ -522,7 +522,7 @@ const Interview = () => {
 
         <div className="main">
 
-          <Topbar title="Mock Interview Simulator"/>
+          <Topbar title="Mock Interview Simulator" onBack={onBack} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen}/>
 
           <div className="page" style={{ maxWidth:580, margin:"0 auto", textAlign:"center" }}>
 
@@ -749,6 +749,9 @@ const Interview = () => {
         title="Interview Results" 
 
         right={<Button size="small" onClick={handleNewSession}>New Session</Button>}
+        onBack={onBack}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
 
       />
 

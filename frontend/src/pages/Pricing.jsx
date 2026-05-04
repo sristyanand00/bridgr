@@ -2,7 +2,7 @@ import React from 'react';
 import { Topbar } from '../components/layout';
 import { Button, Card, Icon } from '../components/ui';
 
-const Pricing = () => {
+const Pricing = ({ mobileMenuOpen, setMobileMenuOpen, onBack }) => {
   const plans = [
     {
       name: "Free",
@@ -60,7 +60,7 @@ const Pricing = () => {
 
   return (
     <div className="main">
-      <Topbar title="Upgrade Plan"/>
+      <Topbar title="Upgrade Plan" onBack={onBack} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen}/>
       <div className="page" style={{ maxWidth:840, margin:"0 auto" }}>
         <div style={{ textAlign:"center", marginBottom:48 }}>
           <h1 className="serif" style={{ fontSize:44, marginBottom:12, color:"var(--t1)" }}>

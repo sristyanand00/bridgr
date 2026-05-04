@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword as firebaseSignIn, createUserWithEmailAndPassword as firebaseCreateUser, GoogleAuthProvider as FirebaseGoogleProvider, signInWithPopup as firebaseSignInWithPopup } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword as firebaseSignIn, createUserWithEmailAndPassword as firebaseCreateUser, GoogleAuthProvider as FirebaseGoogleProvider, signInWithPopup as firebaseSignInWithPopup, signOut as firebaseSignOut } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 
 // Check if Firebase credentials are available
@@ -71,11 +71,17 @@ const mockGoogleAuthProvider = class GoogleAuthProvider {
   }
 };
 
+const mockSignOut = async () => {
+  // Mock sign-out — just clears local state
+  return Promise.resolve();
+};
+
 // Export real Firebase if available, otherwise mock
 export const auth = firebaseAuth || mockAuth;
 export const signInWithEmailAndPassword = firebaseAuth ? firebaseSignIn : mockSignInWithEmailAndPassword;
 export const createUserWithEmailAndPassword = firebaseAuth ? firebaseCreateUser : mockCreateUserWithEmailAndPassword;
 export const GoogleAuthProvider = firebaseAuth ? FirebaseGoogleProvider : mockGoogleAuthProvider;
 export const signInWithPopup = firebaseAuth ? firebaseSignInWithPopup : mockSignInWithPopup;
+export const signOut = firebaseAuth ? firebaseSignOut : mockSignOut;
 
 export default app;

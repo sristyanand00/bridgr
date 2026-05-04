@@ -6,7 +6,7 @@ import { Button, Icon, Input, Chip } from '../components/ui';
 
 
 
-const Chat = ({ profile, analysisData, mobileMenuOpen, setMobileMenuOpen }) => {
+const Chat = ({ profile, analysisData, mobileMenuOpen, setMobileMenuOpen, onBack }) => {
 
   const city = profile?.city || "Bengaluru";
 
@@ -265,6 +265,8 @@ const Chat = ({ profile, analysisData, mobileMenuOpen, setMobileMenuOpen }) => {
         title="Career Coach AI" 
 
         sub={`Personalized for your ${city} · ${timeline} context`}
+
+        onBack={onBack}
 
         right={
 

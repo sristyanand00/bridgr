@@ -3,7 +3,7 @@ import { Topbar } from '../components/layout';
 import { Button, Card, Chip, ProgressBar, Icon } from '../components/ui';
 import { useAnalysis } from '../App';
 
-const Roadmap = ({ profile, mobileMenuOpen, setMobileMenuOpen }) => {
+const Roadmap = ({ profile, mobileMenuOpen, setMobileMenuOpen, onBack }) => {
   const {
     analysisData,
     roadmapDays,  setRoadmapDays,
@@ -109,6 +109,7 @@ const Roadmap = ({ profile, mobileMenuOpen, setMobileMenuOpen }) => {
             </Button>
           </>
         }
+        onBack={onBack}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
       />

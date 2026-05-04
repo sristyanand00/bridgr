@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Topbar } from '../components/layout';
 import { Button, Card, Icon, Input, Chip } from '../components/ui';
 
-const Settings = ({ profile }) => {
+const Settings = ({ profile, mobileMenuOpen, setMobileMenuOpen, onBack, onSignOut }) => {
   const [notifications, setNotifications] = useState({ 
     daily: true, 
     weekly: true, 
@@ -42,7 +42,7 @@ const Settings = ({ profile }) => {
 
   return (
     <div className="main">
-      <Topbar title="Settings"/>
+      <Topbar title="Settings" onBack={onBack} mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen}/>
       <div className="page" style={{ maxWidth:620, margin:"0 auto" }}>
         {/* Profile Section */}
         <Card className="gl" style={{ padding:24, marginBottom:12 }}>
@@ -69,7 +69,7 @@ const Settings = ({ profile }) => {
               color:"white", 
               boxShadow:"0 0 20px rgba(139,92,246,.35)" 
             }}>
-              A
+              {(profile?.name || profile?.email || "U").charAt(0).toUpperCase()}
             </div>
             <div>
               <div style={{ 
@@ -78,17 +78,17 @@ const Settings = ({ profile }) => {
                 color:"var(--t1)", 
                 lineHeight:1.2 
               }}>
-                {profile?.name || "Ananya Sharma"}
+                {profile?.name || "Guest User"}
               </div>
               <div style={{ color:"var(--t3)", fontSize:13 }}>
-                {profile?.email || "ananya@gmail.com"}
+                {profile?.email || "Not signed in"}
               </div>
               <div style={{ 
                 fontSize:12, 
-                color:"var(--g)", 
+                color: profile?.authenticated ? "var(--g)" : "var(--t4)", 
                 marginTop:3 
               }}>
-                Signed in with Google
+                {profile?.authenticated ? "✓ Signed in" : "Guest session — sign in to save"}
               </div>
             </div>
             <Button size="small" style={{ marginLeft:"auto" }}>
@@ -172,7 +172,7 @@ const Settings = ({ profile }) => {
                     "var(--p)" : 
                     "rgba(255,255,255,.08)", 
                   position:"relative", 
-                  cursor:"none", 
+                  cursor:"pointer", 
                   transition:"background .25s", 
                   boxShadow:notifications[setting.key] ? 
                     "0 0 12px rgba(139,92,246,.4)" : "none", 
@@ -198,12 +198,29 @@ const Settings = ({ profile }) => {
         <div style={{ 
           display:"flex", 
           justifyContent:"space-between", 
-          alignItems:"center" 
+          alignItems:"center",
+          flexWrap:"wrap",
+          gap:10
         }}>
-          <div style={{ display:"flex", gap:10 }}>
+          <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
             <Button size="small" variant="secondary">
               Export Data
             </Button>
+            {profile?.authenticated && onSignOut && (
+              <Button 
+                size="small" 
+                variant="secondary"
+                onClick={onSignOut}
+                style={{ 
+                  color:"var(--r)", 
+                  borderColor:"rgba(244,63,94,.2)",
+                  cursor:"pointer"
+                }}
+              >
+                <Icon name="logout" s={13} c="var(--r)"/>
+                Sign Out
+              </Button>
+            )}
             <Button 
               size="small" 
               variant="secondary"

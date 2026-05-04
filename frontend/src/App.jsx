@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import './styles/index.css';
 
 import { Sidebar, Topbar, Cursor } from './components/layout';
@@ -14,11 +14,10 @@ import {
   Pricing,
   Settings,
 } from './pages';
+import { auth, signOut } from './config/firebase';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Global Analysis Context
-// Holds analysisData, roadmapDays, and autoGenerate so Resume → Roadmap
-// navigation can pass days + trigger auto-generation without prop drilling.
 // ─────────────────────────────────────────────────────────────────────────────
 export const AnalysisContext = createContext({
   analysisData:    null,
@@ -33,40 +32,117 @@ export const useAnalysis = () => useContext(AnalysisContext);
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Pages that show a back button pointing to dashboard
+const PAGES_WITH_BACK = ['resume', 'chat', 'roadmap', 'market', 'interview', 'pricing', 'settings'];
+
 const App = () => {
-  const [screen, setScreen]               = useState("landing");
+  const [screen, setScreen]               = useState("loading"); // start in loading state
   const [currentPage, setCurrentPage]     = useState("dashboard");
+  const [pageHistory, setPageHistory]     = useState(["dashboard"]);
   const [profile, setProfile]             = useState(null);
   const [user, setUser]                   = useState(null);
   const [analysisData, setAnalysisData]   = useState(null);
-  const [roadmapDays,  setRoadmapDays]    = useState(90);   // ← NEW
-  const [autoGenerate, setAutoGenerate]   = useState(false); // ← NEW
+  const [roadmapDays,  setRoadmapDays]    = useState(90);
+  const [autoGenerate, setAutoGenerate]   = useState(false);
   const [showAuth, setShowAuth]           = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // ── Firebase persistent auth check ──────────────────────────────────────
+  useEffect(() => {
+    let unsubscribe = () => {};
+
+    if (auth && typeof auth.onAuthStateChanged === 'function') {
+      unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+        if (firebaseUser) {
+          // User was previously logged in — restore session
+          const userData = {
+            uid:           firebaseUser.uid,
+            name:          firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+            email:         firebaseUser.email,
+            avatar:        (firebaseUser.displayName || firebaseUser.email || 'U').charAt(0).toUpperCase(),
+            authenticated: true,
+          };
+          setUser(userData);
+          setProfile(prev => ({ ...(prev || {}), ...userData }));
+          // Skip auth + quiz screens for returning users — go straight to app
+          setScreen("app");
+        } else {
+          // No active session — show landing
+          if (screen === "loading") setScreen("landing");
+        }
+      });
+    } else {
+      // Mock auth — go straight to landing
+      setScreen("landing");
+    }
+
+    return () => unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Navigation helpers ───────────────────────────────────────────────────
+  const navigateTo = (page) => {
+    setPageHistory(prev => [...prev, page]);
+    setCurrentPage(page);
+  };
+
+  const navigateBack = () => {
+    setPageHistory(prev => {
+      if (prev.length <= 1) return prev;
+      const newHistory = prev.slice(0, -1);
+      setCurrentPage(newHistory[newHistory.length - 1]);
+      return newHistory;
+    });
+  };
+
+  const canGoBack = pageHistory.length > 1;
+
+  // ── Auth handlers ────────────────────────────────────────────────────────
   const handleQuizComplete = (answers) => {
-    setProfile(answers);
+    setProfile(prev => ({ ...(prev || {}), ...answers }));
     setScreen("app");
   };
 
   const handleSkipQuiz = () => {
-    setProfile({ stage: "Not specified", timeline: "Exploring, no rush", city: "Bengaluru" });
+    setProfile(prev => ({ ...(prev || {}), stage: "Not specified", timeline: "Exploring, no rush", city: "Bengaluru" }));
     setScreen("app");
   };
 
   const handleAuth = (userData) => {
-    setUser({ ...userData, authenticated: true });
-    setProfile(prev => ({ ...prev, ...userData, authenticated: true }));
+    const enriched = { ...userData, authenticated: true };
+    setUser(enriched);
+    setProfile(prev => ({ ...(prev || {}), ...enriched }));
     setShowAuth(false);
-    setScreen("quiz");
+    // First-time login → show quiz; returning (onAuthStateChanged fired) → already in app
+    if (screen !== "app") {
+      setScreen("quiz");
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error("Sign-out error:", err);
+    }
+    setUser({ name: "Guest", avatar: "G", authenticated: false });
+    setProfile(null);
+    setScreen("landing");
+    setCurrentPage("dashboard");
+    setPageHistory(["dashboard"]);
+  };
+
+  const handleSignInFromSidebar = () => {
+    setShowAuth(true);
   };
 
   const mergedProfile = { ...profile, ...user };
 
+  // ── Pages ────────────────────────────────────────────────────────────────
   const pages = {
     dashboard: (
       <Dashboard
-        setCurrentPage={setCurrentPage}
+        setCurrentPage={navigateTo}
         profile={mergedProfile}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
@@ -78,7 +154,8 @@ const App = () => {
         onSaveGate={() => setShowAuth(true)}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
-        setCurrentPage={setCurrentPage}
+        setCurrentPage={navigateTo}
+        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
       />
     ),
     chat: (
@@ -86,6 +163,7 @@ const App = () => {
         profile={mergedProfile}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
+        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
       />
     ),
     roadmap: (
@@ -93,6 +171,7 @@ const App = () => {
         profile={mergedProfile}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
+        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
       />
     ),
     market: (
@@ -100,18 +179,21 @@ const App = () => {
         profile={mergedProfile}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
+        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
       />
     ),
     interview: (
       <Interview
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
+        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
       />
     ),
     pricing: (
       <Pricing
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
+        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
       />
     ),
     settings: (
@@ -119,10 +201,13 @@ const App = () => {
         profile={mergedProfile}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
+        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
+        onSignOut={handleSignOut}
       />
     ),
   };
 
+  // ── Landing ──────────────────────────────────────────────────────────────
   const LandingPage = () => (
     <>
       <div style={{
@@ -182,16 +267,43 @@ const App = () => {
     </>
   );
 
+  // ── Loading screen ───────────────────────────────────────────────────────
+  const LoadingScreen = () => (
+    <div style={{
+      minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
+      flexDirection: "column", gap: 16,
+    }}>
+      <div style={{
+        width: 36, height: 36, borderRadius: 10,
+        background: "linear-gradient(135deg,var(--p2),var(--i))",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        boxShadow: "0 0 24px rgba(139,92,246,.45)",
+        animation: "pulse 1.5s ease-in-out infinite",
+      }}>
+        <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9.5 2A2.5 2.5 0 017 4.5v1A2.5 2.5 0 014.5 8H4a2 2 0 00-2 2v4a2 2 0 002 2h.5A2.5 2.5 0 017 18.5v1a2.5 2.5 0 002.5 2.5h5a2.5 2.5 0 002.5-2.5v-1a2.5 2.5 0 012.5-2.5h.5a2 2 0 002-2v-4a2 2 0 00-2-2h-.5A2.5 2.5 0 0117 5.5v-1A2.5 2.5 0 0114.5 2h-5z"/>
+        </svg>
+      </div>
+      <span style={{ fontFamily: "'Fraunces',serif", fontWeight: 300, fontSize: 18, color: "var(--t2)", letterSpacing: "-.02em" }}>
+        bridgr
+      </span>
+      <div style={{ fontSize: 12, color: "var(--t3)", marginTop: -8 }}>Checking authentication…</div>
+    </div>
+  );
+
+  // ── Render ───────────────────────────────────────────────────────────────
   return (
     <AnalysisContext.Provider value={{
       analysisData,  setAnalysisData,
-      roadmapDays,   setRoadmapDays,   // ← NEW
-      autoGenerate,  setAutoGenerate,  // ← NEW
+      roadmapDays,   setRoadmapDays,
+      autoGenerate,  setAutoGenerate,
     }}>
       <Cursor />
       <div className="o1 orb" />
       <div className="o2 orb" />
       <div className="o3 orb" />
+
+      {screen === "loading" && <LoadingScreen />}
 
       {screen === "landing" && <LandingPage />}
 
@@ -207,6 +319,7 @@ const App = () => {
             setUser({ name: "Guest", avatar: "G", authenticated: false });
             setScreen("app");
           }}
+          onBack={() => setScreen("landing")}
         />
       )}
 
@@ -225,12 +338,14 @@ const App = () => {
           />
           <Sidebar
             currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
+            setCurrentPage={navigateTo}
             user={user}
             mobileMenuOpen={mobileMenuOpen}
             setMobileMenuOpen={setMobileMenuOpen}
+            onSignOut={handleSignOut}
+            onSignIn={handleSignInFromSidebar}
           />
-          {pages[currentPage]}
+          {pages[currentPage] || pages.dashboard}
         </div>
       )}
     </AnalysisContext.Provider>
