@@ -30,8 +30,7 @@ const AuthModal = ({ mode = "save", onAuth, onSkip, onBack }) => {
       
       if (isSignUp) {
         userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
-        // Update profile with display name
-        await userCredential.user.updateProfile({ displayName: name.trim() });
+        // We skip updateProfile here to keep it simple, or user can be updated via a backend call later
       } else {
         userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
       }
