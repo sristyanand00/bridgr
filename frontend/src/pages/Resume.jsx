@@ -18,7 +18,7 @@ const Resume = ({ profile, onSaveGate, mobileMenuOpen, setMobileMenuOpen, setCur
     setRoadmapDays, setAutoGenerate,   // ← from context
   } = useAnalysis();
 
-  const [stage, setStage]               = useState(analysisData ? "results" : "upload");
+  const [stage, setStage]               = useState("upload");
   const [targetRole, setTargetRole]     = useState(analysisData?.target_role || "");
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError]               = useState("");
@@ -191,6 +191,40 @@ const Resume = ({ profile, onSaveGate, mobileMenuOpen, setMobileMenuOpen, setCur
               <Button variant="secondary">Browse Templates</Button>
             </div>
           </Card>
+
+          {/* Show last analysis if exists */}
+          {analysisData && (
+            <div style={{ marginTop: 24 }}>
+              <Card>
+                <div style={{ padding: 24 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                    <h3 style={{ margin: 0, fontSize: 16, color: "var(--t1)" }}>Last Analysis</h3>
+                    <Button 
+                      size="small" 
+                      variant="secondary"
+                      onClick={() => setStage("results")}
+                    >
+                      View Results
+                    </Button>
+                  </div>
+                  <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, color: "var(--t2)", marginBottom: 4 }}>Target Role</div>
+                      <div style={{ fontSize: 16, fontWeight: 500, color: "var(--t1)" }}>{analysisData.target_role}</div>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, color: "var(--t2)", marginBottom: 4 }}>Match Score</div>
+                      <div style={{ fontSize: 16, fontWeight: 500, color: "var(--t1)" }}>{analysisData.match_score}%</div>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 14, color: "var(--t2)", marginBottom: 4 }}>Readiness</div>
+                      <div style={{ fontSize: 16, fontWeight: 500, color: "var(--t1)" }}>{analysisData.readiness_level}</div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
     );
