@@ -11,7 +11,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from core.config import get_settings
 from core.exceptions import BridgrException, bridgr_exception_handler
-from ml.model_loader import get_core
+# ML imports deferred to speed up startup — loaded lazily on first request
+# from ml.model_loader import get_core
 from routes import analyze, chat, roadmap, market_pulse, interview, user
 
 # Global flag to track when ML core is ready
@@ -22,22 +23,22 @@ _core_ready = False
 async def lifespan(app: FastAPI):
     """Runs at startup and shutdown."""
     global _core_ready
-    # STARTUP: Load ML models immediately to avoid first-request hang
+    # STARTUP: Load ML models in background so port binds immediately
     print("Starting Bridgr server...")
-    print("Pre-loading ML models (this may take 30-60 seconds)...")
     try:
-        # Load core in a background thread to not block the main thread
         import threading
         def load_models():
             global _core_ready
             try:
+                from ml.model_loader import get_core
+                print("[ML] Pre-loading models (this may take 30-60s)...")
                 get_core()
                 _core_ready = True
                 print("[OK] ML models loaded and ready!")
             except Exception as e:
                 print(f"[ERROR] Failed to load ML models: {e}")
         
-        thread = threading.Thread(target=load_models)
+        thread = threading.Thread(target=load_models, daemon=True)
         thread.start()
         
     except Exception as e:
@@ -60,7 +61,7 @@ app = FastAPI(
 # CORS — allow your React frontend to call this server
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=settings.get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

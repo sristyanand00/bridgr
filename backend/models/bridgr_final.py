@@ -390,7 +390,7 @@ class SkillExtractor:
 
         if verbose:
             print("  Loading NLP models...")
-        self.nlp         = spacy.load("en_core_web_sm")
+        self.nlp         = spacy.load("en_core_web_sm") if spacy.util.is_package("en_core_web_sm") else spacy.blank("en")
         
         # Fix 2: Use safer model loading method
         # Fix 3: HARD PROTECT fallback (CRITICAL)
