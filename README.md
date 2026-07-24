@@ -84,21 +84,15 @@ npm run dev:all        # Starts both (requires two terminals)
 Backend runs on `http://localhost:8000`
 - `GET /` - API status
 - `GET /health` - Health check
-- `/api/analyze` - Resume/skill analysis
-- `/api/chat` - AI chat interface
-- `/api/roadmap` - Career roadmapping
-- `/api/market-pulse` - Job market insights
-- `/api/interview` - Interview preparation
+- `POST /api/readiness` - Resume readiness scoring
 
 Frontend runs on `http://localhost:3000` (React Scripts) or `http://localhost:5173` (Vite)
 
 ## Features
 
-- **Resume Analysis**: Upload and analyze resumes for skill gaps
-- **Career Roadmapping**: Generate personalized career development paths
-- **Market Insights**: Real-time job market trends and demand analysis
-- **AI Chat**: Claude-powered career advice and guidance
-- **Interview Prep**: Practice questions and feedback
+- **Resume Analysis**: Upload and analyze resumes for skill gaps and role readiness
+- **Readiness Scoring**: Three separate scores (Screen, Interview, Job) with evidence levels
+- **Skill Extraction**: Demonstrated skills with context-based evidence levelling
 
 ## Technology Stack
 
