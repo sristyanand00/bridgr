@@ -57,14 +57,22 @@ def _clean_json(text: str) -> str:
     text = text.replace(",\n}", "\n}").replace(",\n]", "\n]")
     text = text.replace(",}", "}").replace(",]", "]")
     
-    # Fix broken line breaks in strings
+    # Fix broken line breaks in strings - escape newlines in JSON strings
     lines = text.split('\n')
     cleaned_lines = []
     for line in lines:
         # Remove excessive whitespace and fix broken string literals
         line = line.strip()
         if line and not line.startswith('//'):  # Skip comment lines
-            cleaned_lines.append(line)
+            # Fix unescaped newlines in strings by replacing them with space
+            if line and not (line.startswith('"') or line.startswith('{') or line.startswith('[') or line.startswith('}')):
+                # This is likely a continuation of a string - join with space
+                if cleaned_lines:
+                    cleaned_lines[-1] = cleaned_lines[-1] + ' ' + line
+                else:
+                    cleaned_lines.append(line)
+            else:
+                cleaned_lines.append(line)
     
     text = '\n'.join(cleaned_lines)
     
@@ -108,9 +116,18 @@ class LLMService:
                 temperature=0.7,
                 max_tokens=2048
             )
-            result = json.loads(_clean_json(response.choices[0].message.content))
-            print(f"[OK] Groq {method_name} succeeded")
-            return result
+            content = response.choices[0].message.content
+            print(f"[DEBUG] Groq raw response length: {len(content)}")
+            
+            # Try to parse the response
+            try:
+                result = json.loads(_clean_json(content))
+                print(f"[OK] Groq {method_name} succeeded")
+                return result
+            except json.JSONDecodeError as je:
+                print(f"    Groq JSON parsing failed: {je}")
+                print(f"    Raw content preview: {content[:200]}...")
+                return None
         except Exception as e:
             print(f"    Groq {method_name} failed: {e}")
             return None
@@ -240,82 +257,80 @@ Return ONLY valid JSON (no markdown, no explanation):
         p2_end = phase_days * 2
         p3_end = total_days
 
-        prompt = f"""You are an expert teacher creating a personalised {total_days}-day learning syllabus.
+        prompt = f"""You are an expert teacher and career mentor creating a comprehensive {total_days}-day learning roadmap for a student aspiring to become a {target_role}.
 
-Student profile:
-- Target role: {target_role}
-- Current match score: {match_score}%
-- Skills ALREADY HAVE (do NOT teach these): {existing}
-- Skills MISSING (focus syllabus on these): {", ".join(top_gaps) if top_gaps else "General role fundamentals"}
-- Available study time: {available_hours_per_week} hours/week
+STUDENT PROFILE:
+- Target Role: {target_role}
+- Current Match Score: {match_score}%
+- Skills Already Mastered: {existing}
+- Skills to Develop: {", ".join(top_gaps) if top_gaps else "Core role competencies"}
+- Study Time Available: {available_hours_per_week} hours per week
+- Total Learning Period: {total_days} days ({total_days // 7} weeks)
 
-Create a 3-phase syllabus split as:
-  Phase 1: Days 1 {p1_end}   (Foundation)
-  Phase 2: Days {p1_end+1} {p2_end} (Core Skills)
-  Phase 3: Days {p2_end+1} {p3_end} (Job Ready)
+TEACHING APPROACH:
+- Design a progressive curriculum that builds confidence through achievable milestones
+- Include hands-on projects that reinforce theoretical concepts
+- Provide free, high-quality learning resources from reputable sources
+- Create a balance between theory and practical application
+- Ensure each skill builds logically on previous knowledge
 
-Rules:
-- Each phase has 2 4 topics
-- Each topic has a title, day range within the phase, 3 5 subtopics to learn, one mini project, and one specific FREE resource
-- Resources must be real URLs: freeCodeCamp, Kaggle, fast.ai, official docs, YouTube, MDN, CS50, etc.
-- Do NOT teach skills they already have
-- Mini projects should be concrete and buildable
+CURRICULUM STRUCTURE:
+Phase 1 (Days 1-{p1_end}): Foundation Building - Core concepts and fundamentals
+Phase 2 (Days {p1_end+1}-{p2_end}): Skill Development - Advanced topics and practical application  
+Phase 3 (Days {p2_end+1}-{p3_end}): Professional Readiness - Portfolio projects and job preparation
 
-Return ONLY valid JSON (no markdown, no extra text):
+Return ONLY valid JSON (no markdown formatting):
 {{
   "phases": [
     {{
       "phase": 1,
-      "label": "Foundation",
-      "day_range": "Days 1 {p1_end}",
-      "goal": "one sentence goal for this phase",
-      "skills": ["skill1", "skill2"],
-      "milestones": ["Built X", "Completed Y"],
+      "label": "Foundation Building",
+      "day_range": "Days 1-{p1_end}",
+      "goal": "Establish strong fundamentals in core concepts",
+      "skills": ["fundamental_skill_1", "fundamental_skill_2"],
       "topics": [
         {{
-          "title": "Topic Name",
-          "days": "Days 1 {p1_end // 3}",
+          "title": "Specific Topic Name",
+          "days": "Days 1-{p1_end//3}",
           "subtopics": [
-            "Specific thing to learn 1",
-            "Specific thing to learn 2",
-            "Specific thing to learn 3"
+            "Concrete learning objective 1",
+            "Concrete learning objective 2", 
+            "Concrete learning objective 3"
           ],
-          "mini_project": "Concrete project description",
+          "mini_project": "Specific, achievable project that demonstrates mastery",
           "resource": {{
-            "name": "Exact Resource Name",
-            "url": "https://real-url.com/...",
+            "name": "Reputable Learning Resource",
+            "url": "https://legitimate-learning-platform.com",
             "free": true
           }}
         }}
       ],
       "resources": [
-        {{"name": "Resource Name", "url": "https://...", "free": true}}
+        {{"name": "Primary Resource", "url": "https://example.com", "free": true}}
       ]
     }},
     {{
       "phase": 2,
-      "label": "Core Skills",
-      "day_range": "Days {p1_end+1} {p2_end}",
-      "goal": "one sentence goal",
-      "skills": ["skill3", "skill4"],
-      "milestones": ["Built X", "Completed Y"],
+      "label": "Skill Development",
+      "day_range": "Days {p1_end+1}-{p2_end}",
+      "goal": "Develop advanced technical skills through practical application",
+      "skills": ["intermediate_skill_1", "intermediate_skill_2"],
       "topics": [...],
       "resources": [...]
     }},
     {{
       "phase": 3,
-      "label": "Job Ready",
-      "day_range": "Days {p2_end+1} {p3_end}",
-      "goal": "one sentence goal",
-      "skills": ["skill5"],
-      "milestones": ["Portfolio live", "Applied to 5 roles"],
+      "label": "Professional Readiness",
+      "day_range": "Days {p2_end+1}-{p3_end}",
+      "goal": "Build portfolio and prepare for job market",
+      "skills": ["advanced_skill_1"],
       "topics": [...],
       "resources": [...]
     }}
   ],
   "total_weeks": {total_days // 7},
   "total_days": {total_days},
-  "summary": "2-3 sentence personalised summary of the plan"
+  "summary": "Comprehensive {total_days}-day learning journey from {match_score}% match to job-ready {target_role}. This structured curriculum balances theoretical knowledge with hands-on projects, ensuring you develop both the technical skills and practical experience needed for success."
 }}"""
 
         # Try Gemini first
