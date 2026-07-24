@@ -1390,9 +1390,12 @@ class FallbackIntelligenceCore:
                 "tech_skills": llm_profile.get("tech_skills", []),
                 "soft_skills": llm_profile.get("soft_skills", [])
             }
-            
-        raise ValueError(f"Could not find job profile for '{role}' and AI generation failed.")
-
+        print(f"[WARN] AI generation failed for '{role}'. Using generic fallback profile.")
+        return {
+            "job_title": role,
+            "tech_skills": ["problem solving", "communication", "teamwork", "time management", "adaptability", "project management", "data analysis", "customer service"],
+            "soft_skills": ["communication", "problem solving", "teamwork", "adaptability"]
+        }
     def analyze(self, resume_path: str, target_role: str) -> AnalysisResult:
         resume_data = self.resume_parser.parse(resume_path)
         return self.analyze_dict(resume_data, target_role)

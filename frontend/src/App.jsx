@@ -1,19 +1,13 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import './styles/index.css';
 
-import { Sidebar, Topbar, Cursor } from './components/layout';
-import { Quiz, AuthModal, RoleGuidance } from './components/forms';
+import { Sidebar, Cursor } from './components/layout';
+import { Quiz, AuthModal } from './components/forms';
 import FeaturesSection from './components/layout/FeaturesSection';
 import {
   Dashboard,
   Resume,
-  Chat,
-  Roadmap,
-  Market,
-  Interview,
-  Pricing,
   Settings,
-  History,
 } from './pages';
 import { auth, signOut } from './config/firebase';
 
@@ -34,7 +28,7 @@ export const useAnalysis = () => useContext(AnalysisContext);
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Pages that show a back button pointing to dashboard
-const PAGES_WITH_BACK = ['resume', 'chat', 'roadmap', 'market', 'interview', 'pricing', 'settings'];
+const PAGES_WITH_BACK = ['resume', 'settings'];
 
 const App = () => {
   const [screen, setScreen]               = useState("loading"); // start in loading state
@@ -188,6 +182,7 @@ const App = () => {
       <Dashboard
         setCurrentPage={navigateTo}
         profile={mergedProfile}
+        analysisData={analysisData}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
       />
@@ -202,44 +197,6 @@ const App = () => {
         onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
       />
     ),
-    chat: (
-      <Chat
-        profile={mergedProfile}
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
-      />
-    ),
-    roadmap: (
-      <Roadmap
-        profile={mergedProfile}
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
-      />
-    ),
-    market: (
-      <Market
-        profile={mergedProfile}
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
-      />
-    ),
-    interview: (
-      <Interview
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
-      />
-    ),
-    pricing: (
-      <Pricing
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
-      />
-    ),
     settings: (
       <Settings
         profile={mergedProfile}
@@ -247,15 +204,6 @@ const App = () => {
         setMobileMenuOpen={setMobileMenuOpen}
         onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
         onSignOut={handleSignOut}
-      />
-    ),
-    history: (
-      <History
-        profile={mergedProfile}
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-        setCurrentPage={navigateTo}
-        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
       />
     ),
   };

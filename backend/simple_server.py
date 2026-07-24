@@ -23,9 +23,9 @@ _core_instance = None
 async def lifespan(app: FastAPI):
     """Initialize ML core on startup"""
     global _core_instance
-    print("🌉 Starting Simple Bridgr Server...")
+    print("[START] Starting Simple Bridgr Server...")
     _core_instance = FallbackIntelligenceCore({})
-    print("🌉 Simple Bridgr is ready!")
+    print("[READY] Simple Bridgr is ready!")
     yield
     _core_instance = None
 
