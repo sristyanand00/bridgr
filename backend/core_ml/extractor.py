@@ -1,0 +1,212 @@
+"""Skill extraction from resume text using multi-tier approach."""
+
+from __future__ import annotations
+import logging
+import json as _json
+import numpy as np
+import spacy
+from spacy.matcher import PhraseMatcher
+from sentence_transformers import SentenceTransformer
+from typing import List, Dict
+
+from .schemas import ExtractedSkill
+
+logger = logging.getLogger(__name__)
+
+STOP_SKILLS = {
+    "work", "use", "ability", "using", "used", "strong",
+    "experience", "skills", "knowledge", "understanding",
+    "management", "team", "working", "the", "and",
+    "with", "for", "in", "of", "a", "an",
+}
+
+
+class SkillExtractor:
+    def __init__(
+        self,
+        skill_list:         List[str],
+        semantic_threshold: float = 0.75,
+        openai_key:         str   = "",   # retained for compat; tier-3 uses MiniLM
+        verbose:            bool  = True,
+    ):
+        self.skill_list = [s for s in skill_list if s.lower() not in STOP_SKILLS]
+        self.threshold  = semantic_threshold
+        self._has_fallback = True   # always available — MiniLM is already loaded
+
+        if verbose:
+            logger.info("Loading NLP models...")
+        self.nlp = spacy.load("en_core_web_sm") if spacy.util.is_package("en_core_web_sm") else spacy.blank("en")
+        
+        # Use safer model loading method with fallback protection
+        try:
+            self.embed_model = SentenceTransformer("all-MiniLM-L6-v2")
+            if verbose:
+                logger.info("Embedding model loaded successfully")
+        except Exception as e:
+            logger.info(f"Embedding model failed: {e}")
+            self.embed_model = None
+            if verbose:
+                logger.info("Using basic mode without embeddings")
+
+        self._matcher = PhraseMatcher(self.nlp.vocab, attr="LOWER")
+        patterns = list(self.nlp.pipe(self.skill_list))
+        self._matcher.add("SKILLS", patterns)
+
+        if verbose:
+            logger.info(f"Encoding {len(self.skill_list)} skills...")
+        
+        # Initialize to empty array to prevent AttributeError
+        self._skill_embeddings = np.array([])
+        
+        if self.embed_model is not None:
+            self._skill_embeddings = self.embed_model.encode(
+                self.skill_list, batch_size=64,
+                normalize_embeddings=True, show_progress_bar=verbose,
+            )
+        else:
+            if verbose:
+                logger.info("Skipping skill encoding (no embedding model)")
+        if verbose:
+            logger.info("Skill extractor ready")
+
+    def extract(self, resume_data: Dict, debug: bool = False) -> List[ExtractedSkill]:
+        full_text = resume_data["full_text"]
+        sections  = resume_data.get("sections", {})
+
+        t1   = self._tier1_phrase_match(full_text, sections)
+        seen = {s.normalized for s in t1}
+        if debug:
+            logger.debug(f"Tier 1 (phrase): {len(t1)} skills")
+
+        priority_text = " ".join(sections.get(k, "") for k in ("skills", "experience", "projects"))
+        t2   = self._tier2_semantic(priority_text, seen)
+        seen.update(s.normalized for s in t2)
+        if debug:
+            logger.debug(f"Tier 2 (semantic): {len(t2)} skills")
+
+        all_skills = t1 + t2
+
+        # Threshold raised to 8 (was 5); logs a warning so the issue is visible
+        if len(all_skills) < 8:
+            logger.info(f"Only {len(all_skills)} skills found — PDF may have "
+                       "parsing issues. Running tier-3 MiniLM window pass...")
+            t3 = self._tier3_miniLM_fallback(full_text, all_skills)
+            all_skills += t3
+            if debug:
+                logger.debug(f"Tier 3 (MiniLM window): {len(t3)} skills")
+
+        return all_skills
+
+    def _tier1_phrase_match(self, text: str, sections: Dict) -> List[ExtractedSkill]:
+        doc     = self.nlp(text)
+        matches = self._matcher(doc)
+        results, seen = [], set()
+
+        for _, start, end in matches:
+            span       = doc[start:end]
+            normalized = span.text.lower().strip()
+            if normalized in seen or normalized in STOP_SKILLS:
+                continue
+            seen.add(normalized)
+            section_hit = any(
+                normalized in sections.get(sec, "").lower()
+                for sec in ("skills", "experience", "projects")
+            )
+            results.append(ExtractedSkill(
+                original=span.text,
+                normalized=normalized,
+                confidence=0.98 if section_hit else 0.90,
+                source="phrase_match",
+                context=doc[max(0, start - 10): end + 10].text,
+            ))
+        return results
+
+    def _tier2_semantic(self, text: str, already_normalized: set) -> List[ExtractedSkill]:
+        # Return empty if no embedding model available
+        if self.embed_model is None:
+            return []
+        doc    = self.nlp(text)
+        chunks = list({
+            c.text.strip() for c in doc.noun_chunks
+            if len(c.text.strip()) > 2 and c.text.strip().lower() not in STOP_SKILLS
+        })
+        if not chunks:
+            return []
+        chunk_vecs = self.embed_model.encode(chunks, batch_size=32, normalize_embeddings=True)
+        results    = []
+        for chunk, chunk_vec in zip(chunks, chunk_vecs):
+            sims      = np.dot(self._skill_embeddings, chunk_vec)
+            best_idx  = int(np.argmax(sims))
+            best_sim  = float(sims[best_idx])
+            if best_sim < self.threshold:
+                continue
+            normalized = self.skill_list[best_idx].lower().strip()
+            if normalized in already_normalized or normalized in STOP_SKILLS:
+                continue
+            results.append(ExtractedSkill(
+                original=self.skill_list[best_idx],
+                normalized=normalized,
+                confidence=round(best_sim, 3),
+                source="semantic",
+                context=f"Matched from: '{chunk}'",
+            ))
+            already_normalized.add(normalized)
+        return results
+
+    def _tier3_miniLM_fallback(
+        self, text: str, already_found: List[ExtractedSkill]
+    ) -> List[ExtractedSkill]:
+        """
+        No API key needed. Runs overlapping word-window passes through
+        the already-loaded MiniLM at a slightly looser threshold (0.70).
+        Deterministic, zero cost, consistent embedding space with tiers 1 & 2.
+        """
+        already_normalized = {s.normalized for s in already_found}
+        WINDOW_THRESHOLD   = 0.70
+
+        words = text.split()
+        if len(words) < 3:
+            return []
+
+        windows: List[str] = []
+        for size in (3, 6):
+            step = max(1, size // 2)
+            for i in range(0, max(1, len(words) - size + 1), step):
+                w = " ".join(words[i: i + size]).strip()
+                if len(w) > 4:
+                    windows.append(w)
+        if not windows:
+            return []
+
+        # Check if embed_model is None before encoding
+        if self.embed_model is None:
+            logger.info("Tier-3 skipped: no embedding model available")
+            return []
+        
+        try:
+            window_vecs = self.embed_model.encode(windows, batch_size=64, normalize_embeddings=True)
+        except Exception as e:
+            logger.info(f"Tier-3 encode failed: {e}")
+            return []
+
+        results: List[ExtractedSkill] = []
+        matched_taxonomy: set = set()
+
+        for window, w_vec in zip(windows, window_vecs):
+            sims      = np.dot(self._skill_embeddings, w_vec)
+            best_idx  = int(np.argmax(sims))
+            best_sim  = float(sims[best_idx])
+            if best_sim < WINDOW_THRESHOLD:
+                continue
+            normalized = self.skill_list[best_idx].lower().strip()
+            if normalized in already_normalized or normalized in matched_taxonomy or normalized in STOP_SKILLS:
+                continue
+            matched_taxonomy.add(normalized)
+            results.append(ExtractedSkill(
+                original=self.skill_list[best_idx],
+                normalized=normalized,
+                confidence=round(best_sim, 3),
+                source="minilm_fallback",
+                context=f"Window: '{window}'",
+            ))
+        return results

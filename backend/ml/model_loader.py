@@ -8,8 +8,8 @@ from dotenv import load_dotenv
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Import all classes from your Colab models
-from models.bridgr_final import (
+# Import from refactored core_ml modules
+from core_ml import (
     IntelligenceCore, 
     FallbackIntelligenceCore,
     get_core as get_colab_core,
