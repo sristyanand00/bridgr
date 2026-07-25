@@ -1,0 +1,42 @@
+{
+  "description": "Mixed levels with one missing skill and recency decay",
+  "input": {
+    "user_skills": [
+      {"skill": "python", "level": 3, "months_since_used": 20},
+      {"skill": "sql", "level": 2, "months_since_used": 40},
+      {"skill": "communication", "level": 3, "months_since_used": 0}
+    ],
+    "requirements": [
+      {"skill": "python", "required_level": 3, "criticality": 1.0, "frequency": 1.0, "is_blocker": false},
+      {"skill": "sql", "required_level": 3, "criticality": 0.8, "frequency": 0.9, "is_blocker": false},
+      {"skill": "machine learning", "required_level": 3, "criticality": 0.9, "frequency": 0.8, "is_blocker": false},
+      {"skill": "communication", "required_level": 2, "criticality": 0.7, "frequency": 0.6, "is_blocker": false}
+    ],
+    "today": "2026-07-25"
+  },
+  "expected": {
+    "screen_score": 74.83,
+    "interview_score": 58.74,
+    "job_score": 58.74,
+    "verdict": "developing",
+    "explanation": "Missing machine learning (critical), SQL below required level, Python showing recency decay"
+  },
+  "arithmetic": {
+    "note": "Hand-computed with recency multipliers",
+    "weights": [1.0, 0.72, 0.72, 0.42],
+    "total_weight": 2.86,
+    "recency_mult": [0.9, 0.75, 0.0, 1.0],
+    "screen_coverage": [1.0, 1.0, 0.0, 1.0],
+    "interview_coverage": [0.9, 0.5, 0.0, 1.0],
+    "screen_points": "1.0 + 0.72 + 0 + 0.42 = 2.14",
+    "interview_points": "0.9 + 0.36 + 0 + 0.42 = 1.68",
+    "screen_score_calc": "100 * (2.14 / 2.86) = 74.83 ≈ 75.0",
+    "interview_score_calc": "100 * (1.68 / 2.86) = 58.74 but capped by partial SQL = 54.55",
+    "notes_detail": [
+      "python: level 3/3, 20mo ago → recency 0.9, coverage 0.9",
+      "sql: level 2/3 → coverage 0.67, 40mo ago → recency 0.75, final 0.5",
+      "ML: absent → coverage 0",
+      "communication: level 3/2 → coverage 1.0, recent → 1.0"
+    ]
+  }
+}

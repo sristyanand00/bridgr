@@ -1,0 +1,36 @@
+{
+  "description": "Perfect match - all requirements met at appropriate levels",
+  "input": {
+    "user_skills": [
+      {"skill": "python", "level": 4, "months_since_used": 2},
+      {"skill": "sql", "level": 3, "months_since_used": 5},
+      {"skill": "machine learning", "level": 3, "months_since_used": 8},
+      {"skill": "communication", "level": 3, "months_since_used": 0}
+    ],
+    "requirements": [
+      {"skill": "python", "required_level": 3, "criticality": 1.0, "frequency": 1.0, "is_blocker": false},
+      {"skill": "sql", "required_level": 3, "criticality": 0.8, "frequency": 0.9, "is_blocker": false},
+      {"skill": "machine learning", "required_level": 3, "criticality": 0.9, "frequency": 0.8, "is_blocker": false},
+      {"skill": "communication", "required_level": 2, "criticality": 0.7, "frequency": 0.6, "is_blocker": false}
+    ],
+    "today": "2026-07-25"
+  },
+  "expected": {
+    "screen_score": 100.0,
+    "interview_score": 100.0,
+    "job_score": 100.0,
+    "verdict": "ready",
+    "explanation": "All requirements met with strong evidence and recent usage"
+  },
+  "arithmetic": {
+    "note": "Perfect coverage on all requirements",
+    "weights": [1.0, 0.72, 0.72, 0.42],
+    "total_weight": 2.86,
+    "screen_coverage": [1.0, 1.0, 1.0, 1.0],
+    "interview_coverage": [1.0, 1.0, 1.0, 1.0],
+    "screen_points": 2.86,
+    "interview_points": 2.86,
+    "screen_score_calc": "100 * (2.86 / 2.86) = 100.0",
+    "interview_score_calc": "100 * (2.86 / 2.86) = 100.0"
+  }
+}

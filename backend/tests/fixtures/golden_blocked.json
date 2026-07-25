@@ -1,0 +1,35 @@
+{
+  "description": "Hard blocker present - security clearance required but not held",
+  "input": {
+    "user_skills": [
+      {"skill": "python", "level": 4, "months_since_used": 0},
+      {"skill": "sql", "level": 3, "months_since_used": 2},
+      {"skill": "aws", "level": 3, "months_since_used": 5}
+    ],
+    "requirements": [
+      {"skill": "python", "required_level": 3, "criticality": 1.0, "frequency": 1.0, "is_blocker": false},
+      {"skill": "sql", "required_level": 3, "criticality": 0.8, "frequency": 0.9, "is_blocker": false},
+      {"skill": "security clearance", "required_level": 1, "criticality": 1.0, "frequency": 1.0, "is_blocker": true},
+      {"skill": "aws", "required_level": 2, "criticality": 0.7, "frequency": 0.7, "is_blocker": false}
+    ],
+    "today": "2026-07-25"
+  },
+  "expected": {
+    "screen_score": 40.0,
+    "interview_score": 55.0,
+    "job_score": 55.0,
+    "verdict": "blocked",
+    "explanation": "Missing hard blocker: security clearance"
+  },
+  "arithmetic": {
+    "note": "Hard blocker caps screen at 40, interview/job at 55",
+    "weights": [1.0, 0.72, 1.0, 0.49],
+    "total_weight": 3.21,
+    "uncapped_coverage": [1.0, 1.0, 0.0, 1.0],
+    "uncapped_points": "1.0 + 0.72 + 0 + 0.49 = 2.21",
+    "uncapped_score": "100 * (2.21 / 3.21) = 68.85",
+    "screen_score_calc": "min(40.0, 68.85) = 40.0",
+    "interview_score_calc": "min(55.0, 68.85) = 55.0",
+    "blocker_note": "Blocker present → screen capped at 40, interview/job capped at 55"
+  }
+}
