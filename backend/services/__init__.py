@@ -1,4 +1,3 @@
 # backend/services/__init__.py
-from .llm_service import llm_service
-
+# Lazy import — don't pull google/groq at import time; callers import explicitly.
 __all__ = ['llm_service']

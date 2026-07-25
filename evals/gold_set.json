@@ -1,0 +1,86 @@
+{
+  "metadata": {
+    "created": "2026-07-25",
+    "annotator": "demo",
+    "version": "1.0"
+  },
+  "examples": [
+    {
+      "bullet": "Developed REST API using Python Flask framework for 18 months",
+      "skills": {
+        "python": {
+          "level": 3,
+          "reasoning": "Professional development with strong verb and sufficient tenure"
+        },
+        "flask": {
+          "level": 3,
+          "reasoning": "Professional use in API development"
+        }
+      }
+    },
+    {
+      "bullet": "Led migration of legacy system to microservices architecture serving 2M+ users",
+      "skills": {
+        "microservices": {
+          "level": 4,
+          "reasoning": "Leadership verb + scale marker (2M+ users)"
+        },
+        "system architecture": {
+          "level": 4,
+          "reasoning": "Leadership in architectural decisions with large scale"
+        }
+      }
+    },
+    {
+      "bullet": "Skills: Python, JavaScript, SQL, Docker, Kubernetes",
+      "skills": {
+        "python": {
+          "level": 1,
+          "reasoning": "Listed only in skills section"
+        },
+        "javascript": {
+          "level": 1,
+          "reasoning": "Listed only in skills section"
+        },
+        "sql": {
+          "level": 1,
+          "reasoning": "Listed only in skills section"
+        },
+        "docker": {
+          "level": 1,
+          "reasoning": "Listed only in skills section"
+        },
+        "kubernetes": {
+          "level": 1,
+          "reasoning": "Listed only in skills section"
+        }
+      }
+    },
+    {
+      "bullet": "Assisted with Python automation scripts during 4-month internship",
+      "skills": {
+        "python": {
+          "level": 2,
+          "reasoning": "Weak verb (assisted) and short tenure"
+        },
+        "automation": {
+          "level": 2,
+          "reasoning": "Exposed level due to weak verb and internship context"
+        }
+      }
+    },
+    {
+      "bullet": "Personal project: Built a React web application with Node.js backend",
+      "skills": {
+        "react": {
+          "level": 2,
+          "reasoning": "Personal project demonstrates exposure but not professional use"
+        },
+        "node.js": {
+          "level": 2,
+          "reasoning": "Personal project demonstrates exposure but not professional use"
+        }
+      }
+    }
+  ]
+}

@@ -1,156 +1,175 @@
-# Bridgr - Career Development Platform
+# Bridgr
 
-A comprehensive career development platform that bridges the gap between who you are and who you want to become.
+Role-readiness scoring system. Upload your resume and real job postings — get three honest scores (Screen, Interview, Job) where every point traces to a specific requirement and a cited line of your resume.
 
-## Project Structure
+---
 
-- **Frontend**: React application (Vite/React Scripts)
-- **Backend**: FastAPI Python server with ML integration
-- **ML Components**: Skill analysis, gap detection, career recommendations
+## Results
 
-## Setup Instructions
+> Run `python evals/run_all.py` to reproduce all numbers below.
 
-### 1. Required Accounts
+### Skill extraction (F1 on 100 labelled examples)
 
-Before starting, create accounts for these services:
+| Approach         |    P |    R |   F1 | ±95% CI |
+|------------------|-----:|-----:|-----:|---------|
+| regex_baseline   |      |      |      | pending — label 100 examples first |
+| bm25_baseline    |      |      |      | pending |
+| embedding_only   |      |      |      | pending |
+| full_cascade     |      |      |      | pending |
 
-1. **Anthropic** (Claude AI)
-   - Visit: https://console.anthropic.com/
-   - Create account and get API key
-   - Required for AI-powered analysis and chat
+### Human ceiling (Krippendorff's alpha)
 
-2. **Supabase** (Database & Auth)
-   - Visit: https://supabase.com/
-   - Create new project
-   - Get Project URL and Anon Key
-   - Required for data storage and user authentication
+| Study                 | α    | Interpretation |
+|-----------------------|------|----------------|
+| Pairwise readiness    |      | pending — recruit 2+ raters |
 
-### 2. Environment Setup
+Alpha is the ceiling for any automated system in this category.
+A low value is a finding about the problem, not a failure.
 
-1. Clone the repository
-2. Copy environment file:
-   ```bash
-   cp .env.example .env
-   ```
-3. Fill in your API keys in `.env` file
+### Presentation variance
 
-### 3. Backend Setup
+| Metric                         | Value   |
+|--------------------------------|---------|
+| Between-candidate variance     | pending |
+| Within-candidate (phrasing)    | pending |
+| Presentation effect ratio      | pending |
+| Non-native phrasing penalty    | pending |
+
+> Run `python evals/presentation_study/run_study.py` and `decompose.py` to fill these in.
+
+### Engineering
+
+| Metric           | Value |
+|------------------|-------|
+| Test count       | 47    |
+| Coverage (core_ml) | run `pytest --cov=core_ml` |
+| CI               | [![Tests](../../actions/workflows/test.yml/badge.svg)](../../actions/workflows/test.yml) |
+
+---
+
+## Why the scoring engine is deterministic
+
+The scoring engine (`core_ml/scoring.py`) is a pure function: given the same
+input it produces byte-identical output every time. No LLM call, no
+`datetime.now()`, no network. `today` is a parameter.
+
+This matters because it means presentation variance is measurable and
+attributable. When the score changes, it's because the resume changed — not
+because a model had a different day.
+
+---
+
+## Architecture
+
+```
+frontend/          React app (upload UI, score display)
+backend/
+  routes/          FastAPI endpoints (validate → parse → extract → score)
+  core_ml/         Pure ML/scoring modules (no I/O)
+    parser.py      PDF text extraction and section detection
+    extractor.py   Skill extraction (phrase → semantic → MiniLM)
+    evidence.py    Context-based evidence levelling (0–4)
+    scoring.py     Pure scoring engine (SCORING_VERSION = v1.0)
+    loader.py      Singleton core initialisation
+  ml/              Model loader (wires core_ml to the route)
+  services/        LLM service (lazy-loaded, never touches scores)
+evals/             Evaluation harness (label, run, sweep, human study)
+scripts/           Data setup
+```
+
+---
+
+## What doesn't work yet
+
+- Evidence levelling uses date heuristics, not a proper date parser — tenure
+  estimates may be off by a few months for unusual formats.
+- The `_evidence_level` default of 12 months professional tenure means a skill
+  in the experience section always reaches at least level 3 if the verb is
+  strong, even if the actual tenure was 2 months.
+- O*NET sample covers 50 occupations; rare roles fall through to the LLM
+  fallback, which is slower and requires an API key.
+- `google-generativeai` and `groq` are in requirements but only loaded lazily
+  (inside `analyze_resume`). Tests mock them; production needs real keys.
+- The human study requires manual recruitment — it cannot be automated.
+- Presentation variant generation uses rule-based transformations. The
+  stylistic priors are the author's. LLM-generated variants would be a better
+  (but costlier) study design.
+
+---
+
+## Setup
+
+### Prerequisites
+
+- Python 3.11
+- Node 20
+- Firebase project (for auth)
+- Optional: Gemini and/or Groq API keys (for unknown-role fallback)
+
+### 1. Clone and configure
+
+```bash
+git clone <repo-url>
+cd bridgr
+cp backend/.env.example backend/.env
+# Fill in FIREBASE_*, GEMINI_API_KEY (optional), GROQ_API_KEY (optional)
+```
+
+### 2. Backend
 
 ```bash
 cd backend
 pip install -r requirements.txt
+python -m spacy download en_core_web_sm
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Download O*NET dataset:
-- Visit https://www.onetcenter.org/database.html
-- Download the "Database 30.2" ZIP file
-- Extract to `data/` directory as specified in config
+The app starts immediately using the 50-occupation sample.
+For all 1,000+ occupations:
 
-### 4. Frontend Setup
+```bash
+python scripts/setup_data.py
+# Then set ONET_EXTRACT_PATH in backend/.env
+```
+
+### 3. Frontend
 
 ```bash
 cd frontend
 npm install
+npm start
 ```
 
-### 5. Running the Application
+### 4. Docker (both services at once)
 
-#### Development Mode:
+```bash
+docker-compose up --build
+```
 
-**Terminal 1 - Backend:**
+### 5. Run tests
+
 ```bash
 cd backend
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+pytest tests/ -v --cov=core_ml
 ```
 
-**Terminal 2 - Frontend:**
-```bash
-cd frontend
-npm start
-# OR for Vite:
-npm run dev
-```
+---
 
-#### Quick Start Scripts:
-```bash
-# From project root
-npm run dev:backend    # Starts backend server
-npm run dev:frontend   # Starts frontend dev server
-npm run dev:all        # Starts both (requires two terminals)
-```
+## API
 
-### 6. API Endpoints
+`POST /api/readiness` — resume readiness scoring
+`GET  /health`        — health check
+`GET  /`              — API status
 
-Backend runs on `http://localhost:8000`
-- `GET /` - API status
-- `GET /health` - Health check
-- `POST /api/readiness` - Resume readiness scoring
-
-Frontend runs on `http://localhost:3000` (React Scripts) or `http://localhost:5173` (Vite)
-
-## Features
-
-- **Resume Analysis**: Upload and analyze resumes for skill gaps and role readiness
-- **Readiness Scoring**: Three separate scores (Screen, Interview, Job) with evidence levels
-- **Skill Extraction**: Demonstrated skills with context-based evidence levelling
-
-## Technology Stack
-
-### Backend
-- FastAPI (Python web framework)
-- spaCy (NLP processing)
-- Sentence Transformers (Semantic similarity)
-- Scikit-learn (ML algorithms)
-- Anthropic Claude (AI integration)
-- Supabase (Database/Authentication)
-
-### Frontend
-- React 18
-- Vite (Build tool)
-- Modern CSS/JavaScript
-
-### ML Components
-- Semantic skill matching
-- Gap analysis algorithms
-- Market demand prediction
-- Personalized recommendations
-
-## Deployment
-
-### Frontend (Vercel/Netlify)
-1. Connect your GitHub repository
-2. Configure build settings:
-   - Build command: `cd frontend && npm run build`
-   - Output directory: `frontend/build`
-
-### Backend (Railway/Heroku)
-1. Connect your GitHub repository
-2. Set environment variables in platform settings
-3. Configure start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-
-## Troubleshooting
-
-### Common Issues
-
-1. **CORS Errors**: Ensure frontend URL is in `CORS_ORIGINS` in backend config
-2. **API Key Errors**: Verify `.env` file has correct keys
-3. **ML Model Loading**: Ensure O*NET dataset is properly extracted
-4. **Port Conflicts**: Change ports if 8000/3000 are occupied
-
-### Getting Help
-
-- Check backend logs for detailed error messages
-- Verify all environment variables are set
-- Ensure all dependencies are installed
-- Check network connectivity for external API calls
+---
 
 ## Contributing
 
-1. Fork the repository
-2. Create feature branch
-3. Make changes and test
-4. Submit pull request
+1. Fork and create a branch
+2. `pytest tests/` must pass before submitting
+3. No new dependencies without discussion
+4. Read `.kiro/steering/project.md` — the hard rules apply to all contributions
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT

@@ -16,9 +16,6 @@ from core_ml import (
     reset_core
 )
 
-# Import LLM service
-from services.llm_service import llm_service
-
 load_dotenv()
 
 _core_instance: Union[IntelligenceCore, FallbackIntelligenceCore, None] = None
@@ -67,6 +64,8 @@ def analyze_resume(resume_path: str, target_role: str) -> Dict[str, Any]:
     Analyze resume using your Colab-trained models.
     Falls back to Gemini Flash for unknown roles (FREE).
     """
+    # Lazy import — avoids pulling google/groq at startup time
+    from services.llm_service import llm_service  # noqa: PLC0415
     core = get_core()
     
     try:

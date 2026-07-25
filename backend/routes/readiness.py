@@ -8,6 +8,12 @@ from fastapi import APIRouter, File, Form, UploadFile
 from pydantic import BaseModel
 
 from core.exceptions import ResumeParseFailed
+from core_ml.evidence import (
+    EvidenceContext,
+    determine_evidence_level,
+    detect_verb_strength,
+    detect_scope_markers,
+)
 from ml.model_loader import get_core
 
 router = APIRouter()
@@ -108,14 +114,105 @@ def _extract_requirements(job_descriptions: List[str], skills: List[str]) -> Cou
     return counts
 
 
-def _evidence_level(skill: Any) -> int:
-    confidence = float(getattr(skill, "confidence", 0.5))
-    source = str(getattr(skill, "source", "resume"))
-    if source == "phrase_match" and confidence >= 0.9:
-        return 3
-    if confidence >= 0.75:
-        return 2
-    return 1
+def _evidence_level(skill: Any, resume_sections: Dict[str, str] | None = None) -> int:
+    """
+    Derive evidence level from context — section, verb, tenure, scope.
+    Extraction confidence is intentionally ignored here (rule #4 in project.md).
+    """
+    context_text = str(getattr(skill, "context", ""))
+    source       = str(getattr(skill, "source", ""))
+    normalized   = str(getattr(skill, "normalized", "")).lower().strip()
+    sections     = resume_sections or {}
+
+    in_skills    = normalized in sections.get("skills", "").lower()
+    in_summary   = normalized in sections.get("summary", "").lower()
+    in_projects  = normalized in sections.get("projects", "").lower()
+    in_exp       = normalized in sections.get("experience", "").lower()
+
+    # Tenure: look for the skill's context bullet in the experience block to
+    # estimate months. Full date-range parsing lives in parser.py; here we
+    # use a rough heuristic — if no date found, default 12 months so a
+    # professional hit isn't unfairly capped at level 2.
+    tenure = _estimate_tenure_months(context_text, sections.get("experience", ""))
+
+    ctx = EvidenceContext(
+        skill=normalized,
+        found=True,
+        in_skills_section=in_skills,
+        in_summary_section=in_summary,
+        in_experience_section=in_exp,
+        in_projects_section=in_projects,
+        verb_strength=detect_verb_strength(context_text),
+        tenure_months=tenure,
+        has_scope_marker=detect_scope_markers(context_text),
+        context_text=context_text,
+    )
+    return determine_evidence_level(ctx)
+
+
+# Date-range pattern used to estimate tenure from a bullet's surrounding text
+_DATE_RANGE_RE = re.compile(
+    r"(\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*[\s'\-\.]*\d{2,4})"
+    r"\s*[\-–—to]+\s*"
+    r"(present|\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*[\s'\-\.]*\d{2,4})",
+    re.IGNORECASE,
+)
+_YEAR_ONLY_RE = re.compile(r"\b(20\d{2})\s*[\-–—]\s*(20\d{2}|present)\b", re.IGNORECASE)
+
+
+def _estimate_tenure_months(context_text: str, experience_section: str) -> int:
+    """
+    Rough tenure estimate from context or experience block.
+    Returns months; defaults to 12 if no date range is found — better than
+    wrongly capping professional experience at level 2.
+    """
+    from datetime import date as _date
+    import calendar as _cal
+
+    def _parse_month_year(s: str):
+        """Return (year, month) or None."""
+        s = s.strip().lower().replace("'", " ")
+        months = {"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,
+                  "jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12}
+        for abbr, num in months.items():
+            if abbr in s:
+                m = re.search(r"(\d{4}|\d{2})", s)
+                if m:
+                    yr = int(m.group(1))
+                    if yr < 100:
+                        yr += 2000
+                    return yr, num
+        m = re.search(r"(\d{4})", s)
+        if m:
+            return int(m.group(1)), 6  # mid-year default
+        return None
+
+    for text in (context_text, experience_section):
+        for match in _DATE_RANGE_RE.finditer(text):
+            start_s, end_s = match.group(1), match.group(2)
+            start = _parse_month_year(start_s)
+            if not start:
+                continue
+            if "present" in end_s.lower():
+                end_yr, end_mo = _date.today().year, _date.today().month
+            else:
+                parsed = _parse_month_year(end_s)
+                if not parsed:
+                    continue
+                end_yr, end_mo = parsed
+            months = (end_yr - start[0]) * 12 + (end_mo - start[1])
+            if months > 0:
+                return months
+
+        for match in _YEAR_ONLY_RE.finditer(text):
+            start_yr = int(match.group(1))
+            end_str  = match.group(2)
+            end_yr   = _date.today().year if "present" in end_str.lower() else int(end_str)
+            months   = (end_yr - start_yr) * 12
+            if months > 0:
+                return months
+
+    return 12  # default: assume at least one year of professional use
 
 
 def _verdict(screen: int, interview: int, job: int) -> str:
@@ -161,7 +258,7 @@ def generate_readiness_report(
             normalized = str(getattr(skill, "normalized", "")).lower().strip()
             if not normalized:
                 continue
-            level = _evidence_level(skill)
+            level = _evidence_level(skill, resume_data.get("sections", {}))
             existing = user_levels.get(normalized)
             if not existing or level > existing.level:
                 user_levels[normalized] = EvidenceItem(
