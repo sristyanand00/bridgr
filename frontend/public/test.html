@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridgr - Connection Test</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px; background: #0a0a0f; color: white; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .test-result { padding: 10px; margin: 10px 0; border-radius: 6px; }
+        .success { background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; }
+        .error { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; }
+        .loading { background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; }
+        button { background: #8b5cf6; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin: 5px; }
+        button:hover { background: #7c3aed; }
+        code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌉 Bridgr - Connection Test</h1>
+        <p>This page tests the connection between frontend and backend to diagnose CORS and connectivity issues.</p>
+        
+        <div id="results"></div>
+        
+        <div>
+            <button onclick="testBackendHealth()">Test Backend Health</button>
+            <button onclick="testCORS()">Test CORS</button>
+            <button onclick="testAuth()">Test Auth Endpoint</button>
+            <button onclick="runAllTests()">Run All Tests</button>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+            <h3>Expected Results:</h3>
+            <ul>
+                <li>✅ Backend Health: Should return <code>{"status":"ok","ready":true}</code></li>
+                <li>✅ CORS Test: Should include <code>access-control-allow-origin</code> header</li>
+                <li>❌ Auth Test: Should return <code>401 Not authenticated</code> (this is expected without token)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        const resultsDiv = document.getElementById('results');
+
+        function addResult(name, success, message, details = '') {
+            const div = document.createElement('div');
+            div.className = `test-result ${success ? 'success' : 'error'}`;
+            div.innerHTML = `
+                <strong>${success ? '✅' : '❌'} ${name}</strong><br>
+                ${message}
+                ${details ? `<br><small>${details}</small>` : ''}
+            `;
+            resultsDiv.appendChild(div);
+        }
+
+        function addLoading(name) {
+            const div = document.createElement('div');
+            div.className = 'test-result loading';
+            div.innerHTML = `<strong>🔄 ${name}</strong><br>Testing...`;
+            div.id = `loading-${name.replace(/\s+/g, '-').toLowerCase()}`;
+            resultsDiv.appendChild(div);
+            return div;
+        }
+
+        async function testBackendHealth() {
+            const loading = addLoading('Backend Health');
+            try {
+                const response = await fetch(`${API_BASE}/health`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                loading.remove();
+                
+                if (response.ok && data.status === 'ok') {
+                    addResult('Backend Health', true, 'Backend is running and healthy', `Response: ${JSON.stringify(data)}`);
+                } else {
+                    addResult('Backend Health', false, 'Backend returned unexpected response', `Status: ${response.status}, Data: ${JSON.stringify(data)}`);
+                }
+            } catch (error) {
+                loading.remove();
+                addResult('Backend Health', false, 'Failed to connect to backend', `Error: ${error.message}`);
+            }
+        }
+
+        async function testCORS() {
+            const loading = addLoading('CORS Headers');
+            try {
+                const response = await fetch(`${API_BASE}/health`, {
+                    method: 'GET',
+                    credentials: 'include'
+                    // Note: Browser automatically sets Origin header, we can't override it
+                });
+                
+                loading.remove();
+                
+                const corsHeader = response.headers.get('access-control-allow-origin');
+                const credentialsHeader = response.headers.get('access-control-allow-credentials');
+                
+                if (corsHeader && credentialsHeader) {
+                    addResult('CORS Headers', true, 'CORS is properly configured', `Origin: ${corsHeader}, Credentials: ${credentialsHeader}`);
+                } else {
+                    addResult('CORS Headers', false, 'CORS headers missing or incorrect', `Origin: ${corsHeader || 'missing'}, Credentials: ${credentialsHeader || 'missing'}`);
+                }
+            } catch (error) {
+                loading.remove();
+                addResult('CORS Headers', false, 'CORS test failed', `Error: ${error.message}`);
+            }
+        }
+
+        async function testAuth() {
+            const loading = addLoading('Auth Endpoint');
+            try {
+                const response = await fetch(`${API_BASE}/api/user/sync`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                loading.remove();
+                
+                if (response.status === 401 && data.detail && data.detail.includes('authenticated')) {
+                    addResult('Auth Endpoint', true, 'Auth endpoint is working (correctly rejected without token)', `Status: ${response.status}, Message: ${data.detail}`);
+                } else if (response.status === 422 && data.detail && data.detail.includes('authorization')) {
+                    addResult('Auth Endpoint', true, 'Auth endpoint is working (missing authorization header)', `Status: ${response.status}, Message: ${data.detail}`);
+                } else if (response.status === 403 && data.detail && data.detail.includes('authenticated')) {
+                    addResult('Auth Endpoint', true, 'Auth endpoint is working (forbidden without token)', `Status: ${response.status}, Message: ${data.detail}`);
+                } else {
+                    addResult('Auth Endpoint', false, 'Auth endpoint returned unexpected response', `Status: ${response.status}, Data: ${JSON.stringify(data)}`);
+                }
+            } catch (error) {
+                loading.remove();
+                addResult('Auth Endpoint', false, 'Auth endpoint test failed', `Error: ${error.message}`);
+            }
+        }
+
+        async function runAllTests() {
+            resultsDiv.innerHTML = '<h3>Running Tests...</h3>';
+            await testBackendHealth();
+            await new Promise(resolve => setTimeout(resolve, 500)); // Small delay between tests
+            await testCORS();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testAuth();
+        }
+
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            setTimeout(runAllTests, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -12,14 +12,18 @@ dist/
 build/
 .env.local
 
-# Data (too large for git)
-data/
+# Data (too large for git) — exclude contents but NOT specific subdirectories
+data/*
+!data/sample/
+!data/sample/**
 *.csv
 
-# Ship the sample so `git clone && docker-compose up` works without setup
+# Ship the backend sample so `git clone && docker-compose up` works without setup
+# Note: negations must target individual files, not re-include excluded parents.
+# Using data/* instead of data/ so the sample/ subdirectory can be re-included.
+!backend/data/
 !backend/data/sample/
-!backend/data/sample/*.csv
-!backend/data/sample/*.md
+!backend/data/sample/**
 
 # VS Code
 .vscode/

@@ -4,9 +4,6 @@ from __future__ import annotations
 import logging
 import json as _json
 import numpy as np
-import spacy
-from spacy.matcher import PhraseMatcher
-from sentence_transformers import SentenceTransformer
 from typing import List, Dict
 
 from .schemas import ExtractedSkill
@@ -29,35 +26,42 @@ class SkillExtractor:
         openai_key:         str   = "",   # retained for compat; tier-3 uses MiniLM
         verbose:            bool  = True,
     ):
+        # Lazy imports — kept inside __init__ so that importing this module
+        # at collection time (e.g. `from core_ml.extractor import STOP_SKILLS`)
+        # does NOT require spacy or sentence-transformers to be installed.
+        # Tests marked `requires_ml` will still fail at runtime if the deps
+        # are absent, but they will no longer abort the whole collection pass.
+        import spacy as _spacy
+        from spacy.matcher import PhraseMatcher as _PhraseMatcher
+        from sentence_transformers import SentenceTransformer as _SentenceTransformer
+
         self.skill_list = [s for s in skill_list if s.lower() not in STOP_SKILLS]
         self.threshold  = semantic_threshold
         self._has_fallback = True   # always available — MiniLM is already loaded
 
         if verbose:
             logger.info("Loading NLP models...")
-        self.nlp = spacy.load("en_core_web_sm") if spacy.util.is_package("en_core_web_sm") else spacy.blank("en")
-        
-        # Use safer model loading method with fallback protection
+        self.nlp = _spacy.load("en_core_web_sm") if _spacy.util.is_package("en_core_web_sm") else _spacy.blank("en")
+
         try:
-            self.embed_model = SentenceTransformer("all-MiniLM-L6-v2")
+            self.embed_model = _SentenceTransformer("all-MiniLM-L6-v2")
             if verbose:
                 logger.info("Embedding model loaded successfully")
         except Exception as e:
-            logger.info(f"Embedding model failed: {e}")
+            logger.info("Embedding model failed: %s", e)
             self.embed_model = None
             if verbose:
                 logger.info("Using basic mode without embeddings")
 
-        self._matcher = PhraseMatcher(self.nlp.vocab, attr="LOWER")
+        self._matcher = _PhraseMatcher(self.nlp.vocab, attr="LOWER")
         patterns = list(self.nlp.pipe(self.skill_list))
         self._matcher.add("SKILLS", patterns)
 
         if verbose:
-            logger.info(f"Encoding {len(self.skill_list)} skills...")
-        
-        # Initialize to empty array to prevent AttributeError
+            logger.info("Encoding %d skills...", len(self.skill_list))
+
         self._skill_embeddings = np.array([])
-        
+
         if self.embed_model is not None:
             self._skill_embeddings = self.embed_model.encode(
                 self.skill_list, batch_size=64,

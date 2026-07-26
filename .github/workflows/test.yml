@@ -22,7 +22,7 @@ jobs:
           cache: pip
 
       - name: Install minimal dependencies
-        working-directory: bridgr/backend
+        working-directory: backend
         run: |
           pip install \
             fastapi==0.111.0 \
@@ -39,7 +39,7 @@ jobs:
             httpx==0.27.0
 
       - name: Run fast tests (no ML)
-        working-directory: bridgr/backend
+        working-directory: backend
         run: |
           python -m pytest tests/ \
             -m "not requires_ml" \
@@ -52,7 +52,7 @@ jobs:
       - name: Upload coverage report
         uses: codecov/codecov-action@v4
         with:
-          files: bridgr/backend/coverage.xml
+          files: backend/coverage.xml
           flags: backend-fast
         continue-on-error: true
 
@@ -85,14 +85,14 @@ jobs:
           key: spacy-en-core-web-sm-${{ runner.os }}
 
       - name: Install all dependencies
-        working-directory: bridgr/backend
+        working-directory: backend
         run: pip install -r requirements.txt
 
       - name: Download spaCy model
         run: python -m spacy download en_core_web_sm
 
       - name: Run full test suite with coverage
-        working-directory: bridgr/backend
+        working-directory: backend
         run: |
           python -m pytest tests/ \
             --cov=core_ml \
@@ -104,6 +104,6 @@ jobs:
       - name: Upload coverage report
         uses: codecov/codecov-action@v4
         with:
-          files: bridgr/backend/coverage.xml
+          files: backend/coverage.xml
           flags: backend-full
         continue-on-error: true

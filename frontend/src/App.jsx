@@ -10,6 +10,7 @@ import {
   Settings,
 } from './pages';
 import { auth, signOut } from './config/firebase';
+import { syncUser, saveQuiz } from './config/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Global Analysis Context
@@ -46,18 +47,13 @@ const App = () => {
   const syncUserWithBackend = async (firebaseUser) => {
     try {
       const token = await firebaseUser.getIdToken();
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/user/sync`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const dbUser = await response.json();
-        if (dbUser.quiz_data) {
-          setProfile(prev => ({ ...prev, ...dbUser.quiz_data }));
-        }
+      const dbUser = await syncUser(token);
+      if (dbUser.quiz_data) {
+        setProfile(prev => ({ ...prev, ...dbUser.quiz_data }));
       }
     } catch (err) {
       console.error("Failed to sync user with backend:", err);
+      // Don't break the app if sync fails - user can still use it
     }
   };
 
@@ -81,16 +77,19 @@ const App = () => {
           
           setScreen("app");
           
-          // Sync with DB in background
-          syncUserWithBackend(firebaseUser);
+          // Sync with DB in background - don't block UI
+          setTimeout(() => syncUserWithBackend(firebaseUser), 100);
         } else {
           // No active session — show landing
           if (screen === "loading") setScreen("landing");
         }
       });
     } else {
-      // Mock auth — go straight to landing
-      setScreen("landing");
+      // Firebase not available — go straight to landing
+      console.warn("Firebase not available, using fallback mode");
+      setTimeout(() => {
+        if (screen === "loading") setScreen("landing");
+      }, 1000);
     }
 
     return () => unsubscribe();
@@ -122,22 +121,16 @@ const App = () => {
     
     // Save quiz to DB in the background if authenticated
     if (user?.authenticated || auth.currentUser) {
-      const syncQuiz = async () => {
+      const syncQuizData = async () => {
         try {
           const token = await auth.currentUser.getIdToken();
-          await fetch(`${process.env.REACT_APP_API_URL}/api/user/quiz`, {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}` 
-            },
-            body: JSON.stringify({ quiz_data: answers })
-          });
+          await saveQuiz(answers, token);
         } catch (err) {
           console.error("Background sync failed:", err);
+          // Don't break the app if sync fails
         }
       };
-      syncQuiz();
+      syncQuizData();
     }
   };
 
