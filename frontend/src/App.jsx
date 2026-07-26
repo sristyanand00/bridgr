@@ -8,6 +8,7 @@ import {
   Dashboard,
   Resume,
   Settings,
+  History,
 } from './pages';
 import { auth, signOut } from './config/firebase';
 import { syncUser, saveQuiz } from './config/api';
@@ -29,7 +30,7 @@ export const useAnalysis = () => useContext(AnalysisContext);
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Pages that show a back button pointing to dashboard
-const PAGES_WITH_BACK = ['resume', 'settings'];
+const PAGES_WITH_BACK = ['resume', 'settings', 'history'];
 
 const App = () => {
   const [screen, setScreen]               = useState("loading"); // start in loading state
@@ -184,6 +185,15 @@ const App = () => {
       <Resume
         profile={mergedProfile}
         onSaveGate={() => setShowAuth(true)}
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
+        setCurrentPage={navigateTo}
+        onBack={canGoBack ? navigateBack : () => navigateTo("dashboard")}
+      />
+    ),
+    history: (
+      <History
+        profile={mergedProfile}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
         setCurrentPage={navigateTo}

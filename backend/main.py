@@ -11,9 +11,18 @@ from contextlib import asynccontextmanager
 # them) lets the API server start and serve all routes.  The ML models load
 # lazily on the first /api/readiness request via FallbackIntelligenceCore,
 # which uses the built-in 50-occupation sample and requires none of these.
+
+# WARNING: This stub should only trigger on Python 3.14+ where packages aren't available
+# If you're seeing this on Python 3.11/3.12, there's likely a dependency installation issue
+_ml_packages_stubbed = False
 try:
     import spacy  # noqa: F401 — already installed, nothing to stub
 except ImportError:
+    _ml_packages_stubbed = True
+    print("⚠️  WARNING: ML packages not available - using stubs!")
+    print("   This should only happen on Python 3.14+ or if dependencies failed to install")
+    print("   Resume analysis will use fallback logic with reduced accuracy")
+    
     from unittest.mock import MagicMock
     for _m in [
         "spacy", "spacy.matcher", "spacy.util", "spacy.lang", "spacy.lang.en",
@@ -26,6 +35,11 @@ except ImportError:
     ]:
         if _m not in sys.modules:
             sys.modules[_m] = MagicMock()
+    
+    # Log this prominently in the server logs
+    logging.basicConfig(level=logging.WARNING)
+    logger = logging.getLogger(__name__)
+    logger.warning("ML dependencies stubbed - analysis accuracy will be reduced!")
 # ─────────────────────────────────────────────────────────────────────────────
 
 from fastapi import FastAPI

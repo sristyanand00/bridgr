@@ -1,6 +1,7 @@
 export const NAVIGATION_ITEMS = [
   { id:"dashboard", i:"home", l:"Readiness Home" },
   { id:"resume",    i:"file", l:"Readiness Report" },
+  { id:"history",   i:"clock", l:"History" },
 ];
 
 export const BOTTOM_NAV_ITEMS = [

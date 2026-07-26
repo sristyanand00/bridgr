@@ -1,4 +1,5 @@
 services:
+  # Backend service
   - type: web
     name: bridgr-backend
     runtime: python
@@ -8,3 +9,29 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
+      - key: ALLOWED_ORIGINS
+        value: "https://bridgr-frontend.onrender.com,http://localhost:3000,http://localhost:5173"
+      - key: DEBUG
+        value: "false"
+      - key: ENVIRONMENT  
+        value: "production"
+        
+  # Frontend service
+  - type: web
+    name: bridgr-frontend
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npx serve -s build -p $PORT
+    envVars:
+      - key: REACT_APP_API_URL
+        value: "https://bridgr-backend.onrender.com"
+
+# Database
+databases:
+  - name: bridgr-db
+    databaseName: bridgr
+    user: bridgr_user
+    
+# Note: Set DATABASE_URL manually in Render dashboard to point to the created database
+# Format: postgresql://bridgr_user:password@host:port/bridgr

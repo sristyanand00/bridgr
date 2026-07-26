@@ -4,7 +4,11 @@ import tempfile
 from collections import Counter
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, File, Form, UploadFile
+from fastapi import APIRouter, Depends, File, Form, UploadFile
+from sqlalchemy.orm import Session
+from db.database import get_db
+from db.models import Analysis
+from services.auth_service import get_user_optional
 from pydantic import BaseModel
 
 from core.exceptions import ResumeParseFailed
@@ -193,6 +197,8 @@ def generate_readiness_report(
     target_role: str = Form(...),
     job_descriptions: str = Form(...),
     weekly_hours: int = Form(8),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_user_optional),
 ):
     import datetime as _dt
 
@@ -344,7 +350,8 @@ def generate_readiness_report(
             for skill in top_roi[:5]
         ]
 
-        return ReadinessResponse(
+        # Create the response
+        response = ReadinessResponse(
             target_role=target_role,
             screen_score=round(result.screen_score),
             interview_score=round(result.interview_score),
@@ -363,6 +370,37 @@ def generate_readiness_report(
             sprint_tasks=sprint_tasks,
             resume_bullets=resume_bullets,
         )
+
+        # Save analysis to database if user is authenticated
+        if current_user and current_user.get("uid"):
+            try:
+                analysis_record = Analysis(
+                    user_id=current_user["uid"],
+                    target_role=target_role,
+                    match_score=round(result.screen_score),
+                    feasibility_score=round(result.job_score),
+                    analysis_data={
+                        "screen_score": round(result.screen_score),
+                        "interview_score": round(result.interview_score), 
+                        "job_score": round(result.job_score),
+                        "verdict": result.verdict,
+                        "has_blocker": result.has_blocker,
+                        "top_roi_gaps": top_roi,
+                        "matched_count": len(matched),
+                        "gaps_count": len(gaps)
+                    }
+                )
+                db.add(analysis_record)
+                db.commit()
+                import logging
+                logging.getLogger(__name__).info(f"Saved analysis record for user {current_user['uid']}")
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(f"Failed to save analysis: {e}")
+                # Don't fail the request if DB save fails
+                pass
+
+        return response
     finally:
         if tmp_path and os.path.exists(tmp_path):
             os.unlink(tmp_path)

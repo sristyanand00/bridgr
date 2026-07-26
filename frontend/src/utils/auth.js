@@ -1,7 +1,6 @@
-import { getAuth } from '../config/firebase';
+import { auth } from '../config/firebase';
 
 export const getCurrentUserToken = async () => {
-  const auth = getAuth();
   const user = auth.currentUser;
   
   if (user) {
@@ -18,6 +17,5 @@ export const getCurrentUserToken = async () => {
 };
 
 export const getCurrentUser = () => {
-  const auth = getAuth();
   return auth.currentUser;
 };
