@@ -49,6 +49,7 @@ measured value once the evaluation harness has enough labelled data.
 |-----------|-------|--------|-------|
 | Top N requirements | 18 | ASSUMED | Top 18 skills from job postings. Arbitrary cap to keep the output readable. |
 | Required level threshold | count ≥ max(2, n_postings//2) → level 3, else level 2 | ASSUMED | Skills appearing in half or more of postings are treated as "required at depth". Heuristic. |
+| Criticality | 1.0 (constant) | ASSUMED | constant placeholder — no signal available to distinguish critical from nice-to-have requirements yet. Until a real signal exists, weight == frequency. |
 | Max file size | 10 MB | ASSUMED | Resumes are rarely >1 MB; 10 MB is a safety ceiling for adversarial inputs. |
 | Default tenure (no date found) | 12 months | ASSUMED | When no date range is parseable in the context, 12 months is assumed so professional experience isn't unfairly capped at level 2. Conservative but not validated. |
 

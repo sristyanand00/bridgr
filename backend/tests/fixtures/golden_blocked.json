@@ -2,9 +2,9 @@
   "description": "Hard blocker present - security clearance required but not held",
   "input": {
     "user_skills": [
-      {"skill": "python", "level": 4, "months_since_used": 0},
-      {"skill": "sql", "level": 3, "months_since_used": 2},
-      {"skill": "aws", "level": 3, "months_since_used": 5}
+      {"skill": "python", "level": 4, "last_used": "2026-07"},
+      {"skill": "sql", "level": 3, "last_used": "2026-05"},
+      {"skill": "aws", "level": 3, "last_used": "2026-02"}
     ],
     "requirements": [
       {"skill": "python", "required_level": 3, "criticality": 1.0, "frequency": 1.0, "is_blocker": false},

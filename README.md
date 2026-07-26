@@ -41,9 +41,9 @@ A low value is a finding about the problem, not a failure.
 
 | Metric           | Value |
 |------------------|-------|
-| Test count       | 47    |
+| Test count       | 82 passing, 1 skipped |
 | Coverage (core_ml) | run `pytest --cov=core_ml` |
-| CI               | [![Tests](../../actions/workflows/test.yml/badge.svg)](../../actions/workflows/test.yml) |
+| CI               | [![Tests](https://github.com/zaryab-tech/bridgr/actions/workflows/test.yml/badge.svg)](https://github.com/zaryab-tech/bridgr/actions/workflows/test.yml) |
 
 ---
 

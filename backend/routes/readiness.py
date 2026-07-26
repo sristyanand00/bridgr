@@ -2,7 +2,7 @@ import os
 import re
 import tempfile
 from collections import Counter
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, File, Form, UploadFile
 from pydantic import BaseModel
@@ -10,13 +10,32 @@ from pydantic import BaseModel
 from core.exceptions import ResumeParseFailed
 from core_ml.evidence import (
     EvidenceContext,
+    TenureInfo,
     determine_evidence_level,
     detect_verb_strength,
     detect_scope_markers,
+    extract_tenure_and_last_used,
+)
+from core_ml.scoring import (
+    Requirement,
+    ScoreComponent,
+    ScoreInput,
+    ScoreResult,
+    UserSkill,
+    score,
 )
 from ml.model_loader import get_core
+from core_ml import loader as _core_loader
 
 router = APIRouter()
+
+
+def _get_data_mode() -> str:
+    """Return the current data_mode from the loader singleton."""
+    try:
+        return _core_loader.DATA_MODE
+    except Exception:
+        return "fallback"
 
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
@@ -26,6 +45,7 @@ class EvidenceItem(BaseModel):
     level: int
     source: str
     evidence: str
+    last_used: Optional[str] = None  # ISO 'YYYY-MM'; None if not parsed
 
 
 class RequirementGap(BaseModel):
@@ -44,12 +64,29 @@ class SprintTask(BaseModel):
     lifts: List[str]
 
 
+class ScoreComponentOut(BaseModel):
+    """Per-requirement score breakdown — fulfils the 'every point traces to a requirement' promise."""
+    skill: str
+    weight: float
+    user_level: int
+    required_level: int
+    recency_mult: Optional[float]    # None when skill is absent (not stale — simply not present)
+    coverage: float          # interview_coverage
+    points_lost: float       # weight - points_earned
+    reason: str
+
+
 class ReadinessResponse(BaseModel):
     target_role: str
     screen_score: int
     interview_score: int
     job_score: int
     verdict: str
+    scoring_version: str
+    has_blocker: bool
+    dates_parsed: bool                  # False if any skill fell back to unknown date
+    data_mode: str                      # "full" | "sample" | "fallback"
+    components: List[ScoreComponentOut]
     extracted_evidence: List[EvidenceItem]
     requirement_gaps: List[RequirementGap]
     matched_requirements: List[RequirementGap]
@@ -114,26 +151,26 @@ def _extract_requirements(job_descriptions: List[str], skills: List[str]) -> Cou
     return counts
 
 
-def _evidence_level(skill: Any, resume_sections: Dict[str, str] | None = None) -> int:
+def _evidence_level_and_tenure(
+    skill: Any,
+    resume_sections: Dict[str, str] | None = None,
+) -> tuple[int, TenureInfo]:
     """
-    Derive evidence level from context — section, verb, tenure, scope.
+    Derive evidence level and tenure info from context.
     Extraction confidence is intentionally ignored here (rule #4 in project.md).
+    Returns (level, TenureInfo) so the route can track whether dates were parsed.
     """
     context_text = str(getattr(skill, "context", ""))
-    source       = str(getattr(skill, "source", ""))
     normalized   = str(getattr(skill, "normalized", "")).lower().strip()
     sections     = resume_sections or {}
 
-    in_skills    = normalized in sections.get("skills", "").lower()
-    in_summary   = normalized in sections.get("summary", "").lower()
-    in_projects  = normalized in sections.get("projects", "").lower()
-    in_exp       = normalized in sections.get("experience", "").lower()
+    in_skills   = normalized in sections.get("skills", "").lower()
+    in_summary  = normalized in sections.get("summary", "").lower()
+    in_projects = normalized in sections.get("projects", "").lower()
+    in_exp      = normalized in sections.get("experience", "").lower()
 
-    # Tenure: look for the skill's context bullet in the experience block to
-    # estimate months. Full date-range parsing lives in parser.py; here we
-    # use a rough heuristic — if no date found, default 12 months so a
-    # professional hit isn't unfairly capped at level 2.
-    tenure = _estimate_tenure_months(context_text, sections.get("experience", ""))
+    # Date parsing now lives in evidence.py where it belongs
+    tenure_info = extract_tenure_and_last_used(context_text, sections.get("experience", ""))
 
     ctx = EvidenceContext(
         skill=normalized,
@@ -143,87 +180,11 @@ def _evidence_level(skill: Any, resume_sections: Dict[str, str] | None = None) -
         in_experience_section=in_exp,
         in_projects_section=in_projects,
         verb_strength=detect_verb_strength(context_text),
-        tenure_months=tenure,
+        tenure_months=tenure_info.tenure_months,
         has_scope_marker=detect_scope_markers(context_text),
         context_text=context_text,
     )
-    return determine_evidence_level(ctx)
-
-
-# Date-range pattern used to estimate tenure from a bullet's surrounding text
-_DATE_RANGE_RE = re.compile(
-    r"(\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*[\s'\-\.]*\d{2,4})"
-    r"\s*[\-–—to]+\s*"
-    r"(present|\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*[\s'\-\.]*\d{2,4})",
-    re.IGNORECASE,
-)
-_YEAR_ONLY_RE = re.compile(r"\b(20\d{2})\s*[\-–—]\s*(20\d{2}|present)\b", re.IGNORECASE)
-
-
-def _estimate_tenure_months(context_text: str, experience_section: str) -> int:
-    """
-    Rough tenure estimate from context or experience block.
-    Returns months; defaults to 12 if no date range is found — better than
-    wrongly capping professional experience at level 2.
-    """
-    from datetime import date as _date
-    import calendar as _cal
-
-    def _parse_month_year(s: str):
-        """Return (year, month) or None."""
-        s = s.strip().lower().replace("'", " ")
-        months = {"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,
-                  "jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12}
-        for abbr, num in months.items():
-            if abbr in s:
-                m = re.search(r"(\d{4}|\d{2})", s)
-                if m:
-                    yr = int(m.group(1))
-                    if yr < 100:
-                        yr += 2000
-                    return yr, num
-        m = re.search(r"(\d{4})", s)
-        if m:
-            return int(m.group(1)), 6  # mid-year default
-        return None
-
-    for text in (context_text, experience_section):
-        for match in _DATE_RANGE_RE.finditer(text):
-            start_s, end_s = match.group(1), match.group(2)
-            start = _parse_month_year(start_s)
-            if not start:
-                continue
-            if "present" in end_s.lower():
-                end_yr, end_mo = _date.today().year, _date.today().month
-            else:
-                parsed = _parse_month_year(end_s)
-                if not parsed:
-                    continue
-                end_yr, end_mo = parsed
-            months = (end_yr - start[0]) * 12 + (end_mo - start[1])
-            if months > 0:
-                return months
-
-        for match in _YEAR_ONLY_RE.finditer(text):
-            start_yr = int(match.group(1))
-            end_str  = match.group(2)
-            end_yr   = _date.today().year if "present" in end_str.lower() else int(end_str)
-            months   = (end_yr - start_yr) * 12
-            if months > 0:
-                return months
-
-    return 12  # default: assume at least one year of professional use
-
-
-def _verdict(screen: int, interview: int, job: int) -> str:
-    lowest = min(screen, interview, job)
-    if lowest >= 75:
-        return "Ready to apply now"
-    if lowest >= 55:
-        return "Apply selectively while closing gaps"
-    if lowest >= 35:
-        return "Two to three focused sprints away"
-    return "Not a realistic near-term target yet"
+    return determine_evidence_level(ctx), tenure_info
 
 
 @router.post("/readiness", response_model=ReadinessResponse)
@@ -233,6 +194,8 @@ def generate_readiness_report(
     job_descriptions: str = Form(...),
     weekly_hours: int = Form(8),
 ):
+    import datetime as _dt
+
     target_role = target_role.strip()
     if len(target_role) < 3:
         raise ResumeParseFailed("Target role must be a real job title.")
@@ -253,12 +216,17 @@ def generate_readiness_report(
         resume_data = core.resume_parser.parse(tmp_path)
         extracted = core.skill_extractor.extract(resume_data)
 
+        # Build evidence map; track whether any date was unparsed
         user_levels: Dict[str, EvidenceItem] = {}
+        any_date_unparsed = False
+
         for skill in extracted:
             normalized = str(getattr(skill, "normalized", "")).lower().strip()
             if not normalized:
                 continue
-            level = _evidence_level(skill, resume_data.get("sections", {}))
+            level, tenure_info = _evidence_level_and_tenure(skill, resume_data.get("sections", {}))
+            if not tenure_info.parsed:
+                any_date_unparsed = True
             existing = user_levels.get(normalized)
             if not existing or level > existing.level:
                 user_levels[normalized] = EvidenceItem(
@@ -266,6 +234,7 @@ def generate_readiness_report(
                     level=level,
                     source=str(getattr(skill, "source", "resume")),
                     evidence=str(getattr(skill, "context", ""))[:220],
+                    last_used=tenure_info.last_used,
                 )
 
         skill_counts = _extract_requirements(postings, _candidate_skills(core))
@@ -281,50 +250,93 @@ def generate_readiness_report(
                 pass
 
         top_requirements = skill_counts.most_common(18)
-        total_weight = sum(count for _, count in top_requirements) or 1
 
+        # Build ScoreInput and call the single scoring implementation
+        today_str = _dt.date.today().isoformat()
+        score_user_skills = [
+            UserSkill(
+                skill=ev.skill,
+                level=ev.level,
+                last_used=ev.last_used,
+            )
+            for ev in user_levels.values()
+        ]
+
+        score_requirements: List[Requirement] = []
+        for skill, count in top_requirements:
+            frequency = count / len(postings)          # 0.0-1.0
+            # criticality is not yet derived from any signal; constant 1.0 means
+            # weight == frequency until a real signal is available (see ASSUMPTIONS.md)
+            criticality = 1.0
+            required_level = 3 if count >= max(2, len(postings) // 2) else 2
+            score_requirements.append(Requirement(
+                skill=skill,
+                required_level=required_level,
+                criticality=criticality,
+                frequency=frequency,
+                is_blocker=False,  # no blocker detection yet
+            ))
+
+        score_input = ScoreInput(
+            user_skills=score_user_skills,
+            requirements=score_requirements,
+            today=today_str,
+        )
+        result: ScoreResult = score(score_input)
+
+        # Map ScoreComponent → ScoreComponentOut
+        components_out: List[ScoreComponentOut] = [
+            ScoreComponentOut(
+                skill=c.skill,
+                weight=c.weight,
+                user_level=c.user_level,
+                required_level=c.required_level,
+                recency_mult=c.recency_mult,
+                coverage=c.interview_coverage,
+                points_lost=round(c.points_possible - c.points_earned, 4),
+                reason=c.reason,
+            )
+            for c in result.components
+        ]
+
+        # Build gap/match lists for the existing UI fields
+        level_map = {ev.skill: ev for ev in user_levels.values()}
         matched: List[RequirementGap] = []
         gaps: List[RequirementGap] = []
-        screen_points = 0
-        interview_points = 0
-        job_points = 0
 
-        for skill, count in top_requirements:
-            evidence = user_levels.get(skill)
-            user_level = evidence.level if evidence else 0
-            required_level = 3 if count >= max(2, len(postings) // 2) else 2
-            weight = count / total_weight
-            screen_points += weight * (100 if user_level > 0 else 0)
-            interview_points += weight * min(user_level / required_level, 1) * 100
-            job_points += weight * min(user_level / max(required_level + 1, 1), 1) * 100
+        for req in score_requirements:
+            ev = level_map.get(req.skill)
+            user_level = ev.level if ev else 0
+            weight = req.criticality * req.frequency
             item = RequirementGap(
-                skill=skill,
-                appears_in=count,
-                required_level=required_level,
+                skill=req.skill,
+                appears_in=round(req.frequency * len(postings)),
+                required_level=req.required_level,
                 user_level=user_level,
-                evidence=evidence.evidence if evidence else "No resume evidence found",
-                points_lost=round(weight * max(required_level - user_level, 0) * 10),
+                evidence=ev.evidence if ev else "No resume evidence found",
+                points_lost=round(weight * max(req.required_level - user_level, 0) * 10),
             )
-            if user_level >= required_level:
+            if user_level >= req.required_level:
                 matched.append(item)
             else:
                 gaps.append(item)
 
-        gaps = sorted(gaps, key=lambda item: (item.appears_in, item.points_lost), reverse=True)
-        matched = sorted(matched, key=lambda item: item.appears_in, reverse=True)
-        top_roi = [gap.skill for gap in gaps[:5]]
-        skip = [skill for skill, count in skill_counts.most_common()[-5:] if skill not in top_roi]
+        gaps = sorted(gaps, key=lambda x: (x.appears_in, x.points_lost), reverse=True)
+        matched = sorted(matched, key=lambda x: x.appears_in, reverse=True)
+        top_roi = [g.skill for g in gaps[:5]]
+        skip = [skill for skill, _ in skill_counts.most_common()[-5:] if skill not in top_roi]
+
         sprint_days = 14
         task_count = min(4, max(2, weekly_hours // 3))
 
         sprint_tasks = [
             SprintTask(
-                day_range=f"Days {index * (sprint_days // task_count) + 1}-{(index + 1) * (sprint_days // task_count)}",
+                day_range=f"Days {i * (sprint_days // task_count) + 1}-{(i + 1) * (sprint_days // task_count)}",
                 title=f"Build evidence for {skill}",
                 outcome=f"Create one concrete artifact that proves {skill} at Level 3 for {target_role}.",
                 lifts=[skill],
             )
-            for index, skill in enumerate(top_roi[:task_count])
+            for i, skill in enumerate(top_roi[:task_count])
         ]
 
         resume_bullets = [
@@ -332,17 +344,18 @@ def generate_readiness_report(
             for skill in top_roi[:5]
         ]
 
-        screen = round(screen_points)
-        interview = round(interview_points)
-        job = round(job_points)
-
         return ReadinessResponse(
             target_role=target_role,
-            screen_score=screen,
-            interview_score=interview,
-            job_score=job,
-            verdict=_verdict(screen, interview, job),
-            extracted_evidence=sorted(user_levels.values(), key=lambda item: item.level, reverse=True)[:30],
+            screen_score=round(result.screen_score),
+            interview_score=round(result.interview_score),
+            job_score=round(result.job_score),
+            verdict=result.verdict,
+            scoring_version=result.scoring_version,
+            has_blocker=result.has_blocker,
+            dates_parsed=not any_date_unparsed,
+            data_mode=_get_data_mode(),
+            components=components_out,
+            extracted_evidence=sorted(user_levels.values(), key=lambda x: x.level, reverse=True)[:30],
             requirement_gaps=gaps[:12],
             matched_requirements=matched[:12],
             top_roi_gaps=top_roi,

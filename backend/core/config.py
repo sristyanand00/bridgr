@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "Bridgr"
     DEBUG: bool = False
     CORS_ORIGINS: list = ["http://localhost:5173", "http://localhost:3000"]
+    ALLOWED_ORIGINS: str = "http://localhost:3000"
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

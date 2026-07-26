@@ -16,6 +16,11 @@ build/
 data/
 *.csv
 
+# Ship the sample so `git clone && docker-compose up` works without setup
+!backend/data/sample/
+!backend/data/sample/*.csv
+!backend/data/sample/*.md
+
 # VS Code
 .vscode/
 

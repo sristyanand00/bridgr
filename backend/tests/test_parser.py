@@ -6,6 +6,8 @@ import pytest
 from unittest.mock import patch, mock_open
 from core_ml.parser import ResumeParser
 
+pytestmark = pytest.mark.requires_ml
+
 
 class TestResumeParser:
     def setup_method(self):

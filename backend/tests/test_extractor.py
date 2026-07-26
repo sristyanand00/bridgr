@@ -8,6 +8,9 @@ import pytest
 from core_ml.extractor import STOP_SKILLS
 
 
+pytestmark = pytest.mark.requires_ml
+
+
 class TestSkillExtractor:
     
     def test_stop_word_filtering(self):

@@ -25,7 +25,7 @@ Recency multipliers:
 from __future__ import annotations
 import logging
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -49,8 +49,8 @@ JOB_CAP_WITH_BLOCKER = 55.0
 class UserSkill(BaseModel):
     """A skill the user possesses."""
     skill: str
-    level: int  # 0-4 evidence level
-    months_since_used: int
+    level: int                      # 0-4 evidence level
+    last_used: Optional[str] = None  # ISO 'YYYY-MM'; None = unknown date
 
 
 class Requirement(BaseModel):
@@ -75,7 +75,7 @@ class ScoreComponent(BaseModel):
     required_level: int
     user_level: int
     weight: float
-    recency_mult: float
+    recency_mult: Optional[float]   # None = skill absent (no recency to report)
     screen_coverage: float
     interview_coverage: float
     job_coverage: float
@@ -97,6 +97,22 @@ class ScoreResult(BaseModel):
     explanation: str
 
 
+def _months_between(last_used: Optional[str], today: str) -> Optional[int]:
+    """
+    Return months elapsed between last_used (ISO 'YYYY-MM') and today (ISO date).
+    Returns None when last_used is None — caller must treat None as unknown,
+    not as stale.  We never guess a date.
+    """
+    if last_used is None:
+        return None
+    try:
+        ly, lm = int(last_used[:4]), int(last_used[5:7])
+        td = datetime.fromisoformat(today)
+        return (td.year - ly) * 12 + (td.month - lm)
+    except (ValueError, IndexError):
+        return None
+
+
 def score(inp: ScoreInput) -> ScoreResult:
     """
     Pure scoring function. NO I/O, NO NETWORK, NO datetime.now().
@@ -108,14 +124,17 @@ def score(inp: ScoreInput) -> ScoreResult:
     Returns:
         ScoreResult with three scores and detailed breakdown
     """
-    # Parse today's date for recency calculations
-    today = datetime.fromisoformat(inp.today)
-    
     # Build skill lookup
     user_skill_map: Dict[str, UserSkill] = {s.skill.lower(): s for s in inp.user_skills}
     
-    # Check for hard blockers
-    has_blocker = any(r.is_blocker and r.skill.lower() not in user_skill_map for r in inp.requirements)
+    # Check for hard blockers — absent OR present but below required level
+    has_blocker = any(
+        r.is_blocker and (
+            r.skill.lower() not in user_skill_map
+            or user_skill_map[r.skill.lower()].level < r.required_level
+        )
+        for r in inp.requirements
+    )
     
     components: List[ScoreComponent] = []
     total_weight = 0.0
@@ -132,24 +151,28 @@ def score(inp: ScoreInput) -> ScoreResult:
         user_skill = user_skill_map.get(skill_key)
         
         if user_skill is None:
-            # Skill absent
+            # Skill absent — recency_mult is None (not stale; simply not present)
             components.append(ScoreComponent(
                 skill=req.skill,
                 required_level=req.required_level,
                 user_level=0,
                 weight=weight,
-                recency_mult=0.0,
+                recency_mult=None,
                 screen_coverage=0.0,
                 interview_coverage=0.0,
                 job_coverage=0.0,
                 points_earned=0.0,
                 points_possible=weight,
-                reason=f"Missing {req.skill} (required level {req.required_level})"
+                reason=f"Not present in profile (required level {req.required_level})"
             ))
             continue
-        
-        # Recency multiplier
-        recency_mult = _get_recency_mult(user_skill.months_since_used)
+
+        # Compute months elapsed from last_used and today (both parameters — pure)
+        months_since = _months_between(user_skill.last_used, inp.today)
+
+        # Unknown date → no decay; we never treat unknown as stale
+        recency_mult = _get_recency_mult(months_since) if months_since is not None else 1.0
+        date_unknown = months_since is None
         
         # Screen coverage: 1.0 if claimed (level >= 1), else 0
         screen_cov = 1.0 if user_skill.level >= 1 else 0.0
@@ -172,7 +195,7 @@ def score(inp: ScoreInput) -> ScoreResult:
         job_points += job_pts
         
         # Generate reason
-        reason = _generate_reason(req, user_skill, recency_mult, level_ratio)
+        reason = _generate_reason(req, user_skill, recency_mult, level_ratio, date_unknown)
         
         components.append(ScoreComponent(
             skill=req.skill,
@@ -206,7 +229,7 @@ def score(inp: ScoreInput) -> ScoreResult:
     verdict = _determine_verdict(interview_score, has_blocker)
     
     # Generate explanation
-    explanation = _generate_explanation(verdict, has_blocker, components)
+    explanation = _generate_explanation(verdict, has_blocker, components, inp.requirements)
     
     return ScoreResult(
         scoring_version=SCORING_VERSION,
@@ -226,13 +249,20 @@ def _get_recency_mult(months_since: int) -> float:
     for threshold, mult in RECENCY_THRESHOLDS:
         if months_since <= threshold:
             return mult
-    return 0.60  # Fallback
+    # RECENCY_THRESHOLDS ends with float('inf'), so this is unreachable
+    return 0.60  # pragma: no cover
 
 
-def _generate_reason(req: Requirement, user_skill: UserSkill, recency_mult: float, level_ratio: float) -> str:
+def _generate_reason(
+    req: Requirement,
+    user_skill: UserSkill,
+    recency_mult: float,
+    level_ratio: float,
+    date_unknown: bool = False,
+) -> str:
     """Generate human-readable reason for a single requirement's score."""
     parts = []
-    
+
     # Level assessment
     if user_skill.level >= req.required_level:
         parts.append(f"Meets required level {req.required_level}")
@@ -240,13 +270,15 @@ def _generate_reason(req: Requirement, user_skill: UserSkill, recency_mult: floa
         parts.append(f"Level {user_skill.level}/{req.required_level} - partially meets requirement")
     else:
         parts.append("Not demonstrated")
-    
+
     # Recency
-    if recency_mult < 1.0:
-        parts.append(f"used {user_skill.months_since_used}mo ago (recency: {int(recency_mult*100)}%)")
+    if date_unknown:
+        parts.append("last-used date unknown — no decay applied")
+    elif recency_mult < 1.0:
+        parts.append(f"last used {user_skill.last_used} (recency: {int(recency_mult * 100)}%)")
     elif user_skill.level > 0:
         parts.append("recently used")
-    
+
     return "; ".join(parts)
 
 
@@ -262,14 +294,23 @@ def _determine_verdict(interview_score: float, has_blocker: bool) -> str:
         return "early"
 
 
-def _generate_explanation(verdict: str, has_blocker: bool, components: List[ScoreComponent]) -> str:
+def _generate_explanation(
+    verdict: str,
+    has_blocker: bool,
+    components: List[ScoreComponent],
+    requirements: List[Requirement],
+) -> str:
     """Generate overall explanation."""
     if has_blocker:
-        missing_blockers = [c.skill for c in components if c.user_level == 0 and any(
-            r.skill.lower() == c.skill.lower() and r.is_blocker
-            for r in []  # Would need to pass requirements here
-        )]
-        return "Contains hard blocker requirements that are not met"
+        missing_blockers = [
+            r.skill for r in requirements
+            if r.is_blocker and any(
+                c.skill.lower() == r.skill.lower() and c.user_level < r.required_level
+                for c in components
+            )
+        ]
+        blocker_list = ", ".join(missing_blockers) if missing_blockers else "unknown"
+        return f"Missing hard blocker: {blocker_list}"
     
     missing = [c.skill for c in components if c.user_level == 0]
     partial = [c.skill for c in components if 0 < c.user_level < c.required_level]

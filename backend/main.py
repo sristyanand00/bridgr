@@ -1,8 +1,10 @@
 # backend/main.py
 
+import logging
 import os
 import sys
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -13,6 +15,14 @@ from core.config import get_settings
 from core.exceptions import BridgrException, bridgr_exception_handler
 from routes import readiness, user
 
+# ── Logging ───────────────────────────────────────────────────────────────────
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%S",
+)
+logger = logging.getLogger(__name__)
+
 # Global flag to track when ML core is ready
 _core_ready = False
 
@@ -21,20 +31,23 @@ _core_ready = False
 async def lifespan(app: FastAPI):
     """Runs at startup and shutdown."""
     global _core_ready
-    # STARTUP: initialize DB tables
     from db.database import engine
     from db import models
+
     models.Base.metadata.create_all(bind=engine)
-    print("[OK] Database tables ensured.")
-    print("[START] Starting Bridgr server...")
+    logger.info("Database tables ensured.")
+    logger.info("Starting Bridgr server...")
     _core_ready = True
-    print("[READY] Bridgr is ready. ML models will load on first report.")
+    logger.info("Bridgr is ready. ML models will load on first report.")
     yield
-    # SHUTDOWN: nothing to clean up
     _core_ready = False
 
 
 settings = get_settings()
+
+# CORS — explicit allowlist; "*" + credentials is forbidden by the CORS spec.
+# Set ALLOWED_ORIGINS in .env as a comma-separated list for production.
+_allowed_origins = [o.strip() for o in settings.ALLOWED_ORIGINS.split(",") if o.strip()]
 
 app = FastAPI(
     title="Bridgr API",
@@ -43,21 +56,18 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS — allow your React frontend to call this server
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Register exception handler
 app.add_exception_handler(BridgrException, bridgr_exception_handler)
 
-# Register MVP routes only
 app.include_router(readiness.router, prefix="/api")
-app.include_router(user.router,      prefix="/api")
+app.include_router(user.router, prefix="/api")
 
 
 @app.get("/")

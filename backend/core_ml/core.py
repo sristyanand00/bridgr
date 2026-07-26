@@ -6,6 +6,7 @@ import os
 import glob
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Dict, List
 
 from .schemas import AnalysisResult, SkillGap, TransferableSkill
@@ -18,19 +19,33 @@ from .job_skills import DynamicJobSkills
 
 logger = logging.getLogger(__name__)
 
+# These are set by IntelligenceCore.__init__ so the route layer can read them.
+DATA_MODE: str = "fallback"  # "full" | "sample" | "fallback"
+
 
 class IntelligenceCore:
     def __init__(self, config: Dict):
+        global DATA_MODE
         logger.info("Initialising Bridgr Intelligence Core...")
         extract_path = config["ONET_EXTRACT_PATH"]
         db_folders   = glob.glob(os.path.join(extract_path, "db_*"))
 
+        sample_csv = Path(__file__).parent.parent / "data" / "sample" / "occupations.csv"
+
         if db_folders:
             self.dataset_loader = OnetDatasetLoader(zip_path="", extract_path=extract_path)
+            DATA_MODE = "full"
         else:
             zip_path = config.get("ONET_ZIP_PATH", "")
             if os.path.exists(zip_path):
                 self.dataset_loader = OnetDatasetLoader(zip_path=zip_path, extract_path=extract_path)
+                DATA_MODE = "full"
+            elif sample_csv.exists():
+                # Use sample CSV — still loads via OnetDatasetLoader which handles the fallback
+                self.dataset_loader = OnetDatasetLoader(zip_path="", extract_path=extract_path)
+                DATA_MODE = "sample"
+                logger.info("SAMPLE MODE — using 50-occupation O*NET extract. "
+                            "Run scripts/setup_data.py for full 1,000+ occupation coverage.")
             else:
                 raise FileNotFoundError(
                     f"Dataset not found in '{extract_path}'. "

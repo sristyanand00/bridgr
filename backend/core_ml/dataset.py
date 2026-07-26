@@ -11,11 +11,30 @@ from typing import List, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
+# Relative to the backend directory — used as the last-resort fallback.
+_SAMPLE_CSV = Path(__file__).parent.parent / "data" / "sample" / "occupations.csv"
+
+
+def _load_sample_csv(csv_path: Path) -> pd.DataFrame:
+    """Load the bundled 50-occupation CSV into the standard dataset shape."""
+    df = pd.read_csv(csv_path)
+    df["tech_skills"] = df["tech_skills"].fillna("").apply(
+        lambda v: [s.strip() for s in v.split(",") if s.strip()]
+    )
+    df["soft_skills"] = df["soft_skills"].fillna("").apply(
+        lambda v: [s.strip() for s in v.split(",") if s.strip()]
+    )
+    df["all_skills"] = df["tech_skills"] + df["soft_skills"]
+    df = df.rename(columns={"title": "job_title"})
+    df["job_description"] = df["job_title"].apply(lambda t: f"O*NET sample profile for {t}")
+    return df[["job_title", "job_description", "tech_skills", "soft_skills", "all_skills"]]
+
 
 class OnetDatasetLoader:
-    def __init__(self, zip_path: str, extract_path: str):
+    def __init__(self, zip_path: str, extract_path: str, sample_csv: Optional[Path] = None):
         self.zip_path     = zip_path
         self.extract_path = extract_path
+        self._sample_csv  = sample_csv or _SAMPLE_CSV
         self._df: Optional[pd.DataFrame] = None
         self.skill_market_demand: Dict[str, float] = {}
 
@@ -49,6 +68,12 @@ class OnetDatasetLoader:
     def _build_dataset(self) -> pd.DataFrame:
         folders = _glob.glob(f"{self.extract_path}/db_*")
         if not folders:
+            # Try the bundled sample CSV before giving up
+            if self._sample_csv.exists():
+                logger.info(f"No db_* folder found — using bundled sample: {self._sample_csv}")
+                df = _load_sample_csv(self._sample_csv)
+                self._compute_market_demand(df)
+                return df
             raise FileNotFoundError(
                 f"No db_* folder found in '{self.extract_path}'. "
                 "Provide the dataset ZIP or pre-extracted folder."
@@ -82,16 +107,19 @@ class OnetDatasetLoader:
         final.columns  = ["job_title", "job_description", "tech_skills", "soft_skills"]
         final["all_skills"] = final["tech_skills"] + final["soft_skills"]
 
-        total     = max(len(final), 1)
-        tech_flat = final["tech_skills"].explode().dropna()
-        soft_flat = final["soft_skills"].explode().dropna()
+        self._compute_market_demand(final)
+        return final
+
+    def _compute_market_demand(self, df: pd.DataFrame) -> None:
+        total     = max(len(df), 1)
+        tech_flat = df["tech_skills"].explode().dropna()
+        soft_flat = df["soft_skills"].explode().dropna()
         tech_freq = Counter(tech_flat)
         soft_freq = Counter(soft_flat)
         self.skill_market_demand = {
             s: (tech_freq.get(s, 0) + 0.5 * soft_freq.get(s, 0)) / total
             for s in set(tech_freq) | set(soft_freq)
         }
-        return final
 
     def get_job_profile(self, title: str):
         df = self.load()

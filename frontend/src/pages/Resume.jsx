@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Topbar } from '../components/layout';
 import { Button, Card, Chip, ProgressBar, Icon, Input } from '../components/ui';
 import { useAnalysis } from '../App';
-import API_BASE_URL from '../config/api';
+import { readiness } from '../config/api';
 
 const samplePosting = `Paste 3-10 real job descriptions here.
 
@@ -46,6 +46,44 @@ const RequirementRow = ({ item, matched = false }) => (
     </div>
   </div>
 );
+
+const ComponentsTable = ({ components }) => {
+  if (!components || components.length === 0) return null;
+  const thStyle = { fontSize: 11, color: 'var(--t3)', fontWeight: 600, textAlign: 'left', padding: '0 10px 8px 0', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: '0.05em' };
+  const tdStyle = (extra) => ({ fontSize: 12.5, color: 'var(--t2)', padding: '7px 10px 7px 0', borderTop: '1px solid var(--gb)', ...extra });
+  return (
+    <div style={{ overflowX: 'auto' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            <th style={thStyle}>Skill</th>
+            <th style={{ ...thStyle, textAlign: 'center' }}>Your Level</th>
+            <th style={{ ...thStyle, textAlign: 'center' }}>Required</th>
+            <th style={{ ...thStyle, textAlign: 'center' }}>Recency</th>
+            <th style={{ ...thStyle, textAlign: 'center' }}>Pts Lost</th>
+            <th style={thStyle}>Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          {components.map(c => (
+            <tr key={c.skill}>
+              <td style={tdStyle({ fontWeight: 600, color: 'var(--t1)' })}>{c.skill}</td>
+              <td style={tdStyle({ textAlign: 'center' })}>{c.user_level}</td>
+              <td style={tdStyle({ textAlign: 'center' })}>{c.required_level}</td>
+              <td style={tdStyle({ textAlign: 'center' })}>
+                {c.recency_mult != null ? `${Math.round(c.recency_mult * 100)}%` : '—'}
+              </td>
+              <td style={tdStyle({ textAlign: 'center', color: c.points_lost > 0 ? 'var(--error)' : 'var(--g)' })}>
+                {c.points_lost > 0 ? `-${c.points_lost.toFixed(2)}` : '✓'}
+              </td>
+              <td style={tdStyle({ color: 'var(--t3)', fontSize: 12 })}>{c.reason}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
 const Resume = ({ profile, mobileMenuOpen, setMobileMenuOpen, setCurrentPage, onBack }) => {
   const { analysisData, setAnalysisData } = useAnalysis();
@@ -99,21 +137,7 @@ const Resume = ({ profile, mobileMenuOpen, setMobileMenuOpen, setCurrentPage, on
       formData.append('job_descriptions', jobDescriptions.trim());
       formData.append('weekly_hours', String(weeklyHours || 8));
 
-      const response = await fetch(`${API_BASE_URL}/api/readiness`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        let message = 'Could not generate readiness report.';
-        try {
-          const body = await response.json();
-          message = body?.error || body?.detail || body?.explanations?.[0] || message;
-        } catch (_) {}
-        throw new Error(message);
-      }
-
-      const data = await response.json();
+      const data = await readiness(formData);
       setAnalysisData(data);
       setStage('report');
     } catch (err) {
@@ -153,6 +177,37 @@ const Resume = ({ profile, mobileMenuOpen, setMobileMenuOpen, setCurrentPage, on
               Every gap below comes from a requirement found in the jobs you pasted and is compared with evidence extracted from your resume.
             </p>
           </Card>
+
+          {report.data_mode && report.data_mode !== 'full' && (
+            <Card style={{
+              padding: '10px 16px',
+              marginBottom: 16,
+              borderColor: report.data_mode === 'sample' ? 'rgba(251,191,36,.35)' : 'rgba(244,63,94,.35)',
+              background: report.data_mode === 'sample' ? 'rgba(251,191,36,.07)' : 'rgba(244,63,94,.07)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13 }}>
+                <span style={{ fontSize: 15 }}>{report.data_mode === 'sample' ? '⚠️' : '🔴'}</span>
+                <span style={{ color: 'var(--t2)' }}>
+                  {report.data_mode === 'sample'
+                    ? 'Scored using 50-occupation sample dataset. Run scripts/setup_data.py for full O*NET coverage.'
+                    : 'FALLBACK MODE — O*NET data not found. Scores are based on hardcoded role profiles only. Run scripts/setup_data.py.'}
+                  <span style={{
+                    marginLeft: 8,
+                    padding: '2px 7px',
+                    borderRadius: 5,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    background: report.data_mode === 'sample' ? 'rgba(251,191,36,.2)' : 'rgba(244,63,94,.2)',
+                    color: report.data_mode === 'sample' ? '#fbbf24' : '#f43f5e',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}>
+                    {report.data_mode}
+                  </span>
+                </span>
+              </div>
+            </Card>
+          )}
 
           <div className="b3" style={{ marginBottom: 16 }}>
             <ScoreCard label="Screen" value={report.screen_score} description="Will your resume likely pass the first filter?" />
@@ -235,6 +290,15 @@ const Resume = ({ profile, mobileMenuOpen, setMobileMenuOpen, setCurrentPage, on
             ))}
           </Card>
 
+          {report.components?.length > 0 && (
+            <Card className="gl" style={{ padding: 24, marginBottom: 16 }}>
+              <div style={{ fontSize: 15, fontWeight: 650, color: 'var(--t1)', marginBottom: 14 }}>
+                Per-requirement scoring breakdown
+              </div>
+              <ComponentsTable components={report.components} />
+            </Card>
+          )}
+
           <div className="b2">
             <Card className="gl" style={{ padding: 24 }}>
               <div style={{ fontSize: 15, fontWeight: 650, color: 'var(--t1)', marginBottom: 12 }}>
@@ -260,6 +324,12 @@ const Resume = ({ profile, mobileMenuOpen, setMobileMenuOpen, setCurrentPage, on
                 These appeared less often than your top gaps. The product should save your effort, not give you an infinite syllabus.
               </div>
             </Card>
+          </div>
+
+          <div style={{ marginTop: 24, padding: '10px 4px', borderTop: '1px solid var(--gb)', display: 'flex', justifyContent: 'flex-end' }}>
+            <span style={{ fontSize: 11, color: 'var(--t4)' }}>
+              scoring {report.scoring_version}
+            </span>
           </div>
         </div>
       </div>
