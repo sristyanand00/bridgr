@@ -3,7 +3,7 @@ import { Topbar } from '../components/layout';
 import { Button, Card, Chip, ProgressBar, Icon } from '../components/ui';
 
 const Dashboard = ({ setCurrentPage, profile, analysisData, mobileMenuOpen, setMobileMenuOpen }) => {
-  const hasReport = Boolean(analysisData?.screen_score || analysisData?.match_score);
+  const hasReport = analysisData != null && (typeof analysisData.screen_score === 'number' || typeof analysisData.match_score === 'number');
   const screenScore = analysisData?.screen_score ?? analysisData?.match_score ?? 0;
   const interviewScore = analysisData?.interview_score ?? 0;
   const jobScore = analysisData?.job_score ?? 0;

@@ -1,8 +1,11 @@
 import os
 import re
 import tempfile
+import logging
 from collections import Counter
 from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from sqlalchemy.orm import Session
@@ -116,42 +119,174 @@ def _validate_pdf(resume: UploadFile) -> bytes:
 
 def _candidate_skills(core: Any) -> List[str]:
     if hasattr(core, "skill_extractor") and getattr(core.skill_extractor, "skill_list", None):
-        return sorted({str(skill).lower().strip() for skill in core.skill_extractor.skill_list if skill})
+        skill_list = core.skill_extractor.skill_list
+        logger.info(f"Using skill_extractor.skill_list with {len(skill_list)} skills")
+        return sorted({str(skill).lower().strip() for skill in skill_list if skill})
 
     if hasattr(core, "dataset_loader"):
         try:
-            return sorted({str(skill).lower().strip() for skill in core.dataset_loader.get_all_tech_skills() if skill})
-        except Exception:
-            pass
+            tech_skills = core.dataset_loader.get_all_tech_skills()
+            logger.info(f"Using dataset_loader.get_all_tech_skills() with {len(tech_skills)} skills")
+            return sorted({str(skill).lower().strip() for skill in tech_skills if skill})
+        except Exception as e:
+            logger.warning(f"dataset_loader.get_all_tech_skills() failed: {e}")
 
+    logger.warning("Falling back to hardcoded skill list (244 skills)")
     return [
-        "python", "java", "javascript", "typescript", "react", "node.js", "sql",
-        "postgresql", "mongodb", "git", "docker", "kubernetes", "aws", "gcp",
-        "azure", "rest api", "fastapi", "django", "flask", "data structures",
-        "algorithms", "system design", "machine learning", "pandas", "numpy",
-        "scikit-learn", "tensorflow", "pytorch", "airflow", "spark", "kafka",
-        "tableau", "power bi", "excel", "statistics", "communication",
-        "stakeholder management", "testing", "ci/cd", "linux",
+        # Core programming languages
+        "python", "java", "javascript", "typescript", "c++", "c#", "r", "scala", "go", "rust", "kotlin", "swift",
+        
+        # Web frameworks and technologies
+        "react", "node.js", "vue.js", "angular", "django", "flask", "fastapi", "express.js", "spring", "asp.net", 
+        "html", "css", "jquery", "bootstrap", "tailwind", "sass", "webpack", "babel",
+        
+        # Databases and storage
+        "sql", "postgresql", "mysql", "mongodb", "redis", "cassandra", "elasticsearch", "sqlite", "oracle",
+        
+        # Cloud platforms and DevOps
+        "aws", "gcp", "azure", "docker", "kubernetes", "terraform", "jenkins", "ci/cd", "linux", "bash", "git",
+        "github actions", "gitlab ci", "ansible", "chef", "puppet", "vagrant", "nginx", "apache",
+        
+        # Data science and analytics
+        "pandas", "numpy", "matplotlib", "seaborn", "plotly", "jupyter", "r studio", "tableau", "power bi", 
+        "excel", "statistics", "data analysis", "data visualization", "sql server", "spark", "hadoop", "hive",
+        
+        # Machine learning and AI
+        "machine learning", "deep learning", "neural networks", "tensorflow", "pytorch", "keras", "scikit-learn",
+        "xgboost", "lightgbm", "catboost", "opencv", "nltk", "spacy", "transformers", "bert", "gpt",
+        
+        # Modern ML/GenAI/MLOps stack
+        "huggingface", "hugging face transformers", "sentence transformers", "langchain", "langgraph", "rag", "retrieval augmented generation",
+        "prompt engineering", "vector database", "faiss", "pinecone", "chromadb", "weaviate", "chroma",
+        "mlflow", "kubeflow", "dvc", "weights and biases", "wandb", "tensorboard", "mlops", "model deployment",
+        "named entity recognition", "ner", "semantic search", "text classification", "sentiment analysis",
+        "cnn", "rnn", "lstm", "gru", "attention mechanism", "llm", "large language model", "openai api",
+        "claude api", "gemini api", "fine tuning", "few shot learning", "zero shot learning",
+        
+        # API and web services
+        "rest api", "graphql", "grpc", "soap", "json", "xml", "microservices", "api gateway", "oauth", "jwt",
+        "jwt authentication", "authentication", "authorization", "security", "https", "ssl", "cors",
+        
+        # Message queues and streaming
+        "kafka", "rabbitmq", "redis pub/sub", "aws sqs", "aws sns", "apache pulsar", "nats", "event sourcing",
+        "airflow", "luigi", "prefect", "dagster", "cron", "celery", "background jobs",
+        
+        # Testing and quality
+        "testing", "unit testing", "integration testing", "pytest", "jest", "selenium", "cypress", "postman",
+        "test automation", "tdd", "bdd", "code review", "linting", "static analysis", "sonarqube",
+        
+        # Mobile development
+        "android", "ios", "react native", "flutter", "kotlin", "swift", "objective-c", "xamarin", "cordova",
+        "android studio", "xcode", "firebase", "push notifications", "app store", "play store",
+        
+        # Business intelligence and visualization
+        "business intelligence", "data warehousing", "etl", "elt", "data pipeline", "dbt", "looker", "qlik",
+        "pentaho", "talend", "informatica", "ssis", "ssrs", "crystal reports",
+        
+        # Project management and collaboration
+        "agile", "scrum", "kanban", "jira", "confluence", "asana", "trello", "slack", "teams", "zoom",
+        "project management", "stakeholder management", "product management", "roadmapping", "user stories",
+        
+        # Core computer science
+        "data structures", "algorithms", "system design", "design patterns", "object oriented programming",
+        "functional programming", "concurrent programming", "distributed systems", "scalability", "performance",
+        
+        # Soft skills
+        "communication", "teamwork", "leadership", "problem solving", "analytical thinking", "critical thinking",
+        "creativity", "adaptability", "time management", "attention to detail", "documentation", "mentoring",
     ]
 
 
 def _extract_requirements(job_descriptions: List[str], skills: List[str]) -> Counter:
     counts: Counter = Counter()
     aliases = {
-        "react": ["react.js", "reactjs"],
-        "node.js": ["node", "nodejs", "node.js"],
-        "rest api": ["rest", "restful", "api"],
-        "ci/cd": ["ci cd", "cicd", "continuous integration"],
-        "postgresql": ["postgres", "postgresql"],
-        "machine learning": ["ml", "machine learning"],
+        # Web frameworks
+        "react": ["react.js", "reactjs", "react js"],
+        "node.js": ["node", "nodejs", "node.js", "node js"],
+        "vue.js": ["vue", "vuejs", "vue js"],
+        "angular": ["angularjs", "angular.js", "angular js"],
+        
+        # APIs and services
+        "rest api": ["rest", "restful", "api", "rest apis", "restful apis"],
+        "graphql": ["graph ql", "graph-ql"],
+        
+        # DevOps and CI/CD
+        "ci/cd": ["ci cd", "cicd", "ci-cd", "continuous integration", "continuous deployment", "continuous delivery"],
+        "github actions": ["github action", "gh actions"],
+        
+        # Databases
+        "postgresql": ["postgres", "postgresql", "postgre sql"],
+        "mongodb": ["mongo db", "mongo", "mongodb"],
+        "mysql": ["my sql"],
+        "sql server": ["sqlserver", "mssql", "ms sql"],
+        
+        # ML and AI
+        "machine learning": ["ml", "machine learning", "machine-learning"],
+        "deep learning": ["dl", "deep learning", "deep-learning"],
+        "artificial intelligence": ["ai", "artificial intelligence", "artificial-intelligence"],
+        "huggingface": ["hugging face", "hugging-face", "hf", "transformers library"],
+        "hugging face transformers": ["huggingface transformers", "hf transformers", "transformers"],
+        "langchain": ["lang chain", "lang-chain"],
+        "langgraph": ["lang graph", "lang-graph"],
+        "rag": ["retrieval augmented generation", "retrieval-augmented generation"],
+        "vector database": ["vector db", "vectordb", "vector databases"],
+        "large language model": ["llm", "llms", "large language models"],
+        "prompt engineering": ["prompt-engineering", "prompting"],
+        "named entity recognition": ["ner", "named-entity recognition", "entity recognition"],
+        "natural language processing": ["nlp", "natural-language processing"],
+        
+        # Cloud platforms
+        "aws": ["amazon web services", "amazon aws"],
+        "gcp": ["google cloud platform", "google cloud", "gcloud"],
+        "azure": ["microsoft azure", "ms azure"],
+        
+        # Programming languages
+        "c++": ["cpp", "c plus plus"],
+        "c#": ["csharp", "c sharp"],
+        "javascript": ["js", "javascript", "java script"],
+        "typescript": ["ts", "typescript", "type script"],
+        
+        # Data science
+        "scikit-learn": ["sklearn", "scikit learn", "sci-kit learn"],
+        "tensorflow": ["tensor flow", "tf"],
+        "pytorch": ["torch", "py torch"],
+        "sentence transformers": ["sentence-transformers", "sentencetransformers"],
+        
+        # Authentication
+        "jwt": ["json web token", "json web tokens"],
+        "jwt authentication": ["jwt auth", "json web token authentication", "jwt authentication"],
+        "oauth": ["oauth2", "oauth 2.0", "o auth"],
+        
+        # Testing
+        "unit testing": ["unit tests", "unittesting"],
+        "integration testing": ["integration tests"],
+        "test automation": ["automated testing", "test-automation"],
+        
+        # Mobile
+        "react native": ["reactnative", "react-native"],
+        "android studio": ["androidstudio", "android-studio"],
     }
 
     for description in job_descriptions:
         text = f" {description.lower()} "
         for skill in skills:
             terms = [skill] + aliases.get(skill, [])
-            if any(re.search(rf"(?<![a-z0-9+#]){re.escape(term)}(?![a-z0-9+#])", text) for term in terms):
-                counts[skill] += 1
+            # Use case-insensitive matching with word boundaries
+            for term in terms:
+                # Create a pattern that handles spaces, hyphens, and case variations
+                # Split the term and join with flexible separators
+                words = term.split()
+                if len(words) == 1:
+                    # Single word - simple word boundary match
+                    pattern = rf"(?<![a-z0-9]){re.escape(term)}(?![a-z0-9])"
+                else:
+                    # Multi-word - allow flexible separators between words
+                    escaped_words = [re.escape(word) for word in words]
+                    pattern = rf"(?<![a-z0-9])" + r"[\s\-_]+".join(escaped_words) + r"(?![a-z0-9])"
+                
+                if re.search(pattern, text, re.IGNORECASE):
+                    counts[skill] += 1
+                    break  # Found this skill, no need to check other aliases
     return counts
 
 
@@ -299,7 +434,7 @@ def generate_readiness_report(
                 required_level=c.required_level,
                 recency_mult=c.recency_mult,
                 coverage=c.interview_coverage,
-                points_lost=round(c.points_possible - c.points_earned, 4),
+                points_lost=round((c.points_possible - c.points_earned) * 10),
                 reason=c.reason,
             )
             for c in result.components
@@ -330,7 +465,7 @@ def generate_readiness_report(
         gaps = sorted(gaps, key=lambda x: (x.appears_in, x.points_lost), reverse=True)
         matched = sorted(matched, key=lambda x: x.appears_in, reverse=True)
         top_roi = [g.skill for g in gaps[:5]]
-        skip = [skill for skill, _ in skill_counts.most_common()[-5:] if skill not in top_roi]
+        skip = [] if len(postings) < 3 else [skill for skill, _ in skill_counts.most_common()[-5:] if skill not in top_roi]
 
         sprint_days = 14
         task_count = min(4, max(2, weekly_hours // 3))
@@ -345,9 +480,17 @@ def generate_readiness_report(
             for i, skill in enumerate(top_roi[:task_count])
         ]
 
+        # Generate varied resume bullets
+        bullet_templates = [
+            f"Strengthened {target_role} readiness by demonstrating {{skill}} through a focused project aligned to real job requirements.",
+            f"Enhanced {{skill}} capabilities with hands-on project work, directly addressing {target_role} role requirements.", 
+            f"Developed concrete {{skill}} expertise through targeted learning and application for {target_role} positions.",
+            f"Built verifiable {{skill}} competency via practical implementation, closing key gaps for {target_role} roles."
+        ]
+        
         resume_bullets = [
-            f"Strengthened {target_role} readiness by demonstrating {skill} through a focused project aligned to real job requirements."
-            for skill in top_roi[:5]
+            bullet_templates[i % len(bullet_templates)].format(skill=skill)
+            for i, skill in enumerate(top_roi[:5])
         ]
 
         # Create the response

@@ -11,21 +11,100 @@ Separate postings with a blank line or a line containing ---.
 Example:
 We are hiring a Backend Engineer with Python, FastAPI, PostgreSQL, Docker, REST APIs, testing, and AWS experience.`;
 
-const ScoreCard = ({ label, value, description }) => (
-  <Card className="gl" style={{ padding: 20 }}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-      <span style={{ fontSize: 12, color: 'var(--t3)' }}>{label}</span>
-      <strong style={{ color: 'var(--t1)' }}>{value}%</strong>
+const Ring = ({ score, size = 120, label, description }) => {
+  const radius = (size - 20) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDasharray = circumference;
+  const strokeDashoffset = circumference - (score / 100) * circumference;
+  
+  const getColor = (score) => {
+    if (score >= 60) return '#10b981';
+    if (score >= 25) return '#f59e0b';
+    return '#ef4444';
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+      <div style={{ position: 'relative', width: size, height: size }}>
+        <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="rgba(255,255,255,0.1)"
+            strokeWidth="8"
+          />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke={getColor(score)}
+            strokeWidth="8"
+            strokeLinecap="round"
+            strokeDasharray={strokeDasharray}
+            strokeDashoffset={strokeDashoffset}
+            style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
+          />
+        </svg>
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          textAlign: 'center'
+        }}>
+          <div style={{ fontSize: 24, fontWeight: 'bold', color: 'var(--t1)' }}>
+            {score}%
+          </div>
+        </div>
+      </div>
+      <div style={{ textAlign: 'center', maxWidth: 140 }}>
+        <div style={{ fontSize: 12, color: 'var(--t3)', marginBottom: 4 }}>{label}</div>
+        <div style={{ fontSize: 11, color: 'var(--t3)', lineHeight: 1.4 }}>{description}</div>
+      </div>
     </div>
-    <div className="serif" style={{ fontSize: 34, color: 'var(--t1)', marginBottom: 10 }}>
-      {value}
-    </div>
-    <ProgressBar value={value} />
-    <div style={{ fontSize: 12, color: 'var(--t3)', marginTop: 10, lineHeight: 1.45 }}>
-      {description}
-    </div>
-  </Card>
-);
+  );
+};
+
+const getSkillCategory = (skill) => {
+  const categories = {
+    'python': 'Core engineering',
+    'java': 'Core engineering',
+    'javascript': 'Core engineering',
+    'typescript': 'Core engineering',
+    'algorithms': 'Core engineering',
+    'data_structures': 'Core engineering',
+    'sql': 'Data and storage',
+    'postgresql': 'Data and storage',
+    'mysql': 'Data and storage',
+    'mongodb': 'Data and storage',
+    'redis': 'Data and storage',
+    'docker': 'Infra and delivery',
+    'kubernetes': 'Infra and delivery',
+    'aws': 'Infra and delivery',
+    'gcp': 'Infra and delivery',
+    'azure': 'Infra and delivery',
+    'react': 'Frontend',
+    'vue': 'Frontend',
+    'angular': 'Frontend',
+    'html': 'Frontend',
+    'css': 'Frontend',
+    'fastapi': 'Backend frameworks',
+    'django': 'Backend frameworks',
+    'flask': 'Backend frameworks',
+    'express': 'Backend frameworks',
+    'spring': 'Backend frameworks',
+    'git': 'Development tools',
+    'testing': 'Development tools',
+    'ci_cd': 'Development tools',
+    'agile': 'Process and collaboration',
+    'scrum': 'Process and collaboration',
+    'communication': 'Process and collaboration'
+  };
+  return categories[skill.toLowerCase()] || 'Other skills';
+};
 
 const RequirementRow = ({ item, matched = false }) => (
   <div style={{
@@ -46,6 +125,18 @@ const RequirementRow = ({ item, matched = false }) => (
     </div>
   </div>
 );
+
+const groupSkillsByCategory = (requirements) => {
+  const grouped = {};
+  requirements.forEach(req => {
+    const category = getSkillCategory(req.skill);
+    if (!grouped[category]) {
+      grouped[category] = [];
+    }
+    grouped[category].push(req);
+  });
+  return grouped;
+};
 
 const ComponentsTable = ({ components }) => {
   if (!components || components.length === 0) return null;
@@ -91,12 +182,12 @@ const Resume = ({ profile, mobileMenuOpen, setMobileMenuOpen, setCurrentPage, on
   const [selectedFile, setSelectedFile] = useState(null);
   const [jobDescriptions, setJobDescriptions] = useState('');
   const [weeklyHours, setWeeklyHours] = useState(8);
-  const [stage, setStage] = useState(analysisData?.screen_score ? 'report' : 'input');
+  const [stage, setStage] = useState(analysisData && typeof analysisData.screen_score === 'number' ? 'report' : 'input');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [completed, setCompleted] = useState({});
 
-  const report = analysisData?.screen_score ? analysisData : null;
+  const report = analysisData && typeof analysisData.screen_score === 'number' ? analysisData : null;
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -160,7 +251,12 @@ const Resume = ({ profile, mobileMenuOpen, setMobileMenuOpen, setCurrentPage, on
       <div className="main">
         <Topbar
           title="Readiness Report"
-          sub={`${report.target_role} - ${report.verdict}`}
+          sub={`${report.target_role} - ${(() => {
+            const minScore = Math.min(report.screen_score, report.interview_score, report.job_score);
+            if (minScore < 25) return 'early';
+            if (minScore < 60) return 'in progress';
+            return 'strong match';
+          })()}`}
           onBack={onBack}
           mobileMenuOpen={mobileMenuOpen}
           setMobileMenuOpen={setMobileMenuOpen}
@@ -168,15 +264,49 @@ const Resume = ({ profile, mobileMenuOpen, setMobileMenuOpen, setCurrentPage, on
         />
 
         <div className="page">
-          <Card className="gl" style={{ padding: 28, marginBottom: 16 }}>
-            <Chip name={report.verdict} level={Math.min(report.screen_score, report.interview_score, report.job_score) >= 55 ? 'ok' : 'learn'} style={{ marginBottom: 16 }} />
-            <h1 className="serif" style={{ fontSize: 34, color: 'var(--t1)', margin: '0 0 8px' }}>
-              You are being measured against real postings, not a generic role template.
-            </h1>
-            <p style={{ color: 'var(--t2)', fontSize: 14, lineHeight: 1.6, maxWidth: 760, margin: 0 }}>
-              Every gap below comes from a requirement found in the jobs you pasted and is compared with evidence extracted from your resume.
-            </p>
-          </Card>
+          {/* Severity-aware banner */}
+          {(() => {
+            const minScore = Math.min(report.screen_score, report.interview_score, report.job_score);
+            const getBannerConfig = (minScore) => {
+              if (minScore < 25) return {
+                severity: 'early',
+                bg: 'rgba(239,68,68,0.1)',
+                border: 'rgba(239,68,68,0.2)',
+                text: `None of the ${report.requirement_gaps?.length || 0} requirements from your posting show up in your resume yet. That's expected this early — the plan below tells you where to start.`
+              };
+              if (minScore < 60) return {
+                severity: 'in progress',
+                bg: 'rgba(245,158,11,0.1)',
+                border: 'rgba(245,158,11,0.2)', 
+                text: `You're building evidence but have significant gaps remaining. Focus on the highest-frequency requirements first.`
+              };
+              return {
+                severity: 'strong match',
+                bg: 'rgba(16,185,129,0.1)',
+                border: 'rgba(16,185,129,0.2)',
+                text: `Strong alignment with job requirements. Focus on polish and edge cases to maximize your advantage.`
+              };
+            };
+            const bannerConfig = getBannerConfig(minScore);
+            return (
+              <Card style={{
+                padding: 24,
+                marginBottom: 16,
+                background: bannerConfig.bg,
+                borderColor: bannerConfig.border
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                  <Chip name={bannerConfig.severity} level={minScore >= 60 ? 'ok' : minScore >= 25 ? 'learn' : 'bad'} />
+                  <span title={`Lowest score determines overall readiness verdict`} style={{ cursor: 'help', color: 'var(--t3)' }}>
+                    ℹ️
+                  </span>
+                </div>
+                <p style={{ color: 'var(--t1)', fontSize: 15, lineHeight: 1.6, margin: 0 }}>
+                  {bannerConfig.text}
+                </p>
+              </Card>
+            );
+          })()}
 
           {report.data_mode && report.data_mode !== 'full' && (
             <Card style={{
@@ -209,40 +339,116 @@ const Resume = ({ profile, mobileMenuOpen, setMobileMenuOpen, setCurrentPage, on
             </Card>
           )}
 
-          <div className="b3" style={{ marginBottom: 16 }}>
-            <ScoreCard label="Screen" value={report.screen_score} description="Will your resume likely pass the first filter?" />
-            <ScoreCard label="Interview" value={report.interview_score} description="Can you defend the claims for 45 minutes?" />
-            <ScoreCard label="Job" value={report.job_score} description="Could you operate in the role after onboarding?" />
-          </div>
+          {/* Score rings */}
+          <Card className="gl" style={{ padding: 32, marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', flexWrap: 'wrap', gap: 24 }}>
+              <Ring 
+                score={report.screen_score} 
+                label="Screen" 
+                description="Will your resume likely pass the first filter?"
+              />
+              <Ring 
+                score={report.interview_score} 
+                label="Interview" 
+                description="Can you defend the claims for 45 minutes?"
+              />
+              <Ring 
+                score={report.job_score} 
+                label="Job" 
+                description="Could you operate in the role after onboarding?"
+              />
+            </div>
+          </Card>
 
-          <div className="b2" style={{ marginBottom: 16 }}>
-            <Card className="gl" style={{ padding: 24 }}>
-              <div style={{ fontSize: 15, fontWeight: 650, color: 'var(--t1)', marginBottom: 14 }}>
-                Highest-ROI gaps
+          {/* Skills coverage by category */}
+          {report.requirement_gaps && report.requirement_gaps.length > 0 && (
+            <Card className="gl" style={{ padding: 24, marginBottom: 16 }}>
+              <div style={{ fontSize: 15, fontWeight: 650, color: 'var(--t1)', marginBottom: 16 }}>
+                Coverage by skill area
               </div>
-              {(report.requirement_gaps || []).slice(0, 8).map(item => (
-                <RequirementRow key={item.skill} item={item} />
-              ))}
-            </Card>
+              {(() => {
+                const allSkills = [...(report.requirement_gaps || []), ...(report.matched_requirements || [])];
+                const categoryGroups = groupSkillsByCategory(allSkills);
+                const categoryStats = Object.entries(categoryGroups)
+                  .map(([category, skills]) => {
+                    const total = skills.length;
+                    const matched = skills.filter(s => report.matched_requirements?.some(m => m.skill === s.skill)).length;
+                    const coverage = total > 0 ? (matched / total) * 100 : 0;
+                    return { category, matched, total, coverage };
+                  })
+                  .sort((a, b) => a.coverage - b.coverage);
 
-            <Card className="gl" style={{ padding: 24 }}>
-              <div style={{ fontSize: 15, fontWeight: 650, color: 'var(--t1)', marginBottom: 14 }}>
-                Evidence already strong enough
-              </div>
-              {report.matched_requirements?.length ? (
-                report.matched_requirements.slice(0, 8).map(item => (
-                  <RequirementRow key={item.skill} item={item} matched />
-                ))
-              ) : (
-                <div style={{ color: 'var(--t3)', fontSize: 13 }}>
-                  No requirement is fully supported yet. Start with the sprint below.
-                </div>
-              )}
+                return categoryStats.map(({ category, matched, total, coverage }) => (
+                  <div key={category} style={{ marginBottom: 12 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                      <span style={{ fontSize: 13, color: 'var(--t1)', fontWeight: 500 }}>{category}</span>
+                      <span style={{ fontSize: 12, color: 'var(--t3)' }}>{matched} of {total} found</span>
+                    </div>
+                    <ProgressBar value={coverage} />
+                  </div>
+                ));
+              })()}
             </Card>
-          </div>
+          )}
+
+          {/* Priority skill chips */}
+          {report.requirement_gaps && report.requirement_gaps.length > 0 && (
+            <Card className="gl" style={{ padding: 24, marginBottom: 16 }}>
+              <div style={{ fontSize: 15, fontWeight: 650, color: 'var(--t1)', marginBottom: 14 }}>
+                Skills to prioritize
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+                {report.requirement_gaps
+                  .slice()
+                  .sort((a, b) => b.appears_in - a.appears_in)
+                  .map(item => {
+                    const isHighPriority = item.appears_in >= 2;
+                    return (
+                      <div key={item.skill} style={{
+                        padding: '8px 12px',
+                        borderRadius: 'var(--rm)',
+                        border: `1px solid var(--gb)`,
+                        background: isHighPriority ? 'rgba(239,68,68,0.1)' : 'rgba(255,255,255,0.03)',
+                        color: isHighPriority ? '#ef4444' : 'var(--t2)',
+                        fontSize: 12,
+                        fontWeight: isHighPriority ? 600 : 400,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6
+                      }}>
+                        {item.skill}
+                        <span style={{ 
+                          fontSize: 10, 
+                          opacity: 0.7,
+                          background: 'rgba(0,0,0,0.2)',
+                          padding: '2px 6px',
+                          borderRadius: 10
+                        }}>
+                          {item.appears_in}×
+                        </span>
+                      </div>
+                    );
+                  })}
+              </div>
+              
+              {/* Collapsible detailed breakdown */}
+              <details>
+                <summary style={{ 
+                  cursor: 'pointer', 
+                  color: 'var(--t3)', 
+                  fontSize: 13,
+                  userSelect: 'none',
+                  marginBottom: 12
+                }}>
+                  See full breakdown
+                </summary>
+                <ComponentsTable components={report.components} />
+              </details>
+            </Card>
+          )}
 
           <Card className="gl" style={{ padding: 24, marginBottom: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'center', marginBottom: 18, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
               <div>
                 <div style={{ fontSize: 15, fontWeight: 650, color: 'var(--t1)', marginBottom: 5 }}>
                   Your next 14 days
@@ -250,6 +456,19 @@ const Resume = ({ profile, mobileMenuOpen, setMobileMenuOpen, setCurrentPage, on
                 <div style={{ fontSize: 12.5, color: 'var(--t3)' }}>
                   Complete these tasks, then re-score with stronger evidence.
                 </div>
+                {(() => {
+                  const totalGaps = report.requirement_gaps?.length || 0;
+                  const sprintGaps = report.sprint_tasks?.length || 0;
+                  const remainingSprints = totalGaps > sprintGaps ? Math.ceil((totalGaps - sprintGaps) / Math.max(sprintGaps, 1)) : 0;
+                  if (remainingSprints > 0) {
+                    return (
+                      <div style={{ fontSize: 12, color: 'var(--t3)', marginTop: 4 }}>
+                        This sprint covers {sprintGaps} of your {totalGaps} gaps. At this pace you'll need about {remainingSprints} more sprint{remainingSprints === 1 ? '' : 's'} like this to close the rest.
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
               <Chip name={`${progress}% sprint complete`} level={progress === 100 ? 'ok' : 'v'} />
             </div>
@@ -290,14 +509,19 @@ const Resume = ({ profile, mobileMenuOpen, setMobileMenuOpen, setCurrentPage, on
             ))}
           </Card>
 
-          {report.components?.length > 0 && (
+          {/* Matched requirements */}
+          {report.matched_requirements?.length > 0 && (
             <Card className="gl" style={{ padding: 24, marginBottom: 16 }}>
               <div style={{ fontSize: 15, fontWeight: 650, color: 'var(--t1)', marginBottom: 14 }}>
-                Per-requirement scoring breakdown
+                Evidence already strong enough
               </div>
-              <ComponentsTable components={report.components} />
+              {report.matched_requirements.slice(0, 8).map(item => (
+                <RequirementRow key={item.skill} item={item} matched />
+              ))}
             </Card>
           )}
+
+          {/* Resume bullets and skip for now in side-by-side layout */}
 
           <div className="b2">
             <Card className="gl" style={{ padding: 24 }}>
