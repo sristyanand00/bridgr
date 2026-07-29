@@ -1,7 +1,7 @@
 {
   "metadata": {
     "created": "2026-07-25",
-    "annotator": "demo",
+    "annotator": "claude-sonnet-human-reviewed",
     "version": "1.0"
   },
   "examples": [
@@ -79,6 +79,361 @@
         "node.js": {
           "level": 2,
           "reasoning": "Personal project demonstrates exposure but not professional use"
+        }
+      }
+    },
+    {
+      "bullet": "Core member of a team helped in developing automated review platform tool from scratch for assisting E discovery domain, this tool implements predictive coding and topic modelling by automating reviews, resulting in reduced labor costs and time spent during the lawyers review.",
+      "skills": {
+        "tensorflow": {
+          "level": 0,
+          "reasoning": "tensorflow never mentioned in the bullet text"
+        }
+      }
+    },
+    {
+      "bullet": "Created customized tableau dashboards for effective reporting and visualizations.",
+      "skills": {
+        "tableau": {
+          "level": 3,
+          "reasoning": "strong verb 'Created', real job, tableau named directly"
+        }
+      }
+    },
+    {
+      "bullet": "This chat bot serves entire product related questions. Giving overview of tool via QA platform and also give recommendation responses so that user question to build chain of relevant answer.",
+      "skills": {
+        "tensorflow": {
+          "level": 0,
+          "reasoning": "tensorflow never mentioned in the bullet text"
+        }
+      }
+    },
+    {
+      "bullet": "India                               Developed and deployed auto preprocessing steps of machine learning mainly missing value",
+      "skills": {
+        "machine learning": {
+          "level": 3,
+          "reasoning": "strong verb 'Developed and deployed', ML explicitly named in real job"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Developed various KPI's individually using complex SQL scripts in Calculation views.",
+      "skills": {
+        "sql": {
+          "level": 3,
+          "reasoning": "strong verb 'Developed', SQL scripts explicitly built in real job"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Worked on manipulating, cleaning & processing data using python.",
+      "skills": {
+        "python": {
+          "level": 2,
+          "reasoning": "weak verb 'Worked on'"
+        }
+      }
+    },
+    {
+      "bullet": "¢\tWorked in Migration from java 1.6 to java 1.8.",
+      "skills": {
+        "java": {
+          "level": 2,
+          "reasoning": "weak verb 'Worked in Migration', no strong action verb"
+        }
+      }
+    },
+    {
+      "bullet": "description - Worked as java developer. Developed 3 projects using java servlet jsp ajax and web technologies.",
+      "skills": {
+        "java": {
+          "level": 3,
+          "reasoning": "strong verb 'Developed 3 projects using java', real job title stated"
+        },
+        "javascript": {
+          "level": 0,
+          "reasoning": "javascript not named, only ajax/servlet/jsp mentioned"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Worked as a M3 Java developer and Stream serve developer of Movex/M3 ERP for 1",
+      "skills": {
+        "java": {
+          "level": 2,
+          "reasoning": "weak verb 'Worked as', role stated but no strong action"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Developed views and templates with Python and Django's view controller and templating language to created user-friendly website interface.",
+      "skills": {
+        "python": {
+          "level": 3,
+          "reasoning": "strong verb 'Developed views and templates', python named in real job"
+        },
+        "django": {
+          "level": 3,
+          "reasoning": "strong verb 'Developed', django explicitly used in real job"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Created this project using Django, Django REST API, MYSQL, PyMYSQL, Python, HTML5, CSS3.",
+      "skills": {
+        "python": {
+          "level": 2,
+          "reasoning": "'this project' signals a personal project despite strong verb, caps at 2"
+        },
+        "sql": {
+          "level": 2,
+          "reasoning": "MySQL/PyMySQL used but in a personal project context"
+        },
+        "machine learning": {
+          "level": 0,
+          "reasoning": "ML never mentioned in the bullet"
+        },
+        "aws": {
+          "level": 0,
+          "reasoning": "AWS never mentioned in the bullet"
+        },
+        "django": {
+          "level": 2,
+          "reasoning": "django used but in a personal project context"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Created CRUD methods (get, post, put, delete) to make requests to the API server and tested Restful API",
+      "skills": {
+        "tensorflow": {
+          "level": 0,
+          "reasoning": "tensorflow never mentioned; bullet is about CRUD/REST API"
+        }
+      }
+    },
+    {
+      "bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "skills": {
+        "tensorflow": {
+          "level": 0,
+          "reasoning": "tensorflow never mentioned; bullet is about team management/support"
+        }
+      }
+    },
+    {
+      "bullet": "POSTGRESQL - ¢ Worked on Redhat Linux OS Cluster with Postgresql for High Availability (HA) using Pacemaker.",
+      "skills": {
+        "sql": {
+          "level": 2,
+          "reasoning": "weak verb 'Worked on', Postgresql named"
+        },
+        "linux": {
+          "level": 2,
+          "reasoning": "weak verb 'Worked on', Redhat Linux named"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Worked with Storage team for Disaster Recovery DR setup built on SAN using EMC technology ¢ Configured LDAP authentication & GSSAPI Authentication from Windows to Linux for Postgresql.",
+      "skills": {
+        "sql": {
+          "level": 2,
+          "reasoning": "Postgresql named but action ties to LDAP config, weak overall"
+        },
+        "linux": {
+          "level": 3,
+          "reasoning": "strong verb 'Configured' applied directly to Windows-to-Linux setup"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Worked with teams on application rollouts, application issues and SQL server migrations.",
+      "skills": {
+        "sql": {
+          "level": 2,
+          "reasoning": "weak verb 'Worked with', SQL migrations mentioned generically"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Performed SQL server patching activity ¢ Worked on daily reports like cluster failover, backup, AG/LS/Mirror report and server disk space report.",
+      "skills": {
+        "sql": {
+          "level": 3,
+          "reasoning": "strong verb 'Performed', concrete SQL server patching/reporting tasks"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Performed MS SQL Server audits ¢ Worked with database mirroring, replication, log shipping and clustering.",
+      "skills": {
+        "sql": {
+          "level": 3,
+          "reasoning": "strong verb 'Performed', concrete SQL audit/mirroring/replication tasks"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Worked on AWS cloud services like EC2, S3, RDS, ELB, EBS, VPC, Route53, Auto, Cloud watch, Cloud Front, IAM for installing configuring and troubleshooting on various Amazon images for server migration from physical into cloud.",
+      "skills": {
+        "aws": {
+          "level": 3,
+          "reasoning": "extensive hands-on AWS services list with 'installing configuring and troubleshooting'"
+        }
+      }
+    },
+    {
+      "bullet": "Delivered upgrades of various applications time to time to keep it on supported platform",
+      "skills": {
+        "tensorflow": {
+          "level": 0,
+          "reasoning": "tensorflow never mentioned; bullet is about generic application upgrades"
+        }
+      }
+    },
+    {
+      "bullet": "Exceeded scope of work by supporting & maintaining WebLogic platform - installation, patching, troubleshooting issues",
+      "skills": {
+        "tensorflow": {
+          "level": 0,
+          "reasoning": "tensorflow never mentioned; bullet is about WebLogic platform support"
+        }
+      }
+    },
+    {
+      "bullet": "¢   Worked with client databases installed on Oracle v10, v11, v12 on a Linux platform.",
+      "skills": {
+        "tensorflow": {
+          "level": 0,
+          "reasoning": "tensorflow never mentioned; bullet is about Oracle/Linux databases"
+        },
+        "linux": {
+          "level": 2,
+          "reasoning": "weak verb 'Worked with', Linux platform mentioned"
+        }
+      }
+    },
+    {
+      "bullet": "Worked on Retail and Banking projects, to design a predictive business model using machine learning techniques in",
+      "skills": {
+        "machine learning": {
+          "level": 3,
+          "reasoning": "ML named directly with substantive task 'design a predictive business model'"
+        }
+      }
+    },
+    {
+      "bullet": "¢       Developed the Sqoop scripts in order to make the interaction between Pig and MySQL Database.",
+      "skills": {
+        "sql": {
+          "level": 3,
+          "reasoning": "strong verb 'Developed', MySQL database integration explicit"
+        }
+      }
+    },
+    {
+      "bullet": "¢   Developed Spark scripts by using Scala shell commands as per the requirement and worked with both",
+      "skills": {
+        "spark": {
+          "level": 3,
+          "reasoning": "strong verb 'Developed', Spark scripts named directly"
+        }
+      }
+    },
+    {
+      "bullet": "¢   Developed reports using TABLEAU and exported data to HDFS and hive using Sqoop.",
+      "skills": {
+        "tableau": {
+          "level": 3,
+          "reasoning": "strong verb 'Developed', Tableau reports named directly"
+        }
+      }
+    },
+    {
+      "bullet": "Responsibility 1. Developed proactive Health Check utility for Data Lake. The utility proactively checks the smooth functioning of all Hadoop components on the cluster and sends the result to email in HTML format. The utility is being used for daily Health Checks as well as after upgrades.",
+      "skills": {
+        "machine learning": {
+          "level": 0,
+          "reasoning": "ML never mentioned; bullet is about a Hadoop health-check utility"
+        }
+      }
+    },
+    {
+      "bullet": "4. Developed and automated various cluster health check, usage, capacity related reports using Unix shell scripting.",
+      "skills": {
+        "linux": {
+          "level": 3,
+          "reasoning": "strong verb 'Developed and automated', Unix shell scripting named"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Implemented various data mining algorithms on Spark like K-means clustering, Random forest, NaÃ¯ve bayes etc.",
+      "skills": {
+        "spark": {
+          "level": 3,
+          "reasoning": "strong verb 'Implemented', Spark named with concrete algorithms"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Worked on Hadoop + Java programming",
+      "skills": {
+        "java": {
+          "level": 2,
+          "reasoning": "weak verb 'Worked on', Java named generically"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Worked on Azure and AWS (EMR) services.",
+      "skills": {
+        "aws": {
+          "level": 2,
+          "reasoning": "weak verb 'Worked on', AWS EMR named generically"
+        }
+      }
+    },
+    {
+      "bullet": "¢ Created and deployed physical objects including custom tables, custom views, stored procedures, and indexes to SQL server for Staging and Data-Warehouse environment. Involved in writing SQL Queries and used Joins to access data from MySQL.",
+      "skills": {
+        "sql": {
+          "level": 3,
+          "reasoning": "strong verb 'Created and deployed', extensive SQL objects/queries in real job"
+        }
+      }
+    },
+    {
+      "bullet": "as well as sql for database and also bootstrap,css,html for designing.created reports using kindo and telerik controls",
+      "skills": {
+        "sql": {
+          "level": 1,
+          "reasoning": "SQL only listed as a tool used, no clear action verb tied to it"
+        },
+        "machine learning": {
+          "level": 0,
+          "reasoning": "ML never mentioned; bullet is about SQL/CSS/reporting controls"
+        }
+      }
+    },
+    {
+      "bullet": "description - Created web application using asp and c# and also used sql for database.",
+      "skills": {
+        "sql": {
+          "level": 3,
+          "reasoning": "strong verb 'Created web application ... used sql for database' in real job"
+        }
+      }
+    },
+    {
+      "bullet": "deployed in java byte code and on ethereum as well and I have written API in java spring on that and then build front end and called all Api)",
+      "skills": {
+        "java": {
+          "level": 3,
+          "reasoning": "strong verbs 'deployed', 'written API', 'build front end' with Java Spring/bytecode named"
         }
       }
     }

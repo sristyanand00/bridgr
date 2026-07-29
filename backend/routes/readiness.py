@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Request, UploadFile
 from sqlalchemy.orm import Session
 from db.database import get_db
 from db.models import Analysis
@@ -15,6 +15,7 @@ from services.auth_service import get_user_optional
 from pydantic import BaseModel
 
 from core.exceptions import ResumeParseFailed
+from core.limiter import limiter
 from core_ml.evidence import (
     EvidenceContext,
     TenureInfo,
@@ -31,8 +32,14 @@ from core_ml.scoring import (
     UserSkill,
     score,
 )
-from ml.model_loader import get_core
 from core_ml import loader as _core_loader
+from core_ml.loader import get_core
+from core_ml.skill_taxonomy import (
+    BASE_SKILLS,
+    SKILL_ALIASES,
+    canonical_skill,
+    merge_skills,
+)
 
 router = APIRouter()
 
@@ -118,175 +125,75 @@ def _validate_pdf(resume: UploadFile) -> bytes:
 
 
 def _candidate_skills(core: Any) -> List[str]:
+    """Vocabulary used to detect requirements in the pasted job descriptions.
+
+    SkillExtractor is built from the same BASE_SKILLS merge (see
+    core_ml/skill_taxonomy.py), so requirement detection and resume detection
+    share one vocabulary and no requirement is structurally unmatchable.
+    """
     if hasattr(core, "skill_extractor") and getattr(core.skill_extractor, "skill_list", None):
         skill_list = core.skill_extractor.skill_list
         logger.info(f"Using skill_extractor.skill_list with {len(skill_list)} skills")
-        return sorted({str(skill).lower().strip() for skill in skill_list if skill})
+        return merge_skills(skill_list, BASE_SKILLS)
 
     if hasattr(core, "dataset_loader"):
         try:
             tech_skills = core.dataset_loader.get_all_tech_skills()
             logger.info(f"Using dataset_loader.get_all_tech_skills() with {len(tech_skills)} skills")
-            return sorted({str(skill).lower().strip() for skill in tech_skills if skill})
+            return merge_skills(tech_skills, BASE_SKILLS)
         except Exception as e:
             logger.warning(f"dataset_loader.get_all_tech_skills() failed: {e}")
 
-    logger.warning("Falling back to hardcoded skill list (244 skills)")
-    return [
-        # Core programming languages
-        "python", "java", "javascript", "typescript", "c++", "c#", "r", "scala", "go", "rust", "kotlin", "swift",
-        
-        # Web frameworks and technologies
-        "react", "node.js", "vue.js", "angular", "django", "flask", "fastapi", "express.js", "spring", "asp.net", 
-        "html", "css", "jquery", "bootstrap", "tailwind", "sass", "webpack", "babel",
-        
-        # Databases and storage
-        "sql", "postgresql", "mysql", "mongodb", "redis", "cassandra", "elasticsearch", "sqlite", "oracle",
-        
-        # Cloud platforms and DevOps
-        "aws", "gcp", "azure", "docker", "kubernetes", "terraform", "jenkins", "ci/cd", "linux", "bash", "git",
-        "github actions", "gitlab ci", "ansible", "chef", "puppet", "vagrant", "nginx", "apache",
-        
-        # Data science and analytics
-        "pandas", "numpy", "matplotlib", "seaborn", "plotly", "jupyter", "r studio", "tableau", "power bi", 
-        "excel", "statistics", "data analysis", "data visualization", "sql server", "spark", "hadoop", "hive",
-        
-        # Machine learning and AI
-        "machine learning", "deep learning", "neural networks", "tensorflow", "pytorch", "keras", "scikit-learn",
-        "xgboost", "lightgbm", "catboost", "opencv", "nltk", "spacy", "transformers", "bert", "gpt",
-        
-        # Modern ML/GenAI/MLOps stack
-        "huggingface", "hugging face transformers", "sentence transformers", "langchain", "langgraph", "rag", "retrieval augmented generation",
-        "prompt engineering", "vector database", "faiss", "pinecone", "chromadb", "weaviate", "chroma",
-        "mlflow", "kubeflow", "dvc", "weights and biases", "wandb", "tensorboard", "mlops", "model deployment",
-        "named entity recognition", "ner", "semantic search", "text classification", "sentiment analysis",
-        "cnn", "rnn", "lstm", "gru", "attention mechanism", "llm", "large language model", "openai api",
-        "claude api", "gemini api", "fine tuning", "few shot learning", "zero shot learning",
-        
-        # API and web services
-        "rest api", "graphql", "grpc", "soap", "json", "xml", "microservices", "api gateway", "oauth", "jwt",
-        "jwt authentication", "authentication", "authorization", "security", "https", "ssl", "cors",
-        
-        # Message queues and streaming
-        "kafka", "rabbitmq", "redis pub/sub", "aws sqs", "aws sns", "apache pulsar", "nats", "event sourcing",
-        "airflow", "luigi", "prefect", "dagster", "cron", "celery", "background jobs",
-        
-        # Testing and quality
-        "testing", "unit testing", "integration testing", "pytest", "jest", "selenium", "cypress", "postman",
-        "test automation", "tdd", "bdd", "code review", "linting", "static analysis", "sonarqube",
-        
-        # Mobile development
-        "android", "ios", "react native", "flutter", "kotlin", "swift", "objective-c", "xamarin", "cordova",
-        "android studio", "xcode", "firebase", "push notifications", "app store", "play store",
-        
-        # Business intelligence and visualization
-        "business intelligence", "data warehousing", "etl", "elt", "data pipeline", "dbt", "looker", "qlik",
-        "pentaho", "talend", "informatica", "ssis", "ssrs", "crystal reports",
-        
-        # Project management and collaboration
-        "agile", "scrum", "kanban", "jira", "confluence", "asana", "trello", "slack", "teams", "zoom",
-        "project management", "stakeholder management", "product management", "roadmapping", "user stories",
-        
-        # Core computer science
-        "data structures", "algorithms", "system design", "design patterns", "object oriented programming",
-        "functional programming", "concurrent programming", "distributed systems", "scalability", "performance",
-        
-        # Soft skills
-        "communication", "teamwork", "leadership", "problem solving", "analytical thinking", "critical thinking",
-        "creativity", "adaptability", "time management", "attention to detail", "documentation", "mentoring",
-    ]
+    logger.warning(f"Falling back to base skill list ({len(BASE_SKILLS)} skills)")
+    return _hardcoded_skill_list()
+
+
+def _hardcoded_skill_list() -> List[str]:
+    """Base vocabulary, kept as a function for callers/tests that import it."""
+    return list(BASE_SKILLS)
+
+
+def _term_pattern(term: str) -> str:
+    """Word-boundary regex for a skill term, tolerant of space/hyphen/underscore."""
+    words = term.split()
+    if len(words) == 1:
+        return rf"(?<![a-z0-9]){re.escape(term)}(?![a-z0-9])"
+    escaped = [re.escape(w) for w in words]
+    return r"(?<![a-z0-9])" + r"[\s\-_]+".join(escaped) + r"(?![a-z0-9])"
 
 
 def _extract_requirements(job_descriptions: List[str], skills: List[str]) -> Counter:
+    """Count how many postings mention each requirement.
+
+    Counting is per POSTING, over CANONICAL skill names.  Both matter:
+
+    * Per posting, not per match — `frequency` downstream is "share of postings
+      that ask for this", so a posting repeating a term must not inflate it.
+    * Canonical names — several vocabulary entries can describe one skill, and
+      a single phrase can therefore trigger several of them.  "Hugging Face
+      Transformers" matched `huggingface`, `hugging face transformers` AND
+      `transformers`, producing three weighted requirements that a resume could
+      satisfy at most one of; the leftovers surfaced as top-ROI gaps for a skill
+      the candidate plainly had.  Collapsing through `canonical_skill` before
+      counting means one concept costs one requirement's worth of weight.
+    """
     counts: Counter = Counter()
-    aliases = {
-        # Web frameworks
-        "react": ["react.js", "reactjs", "react js"],
-        "node.js": ["node", "nodejs", "node.js", "node js"],
-        "vue.js": ["vue", "vuejs", "vue js"],
-        "angular": ["angularjs", "angular.js", "angular js"],
-        
-        # APIs and services
-        "rest api": ["rest", "restful", "api", "rest apis", "restful apis"],
-        "graphql": ["graph ql", "graph-ql"],
-        
-        # DevOps and CI/CD
-        "ci/cd": ["ci cd", "cicd", "ci-cd", "continuous integration", "continuous deployment", "continuous delivery"],
-        "github actions": ["github action", "gh actions"],
-        
-        # Databases
-        "postgresql": ["postgres", "postgresql", "postgre sql"],
-        "mongodb": ["mongo db", "mongo", "mongodb"],
-        "mysql": ["my sql"],
-        "sql server": ["sqlserver", "mssql", "ms sql"],
-        
-        # ML and AI
-        "machine learning": ["ml", "machine learning", "machine-learning"],
-        "deep learning": ["dl", "deep learning", "deep-learning"],
-        "artificial intelligence": ["ai", "artificial intelligence", "artificial-intelligence"],
-        "huggingface": ["hugging face", "hugging-face", "hf", "transformers library"],
-        "hugging face transformers": ["huggingface transformers", "hf transformers", "transformers"],
-        "langchain": ["lang chain", "lang-chain"],
-        "langgraph": ["lang graph", "lang-graph"],
-        "rag": ["retrieval augmented generation", "retrieval-augmented generation"],
-        "vector database": ["vector db", "vectordb", "vector databases"],
-        "large language model": ["llm", "llms", "large language models"],
-        "prompt engineering": ["prompt-engineering", "prompting"],
-        "named entity recognition": ["ner", "named-entity recognition", "entity recognition"],
-        "natural language processing": ["nlp", "natural-language processing"],
-        
-        # Cloud platforms
-        "aws": ["amazon web services", "amazon aws"],
-        "gcp": ["google cloud platform", "google cloud", "gcloud"],
-        "azure": ["microsoft azure", "ms azure"],
-        
-        # Programming languages
-        "c++": ["cpp", "c plus plus"],
-        "c#": ["csharp", "c sharp"],
-        "javascript": ["js", "javascript", "java script"],
-        "typescript": ["ts", "typescript", "type script"],
-        
-        # Data science
-        "scikit-learn": ["sklearn", "scikit learn", "sci-kit learn"],
-        "tensorflow": ["tensor flow", "tf"],
-        "pytorch": ["torch", "py torch"],
-        "sentence transformers": ["sentence-transformers", "sentencetransformers"],
-        
-        # Authentication
-        "jwt": ["json web token", "json web tokens"],
-        "jwt authentication": ["jwt auth", "json web token authentication", "jwt authentication"],
-        "oauth": ["oauth2", "oauth 2.0", "o auth"],
-        
-        # Testing
-        "unit testing": ["unit tests", "unittesting"],
-        "integration testing": ["integration tests"],
-        "test automation": ["automated testing", "test-automation"],
-        
-        # Mobile
-        "react native": ["reactnative", "react-native"],
-        "android studio": ["androidstudio", "android-studio"],
-    }
 
     for description in job_descriptions:
         text = f" {description.lower()} "
+        # Set, not Counter: one posting contributes at most 1 to each skill.
+        present: set = set()
         for skill in skills:
-            terms = [skill] + aliases.get(skill, [])
-            # Use case-insensitive matching with word boundaries
-            for term in terms:
-                # Create a pattern that handles spaces, hyphens, and case variations
-                # Split the term and join with flexible separators
-                words = term.split()
-                if len(words) == 1:
-                    # Single word - simple word boundary match
-                    pattern = rf"(?<![a-z0-9]){re.escape(term)}(?![a-z0-9])"
-                else:
-                    # Multi-word - allow flexible separators between words
-                    escaped_words = [re.escape(word) for word in words]
-                    pattern = rf"(?<![a-z0-9])" + r"[\s\-_]+".join(escaped_words) + r"(?![a-z0-9])"
-                
-                if re.search(pattern, text, re.IGNORECASE):
-                    counts[skill] += 1
-                    break  # Found this skill, no need to check other aliases
+            for term in [skill] + SKILL_ALIASES.get(skill, []):
+                if re.search(_term_pattern(term), text, re.IGNORECASE):
+                    present.add(canonical_skill(skill))
+                    break  # this skill is present; other aliases add nothing
+        # sorted(), not the raw set: Counter preserves insertion order, and
+        # most_common() breaks ties by it.  Feeding it set-iteration order makes
+        # the tie-break depend on PYTHONHASHSEED, so the same resume and the
+        # same postings score differently across server restarts.
+        counts.update(sorted(present))
+
     return counts
 
 
@@ -327,7 +234,15 @@ def _evidence_level_and_tenure(
 
 
 @router.post("/readiness", response_model=ReadinessResponse)
+@limiter.limit("10/hour")
+# ^ Flat 10/hour per IP as a pragmatic v1 backstop.
+# v2 improvement: tiered limiting — anonymous callers should be capped at
+# 3/hour while authenticated users get 20/hour. slowapi supports conditional
+# key functions but tiered per-identity limiting requires extra plumbing
+# (custom key_func + override storage key). Deferred to v2; the flat IP
+# ceiling is still meaningful abuse protection for a portfolio deployment.
 def generate_readiness_report(
+    request: Request,  # required by slowapi for rate-limit key derivation
     resume: UploadFile = File(...),
     target_role: str = Form(...),
     job_descriptions: str = Form(...),
@@ -346,6 +261,14 @@ def generate_readiness_report(
         raise ResumeParseFailed("Paste at least one real job description.")
 
     contents = _validate_pdf(resume)
+
+    from core.logging_config import get_request_id
+    _rid = get_request_id()
+    logger.info(
+        "readiness request received | rid=%s target_role=%r num_postings=%d file_size=%d",
+        _rid, target_role, len(postings), len(contents),
+    )
+
     tmp_path = None
 
     try:
@@ -357,12 +280,27 @@ def generate_readiness_report(
         resume_data = core.resume_parser.parse(tmp_path)
         extracted = core.skill_extractor.extract(resume_data)
 
+        # Log resume parse result
+        full_text = resume_data.get("full_text", "")
+        sections = resume_data.get("sections", {})
+        logger.info(
+            "resume parsed | rid=%s page_count=%s char_count=%d sections_found=%s",
+            _rid,
+            resume_data.get("page_count", "unknown"),
+            len(full_text),
+            list(sections.keys()),
+        )
+
         # Build evidence map; track whether any date was unparsed
         user_levels: Dict[str, EvidenceItem] = {}
         any_date_unparsed = False
 
         for skill in extracted:
-            normalized = str(getattr(skill, "normalized", "")).lower().strip()
+            # Canonicalise to the same form the requirement side counts under,
+            # otherwise evidence for "hugging face transformers" never matches a
+            # requirement recorded as "huggingface".  Duplicates that collapse
+            # onto one canonical name keep the highest level (see below).
+            normalized = canonical_skill(str(getattr(skill, "normalized", "")))
             if not normalized:
                 continue
             level, tenure_info = _evidence_level_and_tenure(skill, resume_data.get("sections", {}))
@@ -379,6 +317,24 @@ def generate_readiness_report(
                 )
 
         skill_counts = _extract_requirements(postings, _candidate_skills(core))
+
+        logger.info(
+            "skills extracted | rid=%s count=%d any_date_unparsed=%s",
+            _rid, len(user_levels), any_date_unparsed,
+        )
+
+        # Zero skills from a resume that clearly has text is never a legitimate
+        # result — it means the extraction stack is broken, not that the
+        # candidate has no skills.  Every score would come back 0% and look like
+        # a real verdict.  Shout about it rather than serving a silent zero.
+        if not user_levels and len(full_text.strip()) > 100:
+            logger.error(
+                "EXTRACTION PRODUCED ZERO SKILLS from %d chars of resume text | rid=%s. "
+                "This is a broken pipeline, not a weak resume — check that spacy and "
+                "sentence-transformers are really installed (a MagicMock stub iterates "
+                "as empty and fails silently). All scores will be 0%%.",
+                len(full_text), _rid,
+            )
         if not skill_counts:
             try:
                 fallback = core.analyze(tmp_path, target_role)
@@ -390,7 +346,12 @@ def generate_readiness_report(
             except Exception:
                 pass
 
-        top_requirements = skill_counts.most_common(18)
+        # Explicit tie-break by skill name. most_common() alone falls back to
+        # insertion order for equal counts, which decides which requirements
+        # survive the cut — that must not vary between identical requests.
+        top_requirements = sorted(
+            skill_counts.items(), key=lambda kv: (-kv[1], kv[0])
+        )[:18]
 
         # Build ScoreInput and call the single scoring implementation
         today_str = _dt.date.today().isoformat()
@@ -424,6 +385,15 @@ def generate_readiness_report(
             today=today_str,
         )
         result: ScoreResult = score(score_input)
+
+        logger.info(
+            "scoring complete | rid=%s screen_score=%s interview_score=%s job_score=%s verdict=%r",
+            _rid,
+            round(result.screen_score),
+            round(result.interview_score),
+            round(result.job_score),
+            result.verdict,
+        )
 
         # Map ScoreComponent → ScoreComponentOut
         components_out: List[ScoreComponentOut] = [
@@ -514,34 +484,43 @@ def generate_readiness_report(
             resume_bullets=resume_bullets,
         )
 
-        # Save analysis to database if user is authenticated
+        # Save analysis to database if user is authenticated.
+        # DB failure must never break the API response — try/except wraps only
+        # the db.add/db.commit block, not the response construction above.
         if current_user and current_user.get("uid"):
             try:
                 analysis_record = Analysis(
                     user_id=current_user["uid"],
                     target_role=target_role,
                     match_score=round(result.screen_score),
-                    feasibility_score=round(result.job_score),
-                    analysis_data={
+                    # feasibility_score is JSON — store a dict for future extensibility
+                    feasibility_score={
+                        "job_score": round(result.job_score),
+                        "verdict": result.verdict,
+                    },
+                    # skill_gaps: gaps list serialised as plain dicts (JSON-safe)
+                    skill_gaps=[g.model_dump() for g in gaps],
+                    # matched_skills: matched list serialised as plain dicts
+                    matched_skills=[m.model_dump() for m in matched],
+                    # roadmap_inputs: everything the roadmap generator needs
+                    roadmap_inputs={
                         "screen_score": round(result.screen_score),
-                        "interview_score": round(result.interview_score), 
+                        "interview_score": round(result.interview_score),
                         "job_score": round(result.job_score),
                         "verdict": result.verdict,
                         "has_blocker": result.has_blocker,
                         "top_roi_gaps": top_roi,
-                        "matched_count": len(matched),
-                        "gaps_count": len(gaps)
-                    }
+                        "scoring_version": result.scoring_version,
+                    },
                 )
                 db.add(analysis_record)
                 db.commit()
-                import logging
-                logging.getLogger(__name__).info(f"Saved analysis record for user {current_user['uid']}")
+                logger.info("analysis persisted | rid=%s user=%s", _rid, current_user["uid"])
             except Exception as e:
-                import logging
-                logging.getLogger(__name__).error(f"Failed to save analysis: {e}")
-                # Don't fail the request if DB save fails
-                pass
+                # Log the real error so it's visible — do NOT swallow silently
+                logger.error("analysis persist failed | rid=%s error=%s", _rid, e, exc_info=True)
+                # Roll back the failed transaction so the session stays usable
+                db.rollback()
 
         return response
     finally:

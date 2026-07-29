@@ -7,6 +7,31 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
+# ── Pre-load real SQLAlchemy before any test module can stub it ───────────────
+# test_api.py stubs sqlalchemy with `if "sqlalchemy" not in sys.modules:`.
+# Importing it here (conftest runs before any test module) ensures the real
+# package is already in sys.modules, so the stub guard is never triggered.
+# This is required for test_persistence.py, which needs the real ORM.
+import sqlalchemy       # noqa: F401
+import sqlalchemy.orm   # noqa: F401
+
+
+# ── Rate limiter reset ────────────────────────────────────────────────────────
+# The in-memory limiter is process-global.  Without this fixture, tests that
+# hit rate-limited routes multiple times within a single pytest session can
+# accumulate counts and cause spurious 429s in unrelated tests.
+# This autouse fixture resets all window counters before each test.
+
+@pytest.fixture(autouse=True)
+def _reset_rate_limiter():
+    """Reset in-memory rate-limit counters before every test."""
+    try:
+        from core.limiter import limiter
+        limiter.reset()
+    except Exception:
+        pass  # limiter not available in all test environments — that's fine
+    yield
+
 
 @pytest.fixture
 def sample_resume_dict():

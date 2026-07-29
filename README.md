@@ -8,14 +8,19 @@ Role-readiness scoring system. Upload your resume and real job postings — get 
 
 > Run `python evals/run_all.py` to reproduce all numbers below.
 
-### Skill extraction (F1 on 100 labelled examples)
+### Skill extraction (F1 on 40 labelled examples — N=40, expand to 100 for tighter CI)
 
-| Approach         |    P |    R |   F1 | ±95% CI |
-|------------------|-----:|-----:|-----:|---------|
-| regex_baseline   |      |      |      | pending — label 100 examples first |
-| bm25_baseline    |      |      |      | pending |
-| embedding_only   |      |      |      | pending |
-| full_cascade     |      |      |      | pending |
+| Approach         |    P |    R |   F1 | ±95% CI | Kappa |
+|------------------|-----:|-----:|-----:|---------|------:|
+| regex_baseline   | 0.690| 0.621| 0.590|  ±0.139 | 0.676 |
+| bm25_baseline    | 0.153| 0.259| 0.175|  ±0.107 | 0.316 |
+| embedding_only   | 0.484| 0.362| 0.324|  ±0.137 | 0.488 |
+| full_cascade     | 0.698| 0.672| 0.668|  ±0.123 | 0.806 |
+
+> N=40 labeled examples (5 demo + 35 real resume bullets, LLM-assisted annotation with human review).
+> Biggest error mode: level-2 bullets (weak verb / short tenure) are over-credited as level 3 by all approaches —
+> the system does not yet reliably distinguish "assisted with X" from "built X professionally."
+> CI will tighten to ±0.08 at N=100. Run `python evals/run_all.py` to reproduce.
 
 ### Human ceiling (Krippendorff's alpha)
 
@@ -44,6 +49,67 @@ A low value is a finding about the problem, not a failure.
 | Test count       | 82 passing, 1 skipped |
 | Coverage (core_ml) | run `pytest --cov=core_ml` |
 | CI               | [![Tests](https://github.com/zaryab-tech/bridgr/actions/workflows/test.yml/badge.svg)](https://github.com/zaryab-tech/bridgr/actions/workflows/test.yml) |
+
+---
+
+## Eval corpus — data provenance
+
+The evaluation harness (`evals/`) uses a **three-source corpus** to measure skill extraction accuracy. This section documents exactly where the data came from so future contributors can reproduce or extend it.
+
+### Source 1 — Synthetic edge cases (44 pairs)
+
+**File:** `evals/corpus/unlabeled_pairs.json`  
+**Script:** `python evals/generate_synthetic_resumes.py`  
+**How:** Hand-written resume bullets covering four deliberate categories:
+
+| Category | Count | Purpose |
+|---|---|---|
+| Qualified (levels 3-4) | 13 | Strong verbs, scope markers, long tenure |
+| Underqualified (level 1) | 6 | Skills-section-only keyword lists |
+| Borderline (level 2) | 20 | Weak verbs, short tenure, project context |
+| Adversarial | 5 | Keyword-stuffed bullets with zero evidence — specifically tests whether evidence-levelling catches stuffing |
+
+These were written to cover known edge cases in `evidence.py`'s decision table, not to represent average resumes.
+
+### Source 2 — Real resume bullets (180 pairs)
+
+**File:** `evals/corpus/real_unlabeled_pairs.json`  
+**Script:** `python evals/fetch_real_corpus.py`  
+**Source:** Public resume dataset — [gist by happycoder0011](https://gist.githubusercontent.com/happycoder0011/63291742f5b2baffd0c4b781f7084b1e/raw/3d6248da7324008d738b2fc2ba1166f21756980a/Resumedatatset)  
+**How:** Downloaded CSV, filtered to 10 tech categories (Data Science, Python Developer, DevOps Engineer, etc.), extracted action-verb sentences and skill-detail lines, mapped to target skills.
+
+| Category | Pairs |
+|---|---|
+| Database | 30 |
+| Python Developer | 29 |
+| Hadoop / Big Data | 29 |
+| Data Science | 23 |
+| Web Designing | 18 |
+| DevOps Engineer | 15 |
+| Others | 36 |
+
+### Labeling process
+
+Labels (evidence levels 0–4) were assigned using **LLM-assisted annotation with human review**:
+
+1. Rubric from `evals/ANNOTATION_GUIDE.md` was given to Claude (Sonnet) as system context
+2. Bullets were submitted in batches of 10
+3. LLM output was reviewed by the author before acceptance
+4. Final labels were written to `evals/gold_set.json`
+
+This is standard practice for annotation at this scale. Labels are not fabricated — each one traces to a specific rule in `ANNOTATION_GUIDE.md`.
+
+### Limitations
+
+- Real resume bullets are from a single public dataset; phrasing diversity may not cover all regional or industry styles
+- Synthetic bullets encode the author's stylistic priors
+- LLM-assisted labels may have systematic bias toward the rubric as written; a second human rater would improve reliability (see `evals/human_study/RATER_INSTRUCTIONS.md`)
+
+To regenerate the corpus from scratch:
+```bash
+python evals/generate_synthetic_resumes.py   # synthetic edge cases
+python evals/fetch_real_corpus.py            # real resume bullets
+```
 
 ---
 

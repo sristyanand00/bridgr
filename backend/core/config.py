@@ -24,7 +24,15 @@ class Settings(BaseSettings):
     APP_NAME: str = "Bridgr"
     DEBUG: bool = False
     CORS_ORIGINS: list = ["http://localhost:5173", "http://localhost:3000"]
-    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173,https://*.vercel.app,https://*.netlify.app,https://*.render.com"
+
+    # CORS exact-match origins (comma-separated).
+    # Wildcard subdomains do NOT work here — use ALLOWED_ORIGIN_REGEX for those.
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
+
+    # CORS regex for dynamic subdomains (preview/staging, e.g. Vercel/Render/Netlify).
+    # Set to empty string to disable.  Uses Python `re` syntax passed straight to
+    # Starlette's CORSMiddleware `allow_origin_regex` parameter.
+    ALLOWED_ORIGIN_REGEX: str = r"https://.*\.(vercel|netlify|onrender)\.app"
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

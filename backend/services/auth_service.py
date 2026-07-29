@@ -56,6 +56,19 @@ except ValueError:
 
 security = HTTPBearer()
 
+# ── Startup-time status log (WARNING level — always visible in Render logs) ───
+# This single log line makes it immediately obvious whether Firebase is wired
+# up correctly after a deploy, without having to trigger an auth request.
+if _firebase_ready:
+    logger.warning("Firebase Admin SDK: CONFIGURED ✔ — authentication is active.")
+else:
+    logger.warning(
+        "Firebase Admin SDK: NOT CONFIGURED — authentication is disabled. "
+        "All /api/readiness scans will be anonymous (no DB persistence). "
+        "Set FIREBASE_CREDENTIALS_PATH or FIREBASE_PROJECT_ID + "
+        "FIREBASE_PRIVATE_KEY + FIREBASE_CLIENT_EMAIL to enable auth."
+    )
+
 
 async def get_current_user(
     res: HTTPAuthorizationCredentials = Security(security),

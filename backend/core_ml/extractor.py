@@ -7,8 +7,13 @@ import numpy as np
 from typing import List, Dict
 
 from .schemas import ExtractedSkill
+from .evidence import detect_scope_markers, detect_verb_strength
 
 logger = logging.getLogger(__name__)
+
+# How much a surrounding context proves about a skill.  Used to pick which
+# occurrence of a repeated skill to keep — see _tier1_phrase_match.
+_VERB_RANK = {"leadership": 3, "strong": 2, "weak": 1, "none": 0}
 
 STOP_SKILLS = {
     "work", "use", "ability", "using", "used", "strong",
@@ -102,16 +107,43 @@ class SkillExtractor:
         return all_skills
 
     def _tier1_phrase_match(self, text: str, sections: Dict) -> List[ExtractedSkill]:
+        """Phrase-match skills, keeping the BEST-EVIDENCED occurrence of each.
+
+        Keeping the *first* occurrence made evidence level depend on where the
+        skill happened to appear first, i.e. on resume section order.  A skill
+        listed in a SKILLS header took its context from a comma-separated list
+        with no verb — verb_strength "none", which determine_evidence_level caps
+        at level 2 — even when a later experience bullet ("Built and deployed
+        PyTorch models... 2M users") proved it at level 4.  Moving the
+        EXPERIENCE block above SKILLS on an otherwise byte-identical resume
+        shifted 13 skills from L2 to L4.
+
+        The context we keep drives verb strength, scope markers and tenure
+        downstream, so it must come from the occurrence that demonstrates the
+        most, not the one that happens to be typeset first.
+        """
         doc     = self.nlp(text)
         matches = self._matcher(doc)
-        results, seen = [], set()
+
+        # normalized -> (rank, span, context) for the strongest occurrence so far
+        best: Dict[str, tuple] = {}
 
         for _, start, end in matches:
             span       = doc[start:end]
             normalized = span.text.lower().strip()
-            if normalized in seen or normalized in STOP_SKILLS:
+            if not normalized or normalized in STOP_SKILLS:
                 continue
-            seen.add(normalized)
+            context = doc[max(0, start - 10): end + 10].text
+            rank = (
+                _VERB_RANK.get(detect_verb_strength(context), 0),
+                1 if detect_scope_markers(context) else 0,
+            )
+            existing = best.get(normalized)
+            if existing is None or rank > existing[0]:
+                best[normalized] = (rank, span, context)
+
+        results = []
+        for normalized, (_rank, span, context) in best.items():
             section_hit = any(
                 normalized in sections.get(sec, "").lower()
                 for sec in ("skills", "experience", "projects")
@@ -121,7 +153,7 @@ class SkillExtractor:
                 normalized=normalized,
                 confidence=0.98 if section_hit else 0.90,
                 source="phrase_match",
-                context=doc[max(0, start - 10): end + 10].text,
+                context=context,
             ))
         return results
 
@@ -130,7 +162,11 @@ class SkillExtractor:
         if self.embed_model is None:
             return []
         doc    = self.nlp(text)
-        chunks = list({
+        # sorted(), not list(set(...)): chunks are consumed in order and the
+        # first chunk to claim a skill wins via already_normalized, so
+        # set-iteration order (hash-seed dependent) would make extraction vary
+        # between runs on identical input.
+        chunks = sorted({
             c.text.strip() for c in doc.noun_chunks
             if len(c.text.strip()) > 2 and c.text.strip().lower() not in STOP_SKILLS
         })

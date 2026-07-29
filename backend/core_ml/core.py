@@ -16,6 +16,7 @@ from .extractor import SkillExtractor
 from .matching import MatchingEngine
 from .gaps import GapAnalyzer, HIGH_DEMAND_THRESHOLD
 from .job_skills import DynamicJobSkills
+from .skill_taxonomy import BASE_SKILLS, merge_skills
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +54,17 @@ class IntelligenceCore:
                 )
 
         self.dataset_loader.load()
-        all_skills = self.dataset_loader.get_all_tech_skills()
+        # Merge BASE_SKILLS in so the resume-side vocabulary matches the
+        # requirement-side vocabulary built by routes/readiness._candidate_skills.
+        # Without this, O*NET-only coverage leaves modern-stack skills (fastapi,
+        # django, redis, microservices, …) detectable in a job posting but never
+        # in a resume, so they silently score 0 forever.
+        onet_skills = self.dataset_loader.get_all_tech_skills()
+        all_skills  = merge_skills(onet_skills, BASE_SKILLS)
+        logger.info(
+            "Skill vocabulary: %d from O*NET + %d base = %d merged",
+            len(onet_skills), len(BASE_SKILLS), len(all_skills),
+        )
 
         self.resume_parser   = ResumeParser()
         self.skill_extractor = SkillExtractor(

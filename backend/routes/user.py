@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from db.database import get_db
 from db.models import User
@@ -7,6 +7,8 @@ from pydantic import BaseModel
 from typing import Optional, Any
 import logging
 
+from core.limiter import limiter
+
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
@@ -14,7 +16,9 @@ class QuizUpdate(BaseModel):
     quiz_data: Any
 
 @router.post("/user/sync")
+@limiter.limit("30/minute")
 def sync_user(
+    request: Request,  # required by slowapi for rate-limit key derivation
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
 ):
@@ -54,7 +58,9 @@ def sync_user(
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 @router.post("/user/quiz")
+@limiter.limit("30/minute")
 def update_quiz(
+    request: Request,  # required by slowapi for rate-limit key derivation
     data: QuizUpdate,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)

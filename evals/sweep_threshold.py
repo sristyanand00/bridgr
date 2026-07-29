@@ -6,6 +6,8 @@ Sweep semantic threshold from 0.60 to 0.90 and plot F1 with confidence intervals
 import json
 import sys
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")   # non-interactive backend — safe for headless / CI runs
 import matplotlib.pyplot as plt
 from pathlib import Path
 from typing import List, Tuple, Dict
@@ -50,7 +52,7 @@ def semantic_threshold_approach(bullet: str, skill: str, threshold: float) -> in
     else:
         return 1
 
-def bootstrap_f1(y_true: List, y_pred: List, n_iterations: int = 1000) -> Tuple[float, float, float]:
+def bootstrap_f1(y_true: List, y_pred: List, n_iterations: int = 200) -> Tuple[float, float, float]:
     """Calculate bootstrapped F1 score with confidence interval."""
     scores = []
     n = len(y_true)
@@ -95,14 +97,17 @@ def main():
         print(f"Gold set not found at {GOLD_SET_FILE}")
         print("Please run label.py first to create labeled examples.")
         return
-    
+
     # Load gold standard
     gold_examples = load_gold_set()
-    
+
     if not gold_examples:
-        print("No labeled examples found in gold set.")
+        print("=" * 60)
+        print("NO LABELED EXAMPLES YET — sweep cannot run.")
+        print("=" * 60)
+        print("Label at least 20 examples with label.py, then re-run this script.")
         return
-    
+
     print("Sweeping semantic threshold from 0.60 to 0.90...")
     
     # Sweep thresholds
@@ -170,8 +175,8 @@ def main():
     
     print(f"Results saved to {results_file}")
     
-    # Display plot
-    plt.show()
+    # Don't display plot — would block on Windows. User can open the PNG file.
+    # plt.show()
 
 if __name__ == "__main__":
     main()

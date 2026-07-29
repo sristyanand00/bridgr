@@ -11,6 +11,7 @@ from .parser import ResumeParser
 from .extractor import SkillExtractor
 from .matching import MatchingEngine
 from .gaps import GapAnalyzer
+from .skill_taxonomy import BASE_SKILLS, merge_skills
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +43,10 @@ class FallbackIntelligenceCore:
         self.config = config
 
         self.resume_parser = ResumeParser()
-        all_skills = list({s for r in self.KNOWN_ROLES.values() for s in r["tech"] + r["soft"]})
+        # Same merge as IntelligenceCore — keeps the resume-side vocabulary in
+        # step with the requirement-side one even in fallback mode.
+        role_skills = {s for r in self.KNOWN_ROLES.values() for s in r["tech"] + r["soft"]}
+        all_skills  = merge_skills(role_skills, BASE_SKILLS)
         self.skill_extractor = SkillExtractor(
             skill_list=all_skills,
             semantic_threshold=float(config.get("SEMANTIC_THRESHOLD", 0.75)),
@@ -69,10 +73,17 @@ class FallbackIntelligenceCore:
             val = self.KNOWN_ROLES[best_key]
             return {"job_title": best_key, "tech_skills": val["tech"], "soft_skills": val["soft"]}
 
-        # Fallback to LLM
-        from services.llm_service import llm_service
-        logger.info(f"Role '{role}' not in known roles — fetching from LLM...")
-        llm_profile = llm_service.fetch_job_profile_from_gemini(role)
+        # Fallback to LLM — enrichment only. A missing provider package or a
+        # dead API must degrade to the generic profile below, never 500 the
+        # readiness endpoint.
+        llm_profile = None
+        try:
+            from services.llm_service import llm_service
+            logger.info(f"Role '{role}' not in known roles — fetching from LLM...")
+            llm_profile = llm_service.fetch_job_profile_from_gemini(role)
+        except Exception as e:
+            logger.warning(f"LLM profile lookup failed for '{role}': {e}")
+
         if llm_profile:
             return {
                 "job_title": role,

@@ -1,0 +1,3892 @@
+{
+  "metadata": {
+    "source": "Real resume data — public gist (happycoder0011)",
+    "url": "https://gist.githubusercontent.com/happycoder0011/63291742f5b2baffd0c4b781f7084b1e/raw/3d6248da7324008d738b2fc2ba1166f21756980a/Resumedatatset",
+    "total_pairs": 180,
+    "by_category": {
+      "Data Science": 23,
+      "Web Designing": 18,
+      "Java Developer": 12,
+      "Python Developer": 29,
+      "DevOps Engineer": 15,
+      "Database": 30,
+      "Hadoop": 29,
+      "ETL Developer": 8,
+      "DotNet Developer": 8,
+      "Blockchain": 8
+    },
+    "note": "These are REAL resume bullets from real people. Labels (level field) are null — fill them in using ANNOTATION_GUIDE.md. Do NOT fabricate labels."
+  },
+  "pairs": [
+    {
+      "pair_id": "real_p001",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "Core member of a team helped in developing automated review platform tool from scratch for assisting E discovery domain, this tool implements predictive coding and topic modelling by automating reviews, resulting in reduced labor costs and time spent during the lawyers review.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p002",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "Created customized tableau dashboards for effective reporting and visualizations.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tableau"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tableau": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p003",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "This chat bot serves entire product related questions. Giving overview of tool via QA platform and also give recommendation responses so that user question to build chain of relevant answer.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p004",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "India                               Developed and deployed auto preprocessing steps of machine learning mainly missing value",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p005",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "â¢ Developed various KPI's individually using complex SQL scripts in Calculation views.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p006",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "â¢ Worked on manipulating, cleaning & processing data using python.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "python"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p007",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "Core member of a team helped in developing automated review platform tool from scratch for assisting E discovery domain, this tool implements predictive coding and topic modelling by automating reviews, resulting in reduced labor costs and time spent during the lawyers review.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p008",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "Created customized tableau dashboards for effective reporting and visualizations.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tableau"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tableau": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p009",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "This chat bot serves entire product related questions. Giving overview of tool via QA platform and also give recommendation responses so that user question to build chain of relevant answer.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p010",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "India                               Developed and deployed auto preprocessing steps of machine learning mainly missing value",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p011",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "â¢ Developed various KPI's individually using complex SQL scripts in Calculation views.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p012",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "â¢ Worked on manipulating, cleaning & processing data using python.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "python"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p013",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "Core member of a team helped in developing automated review platform tool from scratch for assisting E discovery domain, this tool implements predictive coding and topic modelling by automating reviews, resulting in reduced labor costs and time spent during the lawyers review.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p014",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "Created customized tableau dashboards for effective reporting and visualizations.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tableau"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tableau": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p015",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "This chat bot serves entire product related questions. Giving overview of tool via QA platform and also give recommendation responses so that user question to build chain of relevant answer.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p016",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "India                               Developed and deployed auto preprocessing steps of machine learning mainly missing value",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p017",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "â¢ Developed various KPI's individually using complex SQL scripts in Calculation views.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p018",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "â¢ Worked on manipulating, cleaning & processing data using python.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "python"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p019",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "Core member of a team helped in developing automated review platform tool from scratch for assisting E discovery domain, this tool implements predictive coding and topic modelling by automating reviews, resulting in reduced labor costs and time spent during the lawyers review.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p020",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "Created customized tableau dashboards for effective reporting and visualizations.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tableau"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tableau": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p021",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "This chat bot serves entire product related questions. Giving overview of tool via QA platform and also give recommendation responses so that user question to build chain of relevant answer.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p022",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "India                               Developed and deployed auto preprocessing steps of machine learning mainly missing value",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p023",
+      "source": "kaggle_gist_real_resume",
+      "category": "Data Science",
+      "target_role": "Data Scientist / ML Engineer",
+      "resume_bullet": "â¢ Developed various KPI's individually using complex SQL scripts in Calculation views.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p024",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "Coded, implemented and integrated complex programs using technologies such as HTML5, CSS3, JavaScript, jQuery, bootstrap.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws",
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p025",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "www.shreekiaspack.co.in, www.3staragroproducts.com, www.luckystationery.co.in: - used technologies like HTML5, CSS3,",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p026",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "Coded, implemented and integrated complex programs using technologies such as HTML5, CSS3, JavaScript, jQuery, bootstrap.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws",
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p027",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "www.shreekiaspack.co.in, www.3staragroproducts.com, www.luckystationery.co.in: - used technologies like HTML5, CSS3,",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p028",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "Coded, implemented and integrated complex programs using technologies such as HTML5, CSS3, JavaScript, jQuery, bootstrap.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws",
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p029",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "www.shreekiaspack.co.in, www.3staragroproducts.com, www.luckystationery.co.in: - used technologies like HTML5, CSS3,",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p030",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "Coded, implemented and integrated complex programs using technologies such as HTML5, CSS3, JavaScript, jQuery, bootstrap.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws",
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p031",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "www.shreekiaspack.co.in, www.3staragroproducts.com, www.luckystationery.co.in: - used technologies like HTML5, CSS3,",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p032",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "Coded, implemented and integrated complex programs using technologies such as HTML5, CSS3, JavaScript, jQuery, bootstrap.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws",
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p033",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "www.shreekiaspack.co.in, www.3staragroproducts.com, www.luckystationery.co.in: - used technologies like HTML5, CSS3,",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p034",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "Coded, implemented and integrated complex programs using technologies such as HTML5, CSS3, JavaScript, jQuery, bootstrap.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws",
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p035",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "www.shreekiaspack.co.in, www.3staragroproducts.com, www.luckystationery.co.in: - used technologies like HTML5, CSS3,",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p036",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "Coded, implemented and integrated complex programs using technologies such as HTML5, CSS3, JavaScript, jQuery, bootstrap.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws",
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p037",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "www.shreekiaspack.co.in, www.3staragroproducts.com, www.luckystationery.co.in: - used technologies like HTML5, CSS3,",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p038",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "Coded, implemented and integrated complex programs using technologies such as HTML5, CSS3, JavaScript, jQuery, bootstrap.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws",
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p039",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "www.shreekiaspack.co.in, www.3staragroproducts.com, www.luckystationery.co.in: - used technologies like HTML5, CSS3,",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p040",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "Coded, implemented and integrated complex programs using technologies such as HTML5, CSS3, JavaScript, jQuery, bootstrap.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws",
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p041",
+      "source": "kaggle_gist_real_resume",
+      "category": "Web Designing",
+      "target_role": "Frontend / Full Stack Developer",
+      "resume_bullet": "www.shreekiaspack.co.in, www.3staragroproducts.com, www.luckystationery.co.in: - used technologies like HTML5, CSS3,",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning",
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p042",
+      "source": "kaggle_gist_real_resume",
+      "category": "Java Developer",
+      "target_role": "Java Backend Developer",
+      "resume_bullet": "â¢\tWorked in Migration from java 1.6 to java 1.8.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p043",
+      "source": "kaggle_gist_real_resume",
+      "category": "Java Developer",
+      "target_role": "Java Backend Developer",
+      "resume_bullet": "description - Worked as java developer. Developed 3 projects using java servlet jsp ajax and web technologies.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p044",
+      "source": "kaggle_gist_real_resume",
+      "category": "Java Developer",
+      "target_role": "Java Backend Developer",
+      "resume_bullet": "â¢\tWorked in Migration from java 1.6 to java 1.8.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p045",
+      "source": "kaggle_gist_real_resume",
+      "category": "Java Developer",
+      "target_role": "Java Backend Developer",
+      "resume_bullet": "description - Worked as java developer. Developed 3 projects using java servlet jsp ajax and web technologies.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p046",
+      "source": "kaggle_gist_real_resume",
+      "category": "Java Developer",
+      "target_role": "Java Backend Developer",
+      "resume_bullet": "â¢\tWorked in Migration from java 1.6 to java 1.8.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p047",
+      "source": "kaggle_gist_real_resume",
+      "category": "Java Developer",
+      "target_role": "Java Backend Developer",
+      "resume_bullet": "description - Worked as java developer. Developed 3 projects using java servlet jsp ajax and web technologies.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p048",
+      "source": "kaggle_gist_real_resume",
+      "category": "Java Developer",
+      "target_role": "Java Backend Developer",
+      "resume_bullet": "â¢\tWorked in Migration from java 1.6 to java 1.8.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p049",
+      "source": "kaggle_gist_real_resume",
+      "category": "Java Developer",
+      "target_role": "Java Backend Developer",
+      "resume_bullet": "description - Worked as java developer. Developed 3 projects using java servlet jsp ajax and web technologies.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p050",
+      "source": "kaggle_gist_real_resume",
+      "category": "Java Developer",
+      "target_role": "Java Backend Developer",
+      "resume_bullet": "â¢\tWorked in Migration from java 1.6 to java 1.8.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p051",
+      "source": "kaggle_gist_real_resume",
+      "category": "Java Developer",
+      "target_role": "Java Backend Developer",
+      "resume_bullet": "description - Worked as java developer. Developed 3 projects using java servlet jsp ajax and web technologies.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p052",
+      "source": "kaggle_gist_real_resume",
+      "category": "Java Developer",
+      "target_role": "Java Backend Developer",
+      "resume_bullet": "â¢\tWorked in Migration from java 1.6 to java 1.8.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p053",
+      "source": "kaggle_gist_real_resume",
+      "category": "Java Developer",
+      "target_role": "Java Backend Developer",
+      "resume_bullet": "description - Worked as java developer. Developed 3 projects using java servlet jsp ajax and web technologies.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java",
+        "javascript"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        },
+        "javascript": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p054",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Worked as a M3 Java developer and Stream serve developer of Movex/M3 ERP for 1",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p055",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Developed views and templates with Python and Django's view controller and templating language to created user-friendly website interface.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "python",
+        "django"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        },
+        "django": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p056",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Created this project using Django, Django REST API, MYSQL, PyMYSQL, Python, HTML5, CSS3.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "python",
+        "sql",
+        "machine learning",
+        "aws",
+        "django"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        },
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "django": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p057",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Created CRUD methods (get, post, put, delete) to make requests to the API server and tested Restful API",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p058",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Worked as a M3 Java developer and Stream serve developer of Movex/M3 ERP for 1",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p059",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Developed views and templates with Python and Django's view controller and templating language to created user-friendly website interface.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "python",
+        "django"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        },
+        "django": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p060",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Created this project using Django, Django REST API, MYSQL, PyMYSQL, Python, HTML5, CSS3.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "python",
+        "sql",
+        "machine learning",
+        "aws",
+        "django"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        },
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "django": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p061",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Created CRUD methods (get, post, put, delete) to make requests to the API server and tested Restful API",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p062",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Worked as a M3 Java developer and Stream serve developer of Movex/M3 ERP for 1",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p063",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Developed views and templates with Python and Django's view controller and templating language to created user-friendly website interface.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "python",
+        "django"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        },
+        "django": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p064",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Created this project using Django, Django REST API, MYSQL, PyMYSQL, Python, HTML5, CSS3.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "python",
+        "sql",
+        "machine learning",
+        "aws",
+        "django"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        },
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "django": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p065",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Created CRUD methods (get, post, put, delete) to make requests to the API server and tested Restful API",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p066",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Worked as a M3 Java developer and Stream serve developer of Movex/M3 ERP for 1",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p067",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Developed views and templates with Python and Django's view controller and templating language to created user-friendly website interface.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "python",
+        "django"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        },
+        "django": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p068",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Created this project using Django, Django REST API, MYSQL, PyMYSQL, Python, HTML5, CSS3.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "python",
+        "sql",
+        "machine learning",
+        "aws",
+        "django"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        },
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "django": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p069",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Created CRUD methods (get, post, put, delete) to make requests to the API server and tested Restful API",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p070",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Worked as a M3 Java developer and Stream serve developer of Movex/M3 ERP for 1",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p071",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Developed views and templates with Python and Django's view controller and templating language to created user-friendly website interface.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "python",
+        "django"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        },
+        "django": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p072",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Created this project using Django, Django REST API, MYSQL, PyMYSQL, Python, HTML5, CSS3.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "python",
+        "sql",
+        "machine learning",
+        "aws",
+        "django"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        },
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "django": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p073",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Created CRUD methods (get, post, put, delete) to make requests to the API server and tested Restful API",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p074",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Worked as a M3 Java developer and Stream serve developer of Movex/M3 ERP for 1",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p075",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Developed views and templates with Python and Django's view controller and templating language to created user-friendly website interface.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "python",
+        "django"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        },
+        "django": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p076",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Created this project using Django, Django REST API, MYSQL, PyMYSQL, Python, HTML5, CSS3.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "python",
+        "sql",
+        "machine learning",
+        "aws",
+        "django"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        },
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "django": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p077",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Created CRUD methods (get, post, put, delete) to make requests to the API server and tested Restful API",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p078",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Worked as a M3 Java developer and Stream serve developer of Movex/M3 ERP for 1",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p079",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Developed views and templates with Python and Django's view controller and templating language to created user-friendly website interface.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "python",
+        "django"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        },
+        "django": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p080",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Created this project using Django, Django REST API, MYSQL, PyMYSQL, Python, HTML5, CSS3.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "python",
+        "sql",
+        "machine learning",
+        "aws",
+        "django"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "python": {
+          "level": null,
+          "reasoning": ""
+        },
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        },
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        },
+        "django": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p081",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Created CRUD methods (get, post, put, delete) to make requests to the API server and tested Restful API",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p082",
+      "source": "kaggle_gist_real_resume",
+      "category": "Python Developer",
+      "target_role": "Python Backend Developer",
+      "resume_bullet": "â¢ Worked as a M3 Java developer and Stream serve developer of Movex/M3 ERP for 1",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p083",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p084",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p085",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p086",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p087",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p088",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p089",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p090",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p091",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p092",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p093",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p094",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p095",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p096",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p097",
+      "source": "kaggle_gist_real_resume",
+      "category": "DevOps Engineer",
+      "target_role": "DevOps / Platform Engineer",
+      "resume_bullet": "Here I manage Tibco Spotfire enterprise & Cloud Product support. Being the only Ops member in India I got a chance to recruit & build entire team of 15 members. I also worked on 4 different Projects / products simultaneously and added the hired members into these products.",
+      "job_description": "devops",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p098",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "POSTGRESQL - â¢ Worked on Redhat Linux OS Cluster with Postgresql for High Availability (HA) using Pacemaker.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql",
+        "linux"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "linux": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p099",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Worked with Storage team for Disaster Recovery DR setup built on SAN using EMC technology â¢ Configured LDAP authentication & GSSAPI Authentication from Windows to Linux for Postgresql.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql",
+        "linux"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "linux": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p100",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Worked with teams on application rollouts, application issues and SQL server migrations.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p101",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Performed SQL server patching activity â¢ Worked on daily reports like cluster failover, backup, AG/LS/Mirror report and server disk space report.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p102",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Performed MS SQL Server audits â¢ Worked with database mirroring, replication, log shipping and clustering.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p103",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Worked on AWS cloud services like EC2, S3, RDS, ELB, EBS, VPC, Route53, Auto, Cloud watch, Cloud Front, IAM for installing configuring and troubleshooting on various Amazon images for server migration from physical into cloud.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p104",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "Delivered upgrades of various applications time to time to keep it on supported platform",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p105",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "Exceeded scope of work by supporting & maintaining WebLogic platform - installation, patching, troubleshooting issues",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p106",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢   Worked with client databases installed on Oracle v10, v11, v12 on a Linux platform.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow",
+        "linux"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        },
+        "linux": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p107",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "Worked on Retail and Banking projects, to design a predictive business model using machine learning techniques in",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p108",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "POSTGRESQL - â¢ Worked on Redhat Linux OS Cluster with Postgresql for High Availability (HA) using Pacemaker.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql",
+        "linux"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "linux": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p109",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Worked with Storage team for Disaster Recovery DR setup built on SAN using EMC technology â¢ Configured LDAP authentication & GSSAPI Authentication from Windows to Linux for Postgresql.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql",
+        "linux"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "linux": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p110",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Worked with teams on application rollouts, application issues and SQL server migrations.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p111",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Performed SQL server patching activity â¢ Worked on daily reports like cluster failover, backup, AG/LS/Mirror report and server disk space report.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p112",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Performed MS SQL Server audits â¢ Worked with database mirroring, replication, log shipping and clustering.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p113",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Worked on AWS cloud services like EC2, S3, RDS, ELB, EBS, VPC, Route53, Auto, Cloud watch, Cloud Front, IAM for installing configuring and troubleshooting on various Amazon images for server migration from physical into cloud.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p114",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "Delivered upgrades of various applications time to time to keep it on supported platform",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p115",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "Exceeded scope of work by supporting & maintaining WebLogic platform - installation, patching, troubleshooting issues",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p116",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢   Worked with client databases installed on Oracle v10, v11, v12 on a Linux platform.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow",
+        "linux"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        },
+        "linux": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p117",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "Worked on Retail and Banking projects, to design a predictive business model using machine learning techniques in",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p118",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "POSTGRESQL - â¢ Worked on Redhat Linux OS Cluster with Postgresql for High Availability (HA) using Pacemaker.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql",
+        "linux"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "linux": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p119",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Worked with Storage team for Disaster Recovery DR setup built on SAN using EMC technology â¢ Configured LDAP authentication & GSSAPI Authentication from Windows to Linux for Postgresql.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql",
+        "linux"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "linux": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p120",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Worked with teams on application rollouts, application issues and SQL server migrations.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p121",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Performed SQL server patching activity â¢ Worked on daily reports like cluster failover, backup, AG/LS/Mirror report and server disk space report.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p122",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Performed MS SQL Server audits â¢ Worked with database mirroring, replication, log shipping and clustering.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p123",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢ Worked on AWS cloud services like EC2, S3, RDS, ELB, EBS, VPC, Route53, Auto, Cloud watch, Cloud Front, IAM for installing configuring and troubleshooting on various Amazon images for server migration from physical into cloud.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p124",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "Delivered upgrades of various applications time to time to keep it on supported platform",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p125",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "Exceeded scope of work by supporting & maintaining WebLogic platform - installation, patching, troubleshooting issues",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p126",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "â¢   Worked with client databases installed on Oracle v10, v11, v12 on a Linux platform.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "tensorflow",
+        "linux"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tensorflow": {
+          "level": null,
+          "reasoning": ""
+        },
+        "linux": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p127",
+      "source": "kaggle_gist_real_resume",
+      "category": "Database",
+      "target_role": "Database Engineer",
+      "resume_bullet": "Worked on Retail and Banking projects, to design a predictive business model using machine learning techniques in",
+      "job_description": "backend_se",
+      "target_skills": [
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p128",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢       Developed the Sqoop scripts in order to make the interaction between Pig and MySQL Database.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p129",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢   Developed Spark scripts by using Scala shell commands as per the requirement and worked with both",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "spark"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "spark": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p130",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢   Developed reports using TABLEAU and exported data to HDFS and hive using Sqoop.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tableau"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tableau": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p131",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "Responsibility 1. Developed proactive Health Check utility for Data Lake. The utility proactively checks the smooth functioning of all Hadoop components on the cluster and sends the result to email in HTML format. The utility is being used for daily Health Checks as well as after upgrades.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p132",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "4. Developed and automated various cluster health check, usage, capacity related reports using Unix shell scripting.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "linux"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "linux": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p133",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢ Implemented various data mining algorithms on Spark like K-means clustering, Random forest, NaÃ¯ve bayes etc.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "spark"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "spark": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p134",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢ Worked on Hadoop + Java programming",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p135",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢ Worked on Azure and AWS (EMR) services.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p136",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢       Developed the Sqoop scripts in order to make the interaction between Pig and MySQL Database.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p137",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢   Developed Spark scripts by using Scala shell commands as per the requirement and worked with both",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "spark"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "spark": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p138",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢   Developed reports using TABLEAU and exported data to HDFS and hive using Sqoop.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tableau"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tableau": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p139",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "Responsibility 1. Developed proactive Health Check utility for Data Lake. The utility proactively checks the smooth functioning of all Hadoop components on the cluster and sends the result to email in HTML format. The utility is being used for daily Health Checks as well as after upgrades.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p140",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "4. Developed and automated various cluster health check, usage, capacity related reports using Unix shell scripting.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "linux"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "linux": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p141",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢ Implemented various data mining algorithms on Spark like K-means clustering, Random forest, NaÃ¯ve bayes etc.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "spark"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "spark": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p142",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢ Worked on Hadoop + Java programming",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p143",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢ Worked on Azure and AWS (EMR) services.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p144",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢       Developed the Sqoop scripts in order to make the interaction between Pig and MySQL Database.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p145",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢   Developed Spark scripts by using Scala shell commands as per the requirement and worked with both",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "spark"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "spark": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p146",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢   Developed reports using TABLEAU and exported data to HDFS and hive using Sqoop.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tableau"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tableau": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p147",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "Responsibility 1. Developed proactive Health Check utility for Data Lake. The utility proactively checks the smooth functioning of all Hadoop components on the cluster and sends the result to email in HTML format. The utility is being used for daily Health Checks as well as after upgrades.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p148",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "4. Developed and automated various cluster health check, usage, capacity related reports using Unix shell scripting.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "linux"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "linux": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p149",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢ Implemented various data mining algorithms on Spark like K-means clustering, Random forest, NaÃ¯ve bayes etc.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "spark"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "spark": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p150",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢ Worked on Hadoop + Java programming",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p151",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢ Worked on Azure and AWS (EMR) services.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "aws"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "aws": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p152",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢       Developed the Sqoop scripts in order to make the interaction between Pig and MySQL Database.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p153",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢   Developed Spark scripts by using Scala shell commands as per the requirement and worked with both",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "spark"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "spark": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p154",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "â¢   Developed reports using TABLEAU and exported data to HDFS and hive using Sqoop.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "tableau"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "tableau": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p155",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "Responsibility 1. Developed proactive Health Check utility for Data Lake. The utility proactively checks the smooth functioning of all Hadoop components on the cluster and sends the result to email in HTML format. The utility is being used for daily Health Checks as well as after upgrades.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p156",
+      "source": "kaggle_gist_real_resume",
+      "category": "Hadoop",
+      "target_role": "Big Data Engineer",
+      "resume_bullet": "4. Developed and automated various cluster health check, usage, capacity related reports using Unix shell scripting.",
+      "job_description": "ml_engineer",
+      "target_skills": [
+        "linux"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "linux": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p157",
+      "source": "kaggle_gist_real_resume",
+      "category": "ETL Developer",
+      "target_role": "Data Engineer",
+      "resume_bullet": "â¢ Created and deployed physical objects including custom tables, custom views, stored procedures, and indexes to SQL server for Staging and Data-Warehouse environment. Involved in writing SQL Queries and used Joins to access data from MySQL.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p158",
+      "source": "kaggle_gist_real_resume",
+      "category": "ETL Developer",
+      "target_role": "Data Engineer",
+      "resume_bullet": "â¢ Created and deployed physical objects including custom tables, custom views, stored procedures, and indexes to SQL server for Staging and Data-Warehouse environment. Involved in writing SQL Queries and used Joins to access data from MySQL.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p159",
+      "source": "kaggle_gist_real_resume",
+      "category": "ETL Developer",
+      "target_role": "Data Engineer",
+      "resume_bullet": "â¢ Created and deployed physical objects including custom tables, custom views, stored procedures, and indexes to SQL server for Staging and Data-Warehouse environment. Involved in writing SQL Queries and used Joins to access data from MySQL.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p160",
+      "source": "kaggle_gist_real_resume",
+      "category": "ETL Developer",
+      "target_role": "Data Engineer",
+      "resume_bullet": "â¢ Created and deployed physical objects including custom tables, custom views, stored procedures, and indexes to SQL server for Staging and Data-Warehouse environment. Involved in writing SQL Queries and used Joins to access data from MySQL.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p161",
+      "source": "kaggle_gist_real_resume",
+      "category": "ETL Developer",
+      "target_role": "Data Engineer",
+      "resume_bullet": "â¢ Created and deployed physical objects including custom tables, custom views, stored procedures, and indexes to SQL server for Staging and Data-Warehouse environment. Involved in writing SQL Queries and used Joins to access data from MySQL.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p162",
+      "source": "kaggle_gist_real_resume",
+      "category": "ETL Developer",
+      "target_role": "Data Engineer",
+      "resume_bullet": "â¢ Created and deployed physical objects including custom tables, custom views, stored procedures, and indexes to SQL server for Staging and Data-Warehouse environment. Involved in writing SQL Queries and used Joins to access data from MySQL.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p163",
+      "source": "kaggle_gist_real_resume",
+      "category": "ETL Developer",
+      "target_role": "Data Engineer",
+      "resume_bullet": "â¢ Created and deployed physical objects including custom tables, custom views, stored procedures, and indexes to SQL server for Staging and Data-Warehouse environment. Involved in writing SQL Queries and used Joins to access data from MySQL.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p164",
+      "source": "kaggle_gist_real_resume",
+      "category": "ETL Developer",
+      "target_role": "Data Engineer",
+      "resume_bullet": "â¢ Created and deployed physical objects including custom tables, custom views, stored procedures, and indexes to SQL server for Staging and Data-Warehouse environment. Involved in writing SQL Queries and used Joins to access data from MySQL.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p165",
+      "source": "kaggle_gist_real_resume",
+      "category": "DotNet Developer",
+      "target_role": "Software Engineer",
+      "resume_bullet": "as well as sql for database and also bootstrap,css,html for designing.created reports using kindo and telerik controls",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql",
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p166",
+      "source": "kaggle_gist_real_resume",
+      "category": "DotNet Developer",
+      "target_role": "Software Engineer",
+      "resume_bullet": "description - Created web application using asp and c# and also used sql for database.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p167",
+      "source": "kaggle_gist_real_resume",
+      "category": "DotNet Developer",
+      "target_role": "Software Engineer",
+      "resume_bullet": "as well as sql for database and also bootstrap,css,html for designing.created reports using kindo and telerik controls",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql",
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p168",
+      "source": "kaggle_gist_real_resume",
+      "category": "DotNet Developer",
+      "target_role": "Software Engineer",
+      "resume_bullet": "description - Created web application using asp and c# and also used sql for database.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p169",
+      "source": "kaggle_gist_real_resume",
+      "category": "DotNet Developer",
+      "target_role": "Software Engineer",
+      "resume_bullet": "as well as sql for database and also bootstrap,css,html for designing.created reports using kindo and telerik controls",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql",
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p170",
+      "source": "kaggle_gist_real_resume",
+      "category": "DotNet Developer",
+      "target_role": "Software Engineer",
+      "resume_bullet": "description - Created web application using asp and c# and also used sql for database.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p171",
+      "source": "kaggle_gist_real_resume",
+      "category": "DotNet Developer",
+      "target_role": "Software Engineer",
+      "resume_bullet": "as well as sql for database and also bootstrap,css,html for designing.created reports using kindo and telerik controls",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql",
+        "machine learning"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        },
+        "machine learning": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p172",
+      "source": "kaggle_gist_real_resume",
+      "category": "DotNet Developer",
+      "target_role": "Software Engineer",
+      "resume_bullet": "description - Created web application using asp and c# and also used sql for database.",
+      "job_description": "backend_se",
+      "target_skills": [
+        "sql"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "sql": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p173",
+      "source": "kaggle_gist_real_resume",
+      "category": "Blockchain",
+      "target_role": "Blockchain Developer",
+      "resume_bullet": "deployed in java byte code and on ethereum as well and I have written API in java spring on that and then build front end and called all Api)",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p174",
+      "source": "kaggle_gist_real_resume",
+      "category": "Blockchain",
+      "target_role": "Blockchain Developer",
+      "resume_bullet": "deployed in java byte code and on ethereum as well and I have written API in java spring on that and then build front end and called all Api)",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p175",
+      "source": "kaggle_gist_real_resume",
+      "category": "Blockchain",
+      "target_role": "Blockchain Developer",
+      "resume_bullet": "deployed in java byte code and on ethereum as well and I have written API in java spring on that and then build front end and called all Api)",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p176",
+      "source": "kaggle_gist_real_resume",
+      "category": "Blockchain",
+      "target_role": "Blockchain Developer",
+      "resume_bullet": "deployed in java byte code and on ethereum as well and I have written API in java spring on that and then build front end and called all Api)",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p177",
+      "source": "kaggle_gist_real_resume",
+      "category": "Blockchain",
+      "target_role": "Blockchain Developer",
+      "resume_bullet": "deployed in java byte code and on ethereum as well and I have written API in java spring on that and then build front end and called all Api)",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p178",
+      "source": "kaggle_gist_real_resume",
+      "category": "Blockchain",
+      "target_role": "Blockchain Developer",
+      "resume_bullet": "deployed in java byte code and on ethereum as well and I have written API in java spring on that and then build front end and called all Api)",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p179",
+      "source": "kaggle_gist_real_resume",
+      "category": "Blockchain",
+      "target_role": "Blockchain Developer",
+      "resume_bullet": "deployed in java byte code and on ethereum as well and I have written API in java spring on that and then build front end and called all Api)",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    },
+    {
+      "pair_id": "real_p180",
+      "source": "kaggle_gist_real_resume",
+      "category": "Blockchain",
+      "target_role": "Blockchain Developer",
+      "resume_bullet": "deployed in java byte code and on ethereum as well and I have written API in java spring on that and then build front end and called all Api)",
+      "job_description": "backend_se",
+      "target_skills": [
+        "java"
+      ],
+      "notes": "Real resume bullet — apply ANNOTATION_GUIDE.md rules: check verb strength, section context, and tenure mentions.",
+      "labels": {
+        "java": {
+          "level": null,
+          "reasoning": ""
+        }
+      },
+      "_annotation_instructions": "Fill in 'level' (0-4) per ANNOTATION_GUIDE.md. Add brief 'reasoning'. Copy to gold_set.json when done."
+    }
+  ]
+}

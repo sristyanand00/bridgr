@@ -1,0 +1,198 @@
+{
+  "best_threshold": 0.6,
+  "best_f1": 0.0,
+  "sweep_results": [
+    {
+      "threshold": 0.6,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.61,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.62,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.63,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.64,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.65,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.66,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.67,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.68,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.6900000000000001,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.7000000000000001,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.7100000000000001,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.7200000000000001,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.7300000000000001,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.7400000000000001,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.7500000000000001,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.7600000000000001,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.7700000000000001,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.7800000000000001,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.7900000000000001,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.8000000000000002,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.8100000000000002,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.8200000000000002,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.8300000000000002,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.8400000000000002,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.8500000000000002,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.8600000000000002,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.8700000000000002,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.8800000000000002,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.8900000000000002,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.9000000000000002,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    },
+    {
+      "threshold": 0.9100000000000003,
+      "f1_mean": 0.0,
+      "f1_ci_lower": 0.0,
+      "f1_ci_upper": 0.0
+    }
+  ]
+}

@@ -1,20 +1,34 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword as firebaseSignIn, createUserWithEmailAndPassword as firebaseCreateUser, GoogleAuthProvider as FirebaseGoogleProvider, signInWithPopup as firebaseSignInWithPopup, signOut as firebaseSignOut } from "firebase/auth";
+import {
+  getAuth,
+  signInWithEmailAndPassword as firebaseSignIn,
+  createUserWithEmailAndPassword as firebaseCreateUser,
+  GoogleAuthProvider as FirebaseGoogleProvider,
+  signInWithPopup as firebaseSignInWithPopup,
+  signOut as firebaseSignOut,
+} from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 
-// Check if Firebase credentials are available
-const hasFirebaseConfig = () => {
-  return !!(process.env.REACT_APP_FIREBASE_API_KEY && 
-           process.env.REACT_APP_FIREBASE_AUTH_DOMAIN &&
-           process.env.REACT_APP_FIREBASE_PROJECT_ID);
-};
+// Check if the three required Firebase keys are present.
+const hasFirebaseConfig = () =>
+  !!(
+    process.env.REACT_APP_FIREBASE_API_KEY &&
+    process.env.REACT_APP_FIREBASE_AUTH_DOMAIN &&
+    process.env.REACT_APP_FIREBASE_PROJECT_ID
+  );
+
+// Mock auth is only allowed during local development when the developer has
+// explicitly opted in via REACT_APP_ALLOW_MOCK_AUTH=true.
+// NEVER set this in a deployed / production environment.
+const isMockAuthAllowed = () =>
+  process.env.NODE_ENV === "development" &&
+  process.env.REACT_APP_ALLOW_MOCK_AUTH === "true";
 
 let app = null;
 let firebaseAuth = null;
 let analytics = null;
 
 if (hasFirebaseConfig()) {
-  // Real Firebase configuration
   const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
     authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -22,7 +36,7 @@ if (hasFirebaseConfig()) {
     storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
     messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
     appId: process.env.REACT_APP_FIREBASE_APP_ID,
-    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
+    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
   };
 
   try {
@@ -33,36 +47,53 @@ if (hasFirebaseConfig()) {
   } catch (error) {
     console.error("❌ Firebase initialization failed:", error);
   }
+} else if (isMockAuthAllowed()) {
+  // DEV-only mock path — only reachable when NODE_ENV=development AND
+  // REACT_APP_ALLOW_MOCK_AUTH=true.  Safe to leave a visible console warning.
+  console.warn(
+    "⚠️  [DEV] Firebase not configured — using mock auth " +
+      "(REACT_APP_ALLOW_MOCK_AUTH=true). " +
+      "Do NOT use this in a deployed environment."
+  );
 } else {
-  console.log("⚠️ Firebase credentials not found, using mock implementation");
+  // Production (or any env without explicit opt-in): no silent fake user.
+  // Log a clear error so developers deploying to staging/production can see
+  // immediately what is missing and fix it before going live.
+  console.error(
+    "Firebase not configured — authentication is disabled. " +
+      "Set REACT_APP_FIREBASE_* env vars. " +
+      "See frontend/.env.example for the full list of required keys."
+  );
 }
 
-// Mock implementations for when Firebase is not configured
+// ── Mock implementations (DEV only) ──────────────────────────────────────────
+
 const createMockUser = (email = "mock@example.com") => ({
   email,
   uid: "mock-uid-123",
-  displayName: "Mock User"
+  displayName: "Mock User",
 });
 
-const mockSignInWithEmailAndPassword = async (email, password) => {
-  return { user: createMockUser(email) };
-};
+const mockSignInWithEmailAndPassword = async (email, _password) => ({
+  user: createMockUser(email),
+});
 
-const mockCreateUserWithEmailAndPassword = async (email, password) => {
-  return { user: createMockUser(email) };
-};
+const mockCreateUserWithEmailAndPassword = async (email, _password) => ({
+  user: createMockUser(email),
+});
 
-const mockSignInWithPopup = async (provider) => {
-  return { user: createMockUser("google-mock@example.com") };
-};
+const mockSignInWithPopup = async (_provider) => ({
+  user: createMockUser("google-mock@example.com"),
+});
 
+// onAuthStateChanged immediately signals "not signed in" (null) so that
+// UI state is at least consistent in mock mode.
 const mockAuth = {
   currentUser: null,
   onAuthStateChanged: (callback) => {
-    // Immediately call callback with null user (not signed in)
     setTimeout(() => callback(null), 0);
-    return () => {}; // Unsubscribe function
-  }
+    return () => {};
+  },
 };
 
 const mockGoogleAuthProvider = class GoogleAuthProvider {
@@ -71,17 +102,63 @@ const mockGoogleAuthProvider = class GoogleAuthProvider {
   }
 };
 
-const mockSignOut = async () => {
-  // Mock sign-out — just clears local state
-  return Promise.resolve();
+const mockSignOut = async () => Promise.resolve();
+
+// ── Null / no-op implementations (production with missing config) ─────────────
+// These are exported when Firebase is not configured AND mock auth is not
+// allowed.  They prevent runtime crashes in components that call auth functions
+// but surface a clear "not authenticated" state rather than a fake user.
+
+const nullAuth = {
+  currentUser: null,
+  onAuthStateChanged: (callback) => {
+    setTimeout(() => callback(null), 0);
+    return () => {};
+  },
 };
 
-// Export real Firebase if available, otherwise mock
-export const auth = firebaseAuth || mockAuth;
-export const signInWithEmailAndPassword = firebaseAuth ? firebaseSignIn : mockSignInWithEmailAndPassword;
-export const createUserWithEmailAndPassword = firebaseAuth ? firebaseCreateUser : mockCreateUserWithEmailAndPassword;
-export const GoogleAuthProvider = firebaseAuth ? FirebaseGoogleProvider : mockGoogleAuthProvider;
-export const signInWithPopup = firebaseAuth ? firebaseSignInWithPopup : mockSignInWithPopup;
-export const signOut = firebaseAuth ? firebaseSignOut : mockSignOut;
+const nullOp = async () => {
+  throw new Error(
+    "Authentication is not configured. Set REACT_APP_FIREBASE_* env vars."
+  );
+};
+
+const NullGoogleAuthProvider = class GoogleAuthProvider {
+  constructor() {
+    this.providerId = "google.com";
+  }
+};
+
+// ── Exports ───────────────────────────────────────────────────────────────────
+
+const useMock = !firebaseAuth && isMockAuthAllowed();
+
+export const auth = firebaseAuth ?? (useMock ? mockAuth : nullAuth);
+
+export const signInWithEmailAndPassword = firebaseAuth
+  ? firebaseSignIn
+  : useMock
+  ? mockSignInWithEmailAndPassword
+  : nullOp;
+
+export const createUserWithEmailAndPassword = firebaseAuth
+  ? firebaseCreateUser
+  : useMock
+  ? mockCreateUserWithEmailAndPassword
+  : nullOp;
+
+export const GoogleAuthProvider = firebaseAuth
+  ? FirebaseGoogleProvider
+  : useMock
+  ? mockGoogleAuthProvider
+  : NullGoogleAuthProvider;
+
+export const signInWithPopup = firebaseAuth
+  ? firebaseSignInWithPopup
+  : useMock
+  ? mockSignInWithPopup
+  : nullOp;
+
+export const signOut = firebaseAuth ? firebaseSignOut : useMock ? mockSignOut : nullOp;
 
 export default app;

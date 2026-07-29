@@ -5,9 +5,21 @@ import logging
 import os
 from typing import Any, Dict, List, Optional
 
-import google.generativeai as genai
 from dotenv import load_dotenv
-from groq import Groq
+
+# Both providers are optional extras.  Importing them unconditionally turned a
+# missing optional dependency into an ImportError at call time — which surfaced
+# as a 500 on the readiness endpoint rather than as a degraded-but-working
+# response.  Absent providers now simply disable LLM enrichment.
+try:
+    import google.generativeai as genai
+except ImportError:  # pragma: no cover - depends on optional extra
+    genai = None
+
+try:
+    from groq import Groq
+except ImportError:  # pragma: no cover - depends on optional extra
+    Groq = None
 
 load_dotenv()
 
@@ -16,8 +28,13 @@ logger = logging.getLogger(__name__)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-if GEMINI_API_KEY:
+if GEMINI_API_KEY and genai is not None:
     genai.configure(api_key=GEMINI_API_KEY)
+elif GEMINI_API_KEY:
+    logger.warning(
+        "GEMINI_API_KEY is set but google-generativeai is not installed — "
+        "Gemini enrichment disabled."
+    )
 
 _GEMINI_MODEL = "gemini-2.0-flash"
 _GROQ_MODEL = "llama-3.1-8b-instant"
@@ -74,11 +91,16 @@ class LLMService:
 
     def __init__(self):
         self.groq_client = None
-        if GROQ_API_KEY:
+        if GROQ_API_KEY and Groq is not None:
             self.groq_client = Groq(api_key=GROQ_API_KEY)
+        elif GROQ_API_KEY:
+            logger.warning(
+                "GROQ_API_KEY is set but the groq package is not installed — "
+                "Groq fallback disabled."
+            )
 
     def _try_gemini(self, prompt: str, method_name: str) -> Optional[Dict[str, Any]]:
-        if not GEMINI_API_KEY:
+        if not GEMINI_API_KEY or genai is None:
             return None
         try:
             logger.info("Sending Gemini request for %s", method_name)

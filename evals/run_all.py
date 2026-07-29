@@ -109,28 +109,33 @@ def full_cascade(bullet: str, skill: str) -> int:
     # Take maximum signal
     return max(regex_level, bm25_level, embedding_level)
 
-def bootstrap_ci(y_true: List, y_pred: List, n_iterations: int = 10000) -> Tuple[float, float, float]:
+def bootstrap_ci(y_true: List, y_pred: List, n_iterations: int = 1000) -> Tuple[float, float, float]:
     """Calculate bootstrapped confidence intervals for F1 score."""
     scores = []
     n = len(y_true)
-    
+
     for _ in range(n_iterations):
         # Resample indices
         indices = np.random.choice(n, n, replace=True)
         y_true_boot = [y_true[i] for i in indices]
         y_pred_boot = [y_pred[i] for i in indices]
-        
-        # Calculate F1 score
-        if len(set(y_true_boot)) > 1 and len(set(y_pred_boot)) > 1:
-            _, _, f1, _ = precision_recall_fscore_support(y_true_boot, y_pred_boot, average='weighted', zero_division=0)
+
+        # Calculate F1 score — skip if only one class in this resample
+        if len(set(y_true_boot)) > 1:
+            _, _, f1, _ = precision_recall_fscore_support(
+                y_true_boot, y_pred_boot, average='weighted', zero_division=0
+            )
             scores.append(f1)
-    
+
+    if not scores:
+        return 0.0, 0.0, 0.0
+
     # Calculate confidence interval
     scores = sorted(scores)
     ci_lower = np.percentile(scores, 2.5)
     ci_upper = np.percentile(scores, 97.5)
     mean_f1 = np.mean(scores)
-    
+
     return mean_f1, ci_lower, ci_upper
 
 def quadratic_weighted_kappa(y_true: List[int], y_pred: List[int]) -> float:
@@ -221,20 +226,54 @@ def print_confusion_matrix(y_true: List[int], y_pred: List[int], approach_name: 
             print(f"{count:6}", end="")
         print()
 
+UNLABELED_CORPUS_FILE = Path(__file__).parent / "corpus" / "unlabeled_pairs.json"
+
+
+def count_unlabeled() -> int:
+    """Return number of pairs in the unlabeled corpus (for informational display)."""
+    if not UNLABELED_CORPUS_FILE.exists():
+        return 0
+    try:
+        with open(UNLABELED_CORPUS_FILE) as f:
+            data = json.load(f)
+        return len(data.get("pairs", []))
+    except Exception:
+        return 0
+
+
 def main():
     # Check if gold set exists
     if not GOLD_SET_FILE.exists():
         print(f"Gold set not found at {GOLD_SET_FILE}")
         print("Please run label.py first to create labeled examples.")
+        n_unlabeled = count_unlabeled()
+        if n_unlabeled:
+            print(f"\n{n_unlabeled} unlabeled pairs are waiting in evals/corpus/unlabeled_pairs.json")
+            print("Open that file and run: python evals/label.py --resume-file <file>")
+            print("See evals/ANNOTATION_GUIDE.md for labeling instructions.")
         return
-    
+
     # Load gold standard
     gold_examples = load_gold_set()
-    
+
     if not gold_examples:
-        print("No labeled examples found in gold set.")
+        n_unlabeled = count_unlabeled()
+        print("=" * 60)
+        print("NO LABELED EXAMPLES YET — eval harness ready but empty.")
+        print("=" * 60)
+        print()
+        if n_unlabeled:
+            print(f"  {n_unlabeled} unlabeled pairs available in evals/corpus/unlabeled_pairs.json")
+        print("  Next steps:")
+        print("  1. Run: python evals/label.py")
+        print("     (or open ANNOTATION_GUIDE.md and label evals/corpus/unlabeled_pairs.json manually)")
+        print("  2. Label at least 100 (resume, skill) pairs")
+        print("  3. Re-run: python evals/run_all.py")
+        print()
+        print("  The harness is working correctly. This is the expected state before")
+        print("  any manual labeling has been done.")
         return
-    
+
     print(f"Evaluating against {len(gold_examples)} labeled examples...")
     
     total_skills = sum(len(ex["skills"]) for ex in gold_examples)
@@ -283,8 +322,8 @@ def main():
     json_results = []
     for result in results:
         json_result = result.copy()
-        json_result['y_true'] = json_result['y_true']  # Already serializable
-        json_result['y_pred'] = json_result['y_pred']  # Already serializable  
+        # f1_ci is a tuple — convert to list for JSON serialization
+        json_result['f1_ci'] = list(json_result['f1_ci'])
         json_results.append(json_result)
     
     with open(results_file, 'w') as f:
