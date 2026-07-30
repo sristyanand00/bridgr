@@ -67,27 +67,27 @@ degrades rather than dies.
    which is all a demo needs. It resets on restart; nothing in the demo path
    depends on it.
 
-4. Push the code to the Space. From the repo root:
+4. Create a write token: **your avatar** → **Access Tokens** → **New token**,
+   type **Write**. Copy it — you'll paste it as the password on push.
+
+5. Push the code to the Space. From the repo root:
 
    ```bash
    git remote add hf https://huggingface.co/spaces/<your-username>/bridgr-api
-   git push hf main
+   git push --force hf main
    ```
 
-   Use a **write** access token as the password (Settings → Access Tokens).
+   Username is your HF username; password is the write token, not your account
+   password.
 
-5. The Space needs Docker config in its `README.md` frontmatter. Easiest route:
-   edit `README.md` in the Space's web editor and put this at the very top:
+   `--force` is needed and safe: creating a Space seeds it with its own initial
+   commit, which your history doesn't share, so a normal push is rejected. The
+   Space repo holds nothing you care about.
 
-   ```yaml
-   ---
-   title: Bridgr API
-   sdk: docker
-   app_port: 7860
-   ---
-   ```
-
-   This must match the `PORT` variable from step 3.
+   The Docker config HF needs already lives in this repo's `README.md`
+   frontmatter (`sdk: docker`, `app_port: 7860`) — that's why the push works
+   without editing anything in the web UI. If you ever change `app_port` there,
+   change the `PORT` variable in step 3 to match.
 
 **The first build takes 8–12 minutes** and produces a ~3GB image — it installs
 torch, spaCy, and bakes in the `all-MiniLM-L6-v2` weights. Watch the **Logs**

@@ -1,3 +1,13 @@
+---
+title: Bridgr API
+emoji: 🌉
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Bridgr
 
 Role-readiness scoring system. Upload your resume and real job postings — get three honest scores (Screen, Interview, Job) where every point traces to a specific requirement and a cited line of your resume.
