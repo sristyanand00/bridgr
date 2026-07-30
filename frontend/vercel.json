@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "CI=false react-scripts build",
+  "outputDirectory": "build",
+  "framework": "create-react-app",
+  "rewrites": [
+    { "source": "/((?!static/|.*\\..*).*)", "destination": "/index.html" }
+  ]
+}

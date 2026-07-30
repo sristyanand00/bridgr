@@ -1,0 +1,42 @@
+# The backend image never needs the frontend, and node_modules/build are large
+# enough to dominate the build context upload on every deploy.
+frontend/
+
+# Python bytecode and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtualenvs
+venv/
+.venv/
+
+# Secrets and local env files — must never land in a published image layer
+.env
+.env.*
+!.env.example
+backend/firebase-service-account.json
+*-service-account.json
+
+# Local SQLite databases (the container creates its own on startup)
+*.db
+*.sqlite
+*.sqlite3
+
+# VCS and editor metadata
+.git/
+.github/
+.vscode/
+.kiro/
+.agents/
+
+# Docs — not needed at runtime
+*.md
+!backend/data/sample/*.md
+
+# Research / eval assets that aren't part of the served API
+ml_research/
+evals/
+scripts/
