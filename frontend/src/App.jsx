@@ -233,11 +233,18 @@ const App = () => {
               bridgr
             </span>
           </div>
+          {/* Every one of these used to open the signup screen, including
+              Features and Pricing. The primary actions now drop straight into
+              the product; only "Sign in" leads to the auth screen. */}
           <div style={{ display: "flex", gap: 8 }}>
-            <button className="btn bgl bsm" onClick={() => setScreen("auth")}>Features</button>
-            <button className="btn bgl bsm" onClick={() => setScreen("auth")}>Pricing</button>
+            <button
+              className="btn bgl bsm"
+              onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}
+            >
+              Features
+            </button>
             <button className="btn bgl bsm" onClick={() => setScreen("auth")}>Sign in</button>
-            <button className="btn bg bsm" onClick={() => setScreen("auth")}>Start Free →</button>
+            <button className="btn bg bsm" onClick={() => setScreen("quiz")}>Start Free →</button>
           </div>
         </div>
 
@@ -257,7 +264,7 @@ const App = () => {
         </p>
 
         <div className="afu d3" style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-          <button className="btn bg" style={{ fontSize: 15, padding: "14px 32px" }} onClick={() => setScreen("auth")}>
+          <button className="btn bg" style={{ fontSize: 15, padding: "14px 32px" }} onClick={() => setScreen("quiz")}>
             <span>Analyze My Resume — Free</span>
             <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
               <line x1="5" y1="12" x2="19" y2="12" />

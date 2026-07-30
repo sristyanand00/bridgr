@@ -35,7 +35,8 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <div style={{
+    // id is the scroll target for the landing page's "Features" nav button.
+    <div id="features" style={{
       padding: "120px 24px",
       maxWidth: "1200px",
       margin: "0 auto",
