@@ -30,6 +30,13 @@ COPY backend/ .
 # starts in "sample" mode on a clean clone without any host volume mount.
 RUN mkdir -p data/sample
 
+# Make the working directory group-writable.  Hugging Face Spaces (and any host
+# that runs the image as an arbitrary UID) would otherwise fail at startup: the
+# SQLAlchemy fallback creates ./bridgr.db in this directory, and root-owned 0755
+# is not writable by a non-root user.  Uploaded PDFs already go to /tmp via
+# tempfile, so this is the only runtime write path that needs it.
+RUN chmod -R a+rwX /app/backend
+
 EXPOSE 8000
 
 # Shell form so $PORT expands at runtime.  Railway, Render, Fly and HF Spaces
