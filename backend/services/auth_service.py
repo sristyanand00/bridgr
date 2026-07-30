@@ -1,58 +1,86 @@
 import logging
 import os
 
-import firebase_admin
 from fastapi import HTTPException, Request, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from firebase_admin import auth, credentials
+
+# firebase-admin pulls in google-cloud-firestore and grpcio — well over 100MB
+# of dependencies that a deployment with no auth configured never executes.
+# Treat it as an optional extra: absent, the auth endpoints return 503 exactly
+# as they already do when credentials are missing, and the anonymous
+# /api/readiness path (the whole demo flow) is unaffected.
+try:
+    import firebase_admin
+    from firebase_admin import auth, credentials
+    _firebase_installed = True
+except ImportError:
+    firebase_admin = None
+    auth = None
+    credentials = None
+    _firebase_installed = False
 
 logger = logging.getLogger(__name__)
 
+
 # ── Firebase Admin SDK init ────────────────────────────────────────────────────
-_firebase_ready = False
+def _init_firebase() -> bool:
+    """Initialise the Admin SDK from whichever credential source is present.
 
-try:
-    firebase_admin.get_app()
-    _firebase_ready = True
-except ValueError:
+    Returns True if auth is usable.  Never raises — a deployment without
+    credentials is a supported configuration (the demo flow is anonymous).
+    """
+    if not _firebase_installed:
+        logger.warning(
+            "firebase-admin is not installed — authentication is disabled. "
+            "Install it to enable the /api/user endpoints."
+        )
+        return False
+
+    try:
+        firebase_admin.get_app()
+        return True
+    except ValueError:
+        pass  # No app yet — fall through and create one.
+
     cred_path = os.getenv("FIREBASE_CREDENTIALS_PATH")
-
     if cred_path and os.path.exists(cred_path):
         try:
-            cred = credentials.Certificate(cred_path)
-            firebase_admin.initialize_app(cred)
-            _firebase_ready = True
+            firebase_admin.initialize_app(credentials.Certificate(cred_path))
             logger.info("Firebase Admin SDK initialized from credentials file.")
+            return True
         except Exception as e:
             logger.warning("Firebase init failed from file: %s", e)
-    else:
-        project_id = os.getenv("FIREBASE_PROJECT_ID")
-        private_key = os.getenv("FIREBASE_PRIVATE_KEY", "").replace("\\n", "\n")
-        client_email = os.getenv("FIREBASE_CLIENT_EMAIL")
+            return False
 
-        if project_id and private_key and client_email:
-            try:
-                cred = credentials.Certificate(
-                    {
-                        "type": "service_account",
-                        "project_id": project_id,
-                        "private_key": private_key,
-                        "client_email": client_email,
-                        "token_uri": "https://oauth2.googleapis.com/token",
-                    }
-                )
-                firebase_admin.initialize_app(cred)
-                _firebase_ready = True
-                logger.info("Firebase Admin SDK initialized from env vars.")
-            except Exception as e:
-                logger.warning("Firebase init failed from env vars: %s", e)
-        else:
-            logger.warning(
-                "Firebase credentials not configured. "
-                "Set FIREBASE_CREDENTIALS_PATH or "
-                "FIREBASE_PROJECT_ID + FIREBASE_PRIVATE_KEY + FIREBASE_CLIENT_EMAIL. "
-                "Authentication endpoints will return 503."
-            )
+    project_id = os.getenv("FIREBASE_PROJECT_ID")
+    private_key = os.getenv("FIREBASE_PRIVATE_KEY", "").replace("\\n", "\n")
+    client_email = os.getenv("FIREBASE_CLIENT_EMAIL")
+
+    if project_id and private_key and client_email:
+        try:
+            firebase_admin.initialize_app(credentials.Certificate({
+                "type": "service_account",
+                "project_id": project_id,
+                "private_key": private_key,
+                "client_email": client_email,
+                "token_uri": "https://oauth2.googleapis.com/token",
+            }))
+            logger.info("Firebase Admin SDK initialized from env vars.")
+            return True
+        except Exception as e:
+            logger.warning("Firebase init failed from env vars: %s", e)
+            return False
+
+    logger.warning(
+        "Firebase credentials not configured. "
+        "Set FIREBASE_CREDENTIALS_PATH or "
+        "FIREBASE_PROJECT_ID + FIREBASE_PRIVATE_KEY + FIREBASE_CLIENT_EMAIL. "
+        "Authentication endpoints will return 503."
+    )
+    return False
+
+
+_firebase_ready = _init_firebase()
 
 security = HTTPBearer()
 

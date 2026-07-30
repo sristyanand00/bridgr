@@ -1,39 +1,36 @@
+# Backend only. The frontend is on Vercel (free, always-on, no cold start), so
+# hosting it here would just burn a second free service for a worse result.
+#
+# No database block: without DATABASE_URL the app falls back to local SQLite,
+# which is all the demo path needs. Render's free disk is ephemeral, so saved
+# history resets on restart — nothing in the anonymous /api/readiness flow
+# depends on it.
+#
+# Uses the native Python runtime rather than the Dockerfile: no image to build
+# or push, and it stays well clear of the 512MB ceiling that the full torch
+# image cannot fit under. The Dockerfile remains for local docker-compose and
+# for hosts with real memory.
+
 services:
-  # Backend service
   - type: web
-    name: bridgr-backend
+    name: bridgr-api
     runtime: python
+    plan: free
     rootDir: backend
-    buildCommand: pip install -r requirements.txt && python -m spacy download en_core_web_sm
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r requirements-render.txt && python -m spacy download en_core_web_sm
+    # Single worker — each additional worker is a full copy of spaCy and the
+    # skill taxonomy, which 512MB has no room for.
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
-      - key: ALLOWED_ORIGINS
-        value: "https://bridgr-frontend.onrender.com,http://localhost:3000,http://localhost:5173"
-      - key: ALLOWED_ORIGIN_REGEX
-        value: "https://.*\\.(vercel|netlify|onrender)\\.app"
       - key: DEBUG
         value: "false"
-      - key: ENVIRONMENT  
+      - key: ENVIRONMENT
         value: "production"
-        
-  # Frontend service
-  - type: web
-    name: bridgr-frontend
-    runtime: node
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    startCommand: npx serve -s build -p $PORT
-    envVars:
-      - key: REACT_APP_API_URL
-        value: "https://bridgr-backend.onrender.com"
-
-# Database
-databases:
-  - name: bridgr-db
-    databaseName: bridgr
-    user: bridgr_user
-    
-# Note: Set DATABASE_URL manually in Render dashboard to point to the created database
-# Format: postgresql://bridgr_user:password@host:port/bridgr
+      # Prompted for in the Render dashboard rather than committed here.
+      - key: GEMINI_API_KEY
+        sync: false
+      # ALLOWED_ORIGIN_REGEX is left at its default, which already matches any
+      # *.vercel.app origin including preview deploys — see core/config.py.

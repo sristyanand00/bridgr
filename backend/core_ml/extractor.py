@@ -38,25 +38,43 @@ class SkillExtractor:
         # are absent, but they will no longer abort the whole collection pass.
         import spacy as _spacy
         from spacy.matcher import PhraseMatcher as _PhraseMatcher
-        from sentence_transformers import SentenceTransformer as _SentenceTransformer
+
+        # sentence-transformers pulls in torch, together ~400MB of resident
+        # memory — more than a 512MB free-tier container has to spare.  Treat it
+        # as an optional extra so the service can run without it.
+        #
+        # This import was previously unconditional, so a missing package raised
+        # ImportError here and the embed_model=None fallback below was
+        # unreachable: the whole extractor failed to construct.
+        try:
+            from sentence_transformers import SentenceTransformer as _SentenceTransformer
+        except ImportError:
+            _SentenceTransformer = None
 
         self.skill_list = [s for s in skill_list if s.lower() not in STOP_SKILLS]
         self.threshold  = semantic_threshold
-        self._has_fallback = True   # always available — MiniLM is already loaded
+        self._has_fallback = True   # PhraseMatcher + fuzzy tiers need no model
 
         if verbose:
             logger.info("Loading NLP models...")
         self.nlp = _spacy.load("en_core_web_sm") if _spacy.util.is_package("en_core_web_sm") else _spacy.blank("en")
 
-        try:
-            self.embed_model = _SentenceTransformer("all-MiniLM-L6-v2")
-            if verbose:
-                logger.info("Embedding model loaded successfully")
-        except Exception as e:
-            logger.info("Embedding model failed: %s", e)
+        if _SentenceTransformer is None:
             self.embed_model = None
-            if verbose:
-                logger.info("Using basic mode without embeddings")
+            logger.info(
+                "sentence-transformers not installed — semantic tier disabled, "
+                "extraction falls back to PhraseMatcher + fuzzy tiers."
+            )
+        else:
+            try:
+                self.embed_model = _SentenceTransformer("all-MiniLM-L6-v2")
+                if verbose:
+                    logger.info("Embedding model loaded successfully")
+            except Exception as e:
+                logger.info("Embedding model failed: %s", e)
+                self.embed_model = None
+                if verbose:
+                    logger.info("Using basic mode without embeddings")
 
         self._matcher = _PhraseMatcher(self.nlp.vocab, attr="LOWER")
         patterns = list(self.nlp.pipe(self.skill_list))

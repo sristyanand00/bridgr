@@ -4,12 +4,24 @@ from __future__ import annotations
 import logging
 import hashlib
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 from typing import List, Tuple
 
 from .schemas import TransferableSkill
 
 logger = logging.getLogger(__name__)
+
+
+def _cosine_sim(a: np.ndarray, b: np.ndarray) -> float:
+    """Cosine similarity between two 1-D vectors.
+
+    Replaces sklearn.metrics.pairwise.cosine_similarity, which was the only
+    thing this module used scikit-learn for — a ~50MB dependency for a two-line
+    dot product that matters on a 512MB container.
+    """
+    denom = float(np.linalg.norm(a) * np.linalg.norm(b))
+    if denom == 0.0:
+        return 0.0
+    return float(np.dot(a, b) / denom)
 
 try:
     from cachetools import LRUCache as _LRUCache
@@ -60,16 +72,25 @@ class MatchingEngine:
         denominator      = len(job_tech) * 3.0 + len(job_soft) * 1.0
         weighted_jaccard = numerator / denominator if denominator > 0 else 0.0
 
-        # Handle case when embed_model is None
+        # The weights must renormalise when the semantic term is unavailable.
+        # Previously semantic_sim was pinned to 0.0 while the ceiling stayed at
+        # 1.0, which capped every score at 40 — a resume matching every single
+        # requirement reported 40/100.  Dropping the semantic term from both the
+        # numerator and the ceiling makes the score mean the same thing in both
+        # modes: percentage of achievable match.
+        SEMANTIC_WEIGHT = 0.60
+        JACCARD_WEIGHT  = 0.40
+
         if self.embed_model is not None:
             user_vec     = self._embed_skill_set(list(user_set))
             job_vec      = self._embed_skill_set(list(job_all))
-            semantic_sim = max(0.0, float(cosine_similarity([user_vec], [job_vec])[0][0]))
+            semantic_sim = max(0.0, _cosine_sim(user_vec, job_vec))
+            raw          = SEMANTIC_WEIGHT * semantic_sim + JACCARD_WEIGHT * weighted_jaccard
+            ceiling      = SEMANTIC_WEIGHT + JACCARD_WEIGHT
         else:
-            semantic_sim = 0.0  # No semantic similarity without embeddings
+            raw          = JACCARD_WEIGHT * weighted_jaccard
+            ceiling      = JACCARD_WEIGHT
 
-        raw      = 0.60 * semantic_sim + 0.40 * weighted_jaccard
-        ceiling  = 0.60 * 1.0 + 0.40 * 1.0
         scaled   = min(100, int((raw / ceiling) * 100))
 
         coverage   = min(len(user_set), len(job_all)) / max(len(job_all), 1)
