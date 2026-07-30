@@ -3,6 +3,26 @@
 A public link you can send to companies. Free, no credit card, no expiry.
 Backend on Render, frontend on Vercel.
 
+## Live
+
+| | URL |
+|---|---|
+| **Share this one** | https://bridgr-satyam-projects.vercel.app |
+| Backend API | https://bridgr-api-j9ca.onrender.com |
+
+Share the alias above, not a `bridgr-<hash>-satyam-projects.vercel.app` URL.
+The alias always points at the current production deployment; the hashed ones
+are frozen to a single build and will still serve an old bundle after a
+redeploy.
+
+Two settings that are easy to lose and break the demo silently:
+
+- **Deployment Protection must stay Disabled** (Vercel → Settings → Deployment
+  Protection). It defaults to on for new projects and puts a Vercel login wall
+  in front of the site — visitors get an SSO redirect instead of the app.
+- **`REACT_APP_API_URL` changes need a redeploy**, not just a save. CRA
+  compiles it into the bundle at build time.
+
 ## Why this combination
 
 Free hosting for a Python service got thin in 2026. Railway and Fly are
