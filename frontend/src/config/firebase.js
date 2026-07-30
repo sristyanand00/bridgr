@@ -161,4 +161,10 @@ export const signInWithPopup = firebaseAuth
 
 export const signOut = firebaseAuth ? firebaseSignOut : useMock ? mockSignOut : nullOp;
 
+// True when sign-in can actually succeed.  The UI needs this to avoid offering
+// a form whose every button throws: without Firebase keys the exported auth
+// functions are nullOp, so a deployment with no auth configured must route
+// people to guest access instead of presenting a dead signup screen.
+export const isAuthConfigured = Boolean(firebaseAuth) || useMock;
+
 export default app;

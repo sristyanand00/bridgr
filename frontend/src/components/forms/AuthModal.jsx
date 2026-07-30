@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Button, Icon, Input } from '../ui';
-import { 
-  auth, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  GoogleAuthProvider, 
-  signInWithPopup 
+import {
+  auth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+  isAuthConfigured
 } from '../../config/firebase';
 
 const AuthModal = ({ mode = "save", onAuth, onSkip, onBack }) => {
@@ -14,7 +15,14 @@ const AuthModal = ({ mode = "save", onAuth, onSkip, onBack }) => {
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(mode === "required");
-  const [error, setError] = useState("");
+  // When accounts are unavailable, say so in the visitor's terms up front rather
+  // than letting them fill in a form and hit a raw "Set REACT_APP_FIREBASE_*
+  // env vars" message meant for whoever deployed it.
+  const [error, setError] = useState(
+    isAuthConfigured
+      ? ""
+      : "Accounts aren't enabled on this demo — continue as a guest to run your analysis."
+  );
 
   const handleEmailAuth = async () => {
     if (!email.trim() || !password.trim() || (isSignUp && !name.trim())) {
@@ -344,25 +352,35 @@ const AuthModal = ({ mode = "save", onAuth, onSkip, onBack }) => {
           </button>
         </div>
 
-        {mode === "save" && onSkip && (
-          <button 
-            onClick={onSkip} 
-            style={{ 
-              width: "100%", 
-              marginTop: 14, 
-              background: "none", 
-              border: "none", 
-              color: "var(--t3)", 
-              fontSize: 13, 
-              cursor: "pointer", 
-              padding: "8px", 
+        {/* Previously gated on mode === "save", which left mode="required" with
+            no way out — the screen a first-time visitor lands on. With auth
+            unconfigured that made the whole app unreachable. Always offer the
+            bypass, and promote it to the primary action when signing in cannot
+            work at all. */}
+        {onSkip && (
+          <button
+            onClick={onSkip}
+            style={{
+              width: "100%",
+              marginTop: 14,
+              background: isAuthConfigured ? "none" : "rgba(139,92,246,.12)",
+              border: isAuthConfigured ? "none" : "1px solid rgba(139,92,246,.35)",
+              borderRadius: isAuthConfigured ? 0 : "var(--rm)",
+              color: isAuthConfigured ? "var(--t3)" : "var(--t1)",
+              fontSize: isAuthConfigured ? 13 : 14,
+              cursor: "pointer",
+              padding: isAuthConfigured ? "8px" : "12px",
               fontFamily: "'Geist',sans-serif",
               transition: "color 0.2s"
             }}
-            onMouseEnter={e => e.currentTarget.style.color = "var(--t2)"}
-            onMouseLeave={e => e.currentTarget.style.color = "var(--t3)"}
+            onMouseEnter={e => e.currentTarget.style.color = isAuthConfigured ? "var(--t2)" : "var(--t1)"}
+            onMouseLeave={e => e.currentTarget.style.color = isAuthConfigured ? "var(--t3)" : "var(--t1)"}
           >
-            View results without saving →
+            {!isAuthConfigured
+              ? "Continue as guest →"
+              : mode === "save"
+              ? "View results without saving →"
+              : "Continue without an account →"}
           </button>
         )}
 
